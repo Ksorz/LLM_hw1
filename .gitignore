@@ -1,0 +1,4 @@
+.vscode/
+.cache/
+wandb/
+output_dir/

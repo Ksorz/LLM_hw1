@@ -73,14 +73,14 @@ SWEEP_CONFIG = {
 
 
 BEST_HP = {
-    'per_device_train_batch_size': 10,
-    'gradient_accumulation_steps': 8,
+    'per_device_train_batch_size':16,
+    'gradient_accumulation_steps': 4,
     'optim': 'adamw_torch',
     'torch_compile': True,
 }
 
-LR_MIN = 8e-5
-LR_MAX = 8e-4
+LR_MIN = 7e-5
+LR_MAX = 7e-4
 
 
 class TimeoutCallback(TrainerCallback):
@@ -345,7 +345,7 @@ def train_model():
         f"bs{cfg['per_device_train_batch_size']}"
         f"_ga{cfg['gradient_accumulation_steps']}"
         f"_lr{cfg['learning_rate']}"
-        f"_adamw_customSched_v2.3"
+        f"_adamw_customSched_v2.4"
     )
     wandb.run.name = run_name
     wandb.run.save()

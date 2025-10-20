@@ -73,15 +73,14 @@ SWEEP_CONFIG = {
 
 
 BEST_HP = {
-    'per_device_train_batch_size': 6,
-    'gradient_accumulation_steps': 6,
-    'learning_rate': 5e-4,
-    'optim': 'adamw_torch',   # заменим
-    'torch_compile': True,    # можно False, если разогрев мешает
+    'per_device_train_batch_size': 10,
+    'gradient_accumulation_steps': 8,
+    'optim': 'adamw_torch',
+    'torch_compile': True,
 }
 
-LR_MIN = 5e-5
-LR_MAX = 7e-4
+LR_MIN = 8e-5
+LR_MAX = 8e-4
 
 
 class TimeoutCallback(TrainerCallback):
@@ -103,10 +102,6 @@ class TimeoutCallback(TrainerCallback):
 
 
 def prepare_tokenizer():
-    """
-    - Загружаем токенизатор
-    - pad_token = eos_token (важно для фиксированной длины)
-    """
     tok = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
@@ -114,10 +109,6 @@ def prepare_tokenizer():
 
 
 def tokenize_function(examples, tokenizer):
-    """
-    - Токенизируем text с truncation/padding до MAX_LENGTH
-    - labels = input_ids, но паддинги помечаем -100 (чтобы не учитывались в loss)
-    """
     texts = examples.get("text", None)
     if texts is None:
         return {INPUT_IDS: [], ATTENTION_MASK: [], LABELS: []}
@@ -130,7 +121,6 @@ def tokenize_function(examples, tokenizer):
         return_attention_mask=True,
     )
 
-    # делаем labels = input_ids, с -100 там где паддинг (attention_mask=0)
     labels = []
     for ids, mask in zip(out[INPUT_IDS], out[ATTENTION_MASK]):
         labels.append([tid if m == 1 else -100 for tid, m in zip(ids, mask)])
@@ -140,15 +130,9 @@ def tokenize_function(examples, tokenizer):
 
 
 def save_as_parquets(ds: Dataset, output_dir=OUTPUT_DIR, num_shards=NUM_SHARDS):
-    """
-    - Создаём каталог
-    - Режем на num_shards
-    - Сохраняем {output_dir}/{index:05d}.parquet
-    """
     od = Path(output_dir)
     od.mkdir(parents=True, exist_ok=True)
 
-    # Чтобы порядок был стабильным:
     ds = ds.select(range(len(ds)))
 
     for i in range(num_shards):
@@ -159,15 +143,9 @@ def save_as_parquets(ds: Dataset, output_dir=OUTPUT_DIR, num_shards=NUM_SHARDS):
 
 
 def prepare_dataset():
-    """
-    - Загружает wiki ru (train)
-    - Токенизирует батчево
-    - Сохраняет parquet-шарды в OUTPUT_DIR
-    """
     print("[STEP] load raw dataset")
     raw = load_dataset("wikimedia/wikipedia", "20231101.ru", split="train")
 
-    # На всякий случай уберём пустые тексты
     raw = raw.filter(lambda x: x.get("text") is not None and len(x["text"]) > 0)
 
     print("[STEP] prepare tokenizer")
@@ -177,7 +155,7 @@ def prepare_dataset():
     tokenized = raw.map(
         lambda batch: tokenize_function(batch, tokenizer),
         batched=True,
-        remove_columns=raw.column_names,  # оставим только нужные фичи
+        remove_columns=raw.column_names,
         num_proc=4,
         desc="tokenize",
     )
@@ -189,14 +167,10 @@ def prepare_dataset():
 
 
 def load_tokenized_dataset(data_dir=OUTPUT_DIR):
-    """
-    - Собирает все parquet и грузит их как один split 'train'
-    """
     files = sorted(glob(os.path.join(data_dir, "*.parquet")))
     if not files:
         raise FileNotFoundError(f"No parquet files in {data_dir}. Run prepare_dataset() first.")
     ds = load_dataset("parquet", data_files={"train": files})["train"]
-    # сделаем сразу торч-формат (ускорит Trainer)
     ds = ds.with_format("torch", columns=[INPUT_IDS, ATTENTION_MASK, LABELS])
     return ds
 
@@ -274,7 +248,7 @@ def build_optimizer(model, lr, weight_decay):
         betas=(0.9, 0.999),
         eps=1e-8,
         weight_decay=weight_decay,
-        fused=use_fused  # PyTorch сам проигнорит, если недоступно
+        fused=use_fused
     )
     return opt
 
@@ -287,46 +261,28 @@ def build_custom_scheduler(
     s_down_end=1800,      # к этому шагу линейно спускаемся до LR_MIN
     cyc_step_up=400,      # "половина" периода треугольника после s_down_end
 ):
-    """
-    Возвращает LambdaLR, который:
-    0..s_up_end:   линейно LR_MIN -> LR_MAX
-    s_up_end..s_hold_end: держит LR_MAX
-    s_hold_end..s_down_end: линейно LR_MAX -> LR_MIN
-    > s_down_end:  triangular между LR_MIN и LR_MAX, с step_size_up=cyc_step_up
-    """
-    # ВАЖНО: устанавливаем БАЗОВУЮ LR оптимизатора в lr_min.
     for g in optimizer.param_groups:
         g['lr'] = lr_min
 
     r = lr_max / lr_min  # во сколько раз LR_MAX больше базовой
 
     def lr_lambda(step: int):
-        # 1) разгон
         if step <= s_up_end:
-            # линейно 1.0 -> r
             return 1.0 + (r - 1.0) * (step / float(max(s_up_end, 1)))
 
-        # 2) полка на LR_MAX
         if step <= s_hold_end:
             return r
 
-        # 3) линейный спад LR_MAX -> LR_MIN к s_down_end
         if step <= s_down_end:
-            # t = 0..1 на участке hold_end..down_end
             t = (step - s_hold_end) / float(max(s_down_end - s_hold_end, 1))
-            # множитель: r -> 1
             return r - (r - 1.0) * t
 
-        # 4) triangular после s_down_end
-        # период = 2 * cyc_step_up; поднимемся от 1 -> r за cyc_step_up, затем назад
         k = step - s_down_end
         period = max(2 * cyc_step_up, 1)
         phase = (k % period) / float(cyc_step_up)  # 0..2
         if phase <= 1.0:
-            # вверх: 1 -> r
             return 1.0 + (r - 1.0) * phase
         else:
-            # вниз: r -> 1
             return r - (r - 1.0) * (phase - 1.0)
 
     return lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
@@ -337,37 +293,25 @@ def build_custom_scheduler_v2(
     lr_min=5e-5,
     lr_max=5e-4,
     s_up_end=10,        # конец разгона LR_MIN -> LR_MAX
-    s_hold_end=650,    # конец плато LR_MAX
-    s_down_end=1800,    # конец спуска LR_MAX -> LR_MIN
+    s_hold_end=450,    # конец плато LR_MAX
+    s_down_end=2000,    # конец спуска LR_MAX -> LR_MIN
 ):
-    """
-    Возвращает LambdaLR, который:
-      0..s_up_end           — линейно LR_MIN -> LR_MAX
-      s_up_end..s_hold_end  — держит LR_MAX
-      s_hold_end..s_down_end — линейно LR_MAX -> LR_MIN
-      > s_down_end          — держит LR_MIN (без циклов)
-    """
-    # базовая LR = lr_min
     for g in optimizer.param_groups:
         g["lr"] = lr_min
 
-    r = lr_max / lr_min  # во сколько раз LR_MAX больше базовой
+    r = lr_max / lr_min
 
     def lr_lambda(step: int):
-        # 1) разгон LR_MIN -> LR_MAX
         if step <= s_up_end:
             return 1.0 + (r - 1.0) * (step / float(max(s_up_end, 1)))
 
-        # 2) полка на LR_MAX
         if step <= s_hold_end:
             return r
 
-        # 3) линейный спад LR_MAX -> LR_MIN
         if step <= s_down_end:
             t = (step - s_hold_end) / float(max(s_down_end - s_hold_end, 1))
             return r - (r - 1.0) * t
 
-        # 4) после s_down_end держим LR_MIN
         return 1.0
 
     return lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
@@ -401,7 +345,7 @@ def train_model():
         f"bs{cfg['per_device_train_batch_size']}"
         f"_ga{cfg['gradient_accumulation_steps']}"
         f"_lr{cfg['learning_rate']}"
-        f"_adamw_customSched_v2.2"
+        f"_adamw_customSched_v2.3"
     )
     wandb.run.name = run_name
     wandb.run.save()
@@ -481,97 +425,8 @@ if __name__ == "__main__":
     # Step 1: Prepare the dataset (run once)
     # prepare_dataset()
 
-    # Step 2: Train the model
+    # Step 2: Train the model or run sweep
     train_model()
     
     # sweep_id = wandb.sweep(SWEEP_CONFIG, project=os.getenv("WANDB_PROJECT", "llm_hw1"))
     # wandb.agent(sweep_id, function=train_model, count=1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def train_model():
-#     # 1) W&B
-#     initialize_wandb()
-
-#     # 2) Tokenizer
-#     tokenizer = prepare_tokenizer()
-
-#     # 3) Данные: грузим parquet и делим на train/val
-#     dataset = load_tokenized_dataset(OUTPUT_DIR)
-#     train_ds, eval_ds = split_dataset(dataset)
-
-#     # 4) Модель
-#     model = create_model(tokenizer)
-#     if TRAINING_CONFIG.get('gradient_checkpointing'):
-#         model.gradient_checkpointing_enable()
-
-#     # 5) Аргументы тренировки
-#     args = TrainingArguments(
-#         **TRAINING_CONFIG,
-#         bf16=torch.cuda.is_bf16_supported(),
-#         remove_unused_columns=False,
-#         save_safetensors=True,
-#         logging_dir=f"{OUTPUT_DIR}/logs",
-#         dataloader_pin_memory=True,
-#         seed=42,
-#     )
-
-#     # 6) Trainer + таймер на 30 минут
-#     trainer = Trainer(
-#         model=model,
-#         args=args,
-#         train_dataset=train_ds,
-#         eval_dataset=eval_ds,
-#         tokenizer=tokenizer,
-#         callbacks=[TimeoutCallback(timeout_seconds=MAX_TRAINING_TIME_SECONDS)]
-#     )
-
-#     # 7) Обучение
-#     trainer.train()
-
-#     # 8) Финальная валидация
-#     print("Running final evaluation...")
-#     eval_results = trainer.evaluate()
-#     print(f"Final evaluation results: {eval_results}")
-
-#     # 9) Проба генерации (короткая)
-#     model.eval()
-#     prompt = "В начале было слово, и слово было"
-#     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-#     with torch.no_grad():
-#         gen = model.generate(
-#             **inputs,
-#             max_new_tokens=64,
-#             do_sample=True,
-#             top_p=0.9,
-#             temperature=0.8,
-#             pad_token_id=tokenizer.eos_token_id,
-#         )
-#     print("\n=== SAMPLE GENERATION ===")
-#     print(tokenizer.decode(gen[0], skip_special_tokens=True))
-
-#     wandb.finish()

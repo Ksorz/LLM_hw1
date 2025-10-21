@@ -4,12 +4,28 @@
 
 ### Batch Size и Gradient Accumulation
 - Проведено 15 экспериментов через `wandb.sweep`
-- Лучший результат показало сочетание `per_device_train_batch_size=6` и `gradient_accumulation_steps=6`
-- Возможно, большие значения дадут ещё больший буст
+- Лучший результат показало сочетание `per_device_train_batch_size=16` и `gradient_accumulation_steps=4`
 
 ### Learning Rate и Scheduler
 - После 15 экспериментов через `wandb.sweep` я делал кастомные эксперименты руками
+```python
+SWEEP_CONFIG = {
+    'method': 'bayes',
+    'metric': {'name': 'final_eval_loss', 'goal': 'minimize'},
+    'parameters': {
+        'per_device_train_batch_size': {'values': [1, 2, 4, 6]},
+        'gradient_accumulation_steps': {'values': [2, 4, 6]},
+        'learning_rate': {'values': [5e-5, 1e-4, 2e-4, 5e-4]},
+        'optim': {'values': ['adamw_torch', 'adamw_torch_fused', 'adafactor']},
+        'lr_scheduler_type': {'values': ['linear', 'cosine', 'constant']},
+        'torch_compile': {'values': [True, False]},
+        'warmup_ratio': {'values': [0.07, 0.1, 0.2]},
+    }
+}
+```
 - При высоком lr (1e-4 или 5e-5) модель перестаёт стабильно сходиться при достижении loss ≈ 4
+
+### Ручные эксперименты
 - Добавлен кастомный scheduler, который снижает lr после N шагов
 - Изначально использовался triangular scheduler, но он показался избыточным (хотя и дал лучший результат)
 - Оставлено только снижение lr до определённого уровня
@@ -19,13 +35,25 @@
 - Попытка снизить lr до ~5e-5 на 20-й минуте была не самой удачной
 - Снижение lr помогает, но баланс сложно нащупать
 
-### Планы на будущее
+### Что хочется попробовать
 - Увеличить batch size и lr
 - Сделать снижение lr более плавным
 - Эксперимент: `per_device_train_batch_size=10` и `gradient_accumulation_steps=8` с большим, но более плавным lr показывает более медленную, но устойчивую сходимость
 - На данный момент лучший показатель c `per_device_train_batch_size=16` и `gradient_accumulation_steps=4`. Пожалуй пока на этом остановлюсь
+
 ## Мониторинг
 [Wandb Dashboard](https://wandb.ai/ksorzz/llm_hw1-aylesnov/workspace?nw=nwuserksorzz)
+имена экспериментов:
+```python
+name = (
+    f"bs{cfg['per_device_train_batch_size']}#"
+    f"ga{cfg['gradient_accumulation_steps']}#"
+    f"lr{cfg['learning_rate']}#"
+    f"{cfg['optim']}#"
+    f"{cfg.get('lr_scheduler_type','linear')}#"
+    f"warmup_{cfg.get('warmup_ratio')}"
+)
+```
 
 
 ## Примеры генераций

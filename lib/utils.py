@@ -79,10 +79,6 @@ def build_run_name(config: Mapping[str, Any], *, prefix: Optional[str] = None, s
         parts.append(f"bs{config['per_device_train_batch_size']}")
     if "gradient_accumulation_steps" in config:
         parts.append(f"ga{config['gradient_accumulation_steps']}")
-    if "learning_rate" in config:
-        parts.append(f"lr{config['learning_rate']}")
-    if "optim" in config:
-        parts.append(str(config["optim"]))
 
     if suffix:
         parts.append(suffix)

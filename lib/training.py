@@ -10,7 +10,7 @@ import torch
 from transformers import Trainer, TrainingArguments
 from transformers.utils import is_torch_bf16_gpu_available
 
-from .callbacks import TimeoutCallback
+from .callbacks import TimeoutCallback, InspectCallback
 from .constants import MAX_TRAINING_TIME_SECONDS, OUTPUT_DIR
 from .utils import is_main_process
 
@@ -35,10 +35,11 @@ def build_training_arguments(
 
     cfg = dict(config)
 
-    # if bf16 is None:
-    #     bf16 = False
-    #     if is_torch_bf16_gpu_available():
-    bf16 = True
+    if bf16 is None:
+        bf16 = False
+        if is_torch_bf16_gpu_available():
+            bf16 = True
+    
 
     cfg.setdefault("bf16", bf16)
     cfg.setdefault("seed", seed)
@@ -77,22 +78,38 @@ def create_trainer(
     callback_list = list(callbacks or [])
     if timeout_seconds:
         callback_list.append(TimeoutCallback(timeout_seconds))
+    
+    # Добавляем колбэк для инспекции модели (DeepSpeed/FSDP)
+    callback_list.append(InspectCallback())
 
-    optimizers = None
-    if optimizer is not None or scheduler is not None:
-        if optimizer is None or scheduler is None:
-            raise ValueError("Необходимо передать и optimizer, и scheduler, либо ни один")
-        optimizers = (optimizer, scheduler)
+    # При FSDP нельзя передавать кастомные оптимизаторы через optimizers
+    # Оптимизатор должен быть настроен через TrainingArguments (optim, learning_rate, etc.)
+    use_fsdp = training_args.fsdp is not None and len(training_args.fsdp) > 0
+    
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": train_dataset,
+        "eval_dataset": eval_dataset,
+        "tokenizer": tokenizer,
+        "callbacks": callback_list,
+    }
+    
+    # Передаём optimizers только если не используется FSDP
+    if not use_fsdp:
+        if optimizer is not None or scheduler is not None:
+            if optimizer is None or scheduler is None:
+                raise ValueError("Необходимо передать и optimizer, и scheduler, либо ни один")
+            trainer_kwargs["optimizers"] = (optimizer, scheduler)
+    
+    LOGGER.info(f"Trainer kwargs: {trainer_kwargs}")
 
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        tokenizer=tokenizer,
-        callbacks=callback_list,
-        optimizers=optimizers,
-    )
+    device_before = next(model.parameters()).device
+    LOGGER.info(f"До Trainer: модель находится на устройстве: {device_before}")
+    trainer = Trainer(**trainer_kwargs)
+    device_after = next(trainer.model.parameters()).device
+    LOGGER.info(f"После Trainer: модель находится на устройстве: {device_after}")
+        
     return trainer
 
 

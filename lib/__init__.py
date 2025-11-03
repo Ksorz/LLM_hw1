@@ -33,7 +33,7 @@ from .data import (
 from .modeling import create_model
 from .optim import build_optimizer
 from .schedulers import build_custom_scheduler, build_custom_scheduler_v2
-from .callbacks import TimeoutCallback
+from .callbacks import TimeoutCallback, InspectCallback
 from .training import (
     build_training_arguments,
     create_trainer,
@@ -79,6 +79,7 @@ __all__ = [
     "build_custom_scheduler",
     "build_custom_scheduler_v2",
     "TimeoutCallback",
+    "InspectCallback",
     "build_training_arguments",
     "create_trainer",
     "run_training",

@@ -8,6 +8,8 @@ from typing import Optional
 
 import torch.distributed as dist
 from transformers import TrainerCallback
+from accelerate.state import AcceleratorState
+from accelerate.utils import DistributedType
 
 
 LOGGER = logging.getLogger(__name__)
@@ -55,6 +57,58 @@ class TimeoutCallback(TrainerCallback):
         return control
 
 
-__all__ = ["TimeoutCallback"]
+class InspectCallback(TrainerCallback):
+    """Колбэк для инспекции обёртки модели (DeepSpeed/FSDP/DDP)."""
+    
+    def on_train_begin(self, args, state, control, model=None, **kwargs):
+        """Логировать информацию о типе обёртки модели при начале обучения."""
+        
+        if model is None:
+            return control
+        
+        # Проверяем distributed type
+        try:
+            accelerator_state = AcceleratorState()
+            distributed_type = accelerator_state.distributed_type
+            LOGGER.info(f"Distributed type: {distributed_type}")
+        except Exception as e:
+            LOGGER.warning(f"Не удалось получить AcceleratorState: {e}")
+        
+        # Проверяем тип обёртки модели
+        model_type = type(model).__name__
+        model_module = getattr(model, '__module__', 'unknown')
+        
+        LOGGER.info(f"Model wrapper type: {model_type} (module: {model_module})")
+        
+        # Дополнительная информация для DeepSpeed
+        if model_type == "DeepSpeedEngine" or "deepspeed" in model_module.lower():
+            try:
+                if hasattr(model, 'zero_optimization_stage'):
+                    stage = model.zero_optimization_stage()
+                    LOGGER.info(f"DeepSpeed ZeRO stage: {stage}")
+            except Exception:
+                pass
+            
+            try:
+                if hasattr(model, 'config'):
+                    zero_config = model.config.get('zero_optimization', {})
+                    stage = zero_config.get('stage', 'unknown')
+                    LOGGER.info(f"DeepSpeed ZeRO stage (from config): {stage}")
+            except Exception:
+                pass
+        
+        # Дополнительная информация для FSDP
+        if "FSDP" in model_type or "fsdp" in model_module.lower():
+            LOGGER.info("Модель обёрнута в FSDP")
+            try:
+                if hasattr(model, 'sharding_strategy'):
+                    LOGGER.info(f"FSDP sharding strategy: {model.sharding_strategy}")
+            except Exception:
+                pass
+        
+        return control
+
+
+__all__ = ["TimeoutCallback", "InspectCallback"]
 
 

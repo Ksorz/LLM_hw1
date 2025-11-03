@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Mapping, Optional
 
+import os
+import torch
 from transformers import Trainer
 
 from lib import (
@@ -120,9 +122,18 @@ def build_trainer_setup(
     dataset = load_tokenized_dataset(data_dir)
     train_ds, eval_ds = split_dataset(dataset, validation_size=validation_size)
 
-    model = create_model(tokenizer, model_config=model_config)
+    model = create_model(tokenizer, model_config=model_config, bf16=config["bf16"])
+    # Если activation_checkpointing включён в FSDP, включаем gradient_checkpointing
+    if fsdp_kwargs and fsdp_kwargs.get("activation_checkpointing", False):
+        config["gradient_checkpointing"] = False
+    else:
+        config["gradient_checkpointing"] = True
     if config.get("gradient_checkpointing"):
         model.gradient_checkpointing_enable()
+    
+    # local_rank = int(os.getenv("LOCAL_RANK", "0"))
+    # device = torch.device(f"cuda:{local_rank}")
+    # model = model.to(device)
 
     optimizer = build_optimizer(
         model,

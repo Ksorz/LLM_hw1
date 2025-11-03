@@ -3,7 +3,7 @@ FROM registry.k.avito.ru/nvcr-proxy/nvidia/pytorch:24.12-py3 AS base
 WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install --upgrade pip \
-    && pip install 'transformers==4.52.0' 'datasets==3.6.0' 'wandb==0.19.10' 'accelerate==1.6.0'
+    && pip install 'transformers==4.52.0' 'datasets==3.6.0' 'wandb==0.19.10' 'accelerate==1.6.0' 'deepspeed>=0.9.3'
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install --no-build-isolation \

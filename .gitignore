@@ -2,3 +2,9 @@
 .cache/
 wandb/
 output_dir/
+
+__pycache__/
+*.pyc
+.env
+
+core

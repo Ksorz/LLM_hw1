@@ -1,4 +1,8 @@
-# Обучение языковой модели
+# Распределённое обучение (HW_2)
+
+- Результаты экспериментов, таблица и отчёт в [ноубуке](/app/hw2_parallel_pretrain/distributed_learning.ipynb) (в конце). [Wandb](https://wandb.ai/ksorzz/llm_hw2-aylesnov?nw=nwuserksorzz)
+
+# Обучение языковой модели (HW_1)
 
 ## Эксперименты с гиперпараметрами
 

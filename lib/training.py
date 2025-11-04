@@ -12,7 +12,7 @@ from transformers.utils import is_torch_bf16_gpu_available
 
 from .callbacks import TimeoutCallback, InspectCallback
 from .constants import MAX_TRAINING_TIME_SECONDS, OUTPUT_DIR
-from .utils import is_main_process
+from .utils.wandb_utils import is_main_process
 
 
 LOGGER = logging.getLogger(__name__)

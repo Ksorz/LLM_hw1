@@ -1,0 +1,925 @@
+The following values were not passed to `accelerate launch` and had defaults used instead:
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--mixed_precision` was set to a value of `'no'`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+2025-11-04 11:46:58,474 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,474 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 11:46:58,474 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,475 [INFO] __main__: World size: 4
+2025-11-04 11:46:58,475 [INFO] __main__: CUDA_VISIBLE_DEVICES: 0,1,2,3
+2025-11-04 11:46:58,475 [INFO] __main__: WANDB_PROJECT: llm_hw2-aylesnov
+2025-11-04 11:46:58,477 [INFO] __main__: Создание FSDP setup
+2025-11-04 11:46:58,477 [INFO] __main__:   sharding_strategy: full_shard
+2025-11-04 11:46:58,477 [INFO] __main__:   cpu_offload: False
+2025-11-04 11:46:58,477 [INFO] __main__:   activation_checkpointing: False
+2025-11-04 11:46:58,477 [INFO] __main__:   backward_prefetch: BACKWARD_POST
+2025-11-04 11:46:58,477 [INFO] __main__:   forward_prefetch: True
+2025-11-04 11:46:58,477 [INFO] __main__:   state_dict_type: FULL_STATE_DICT
+2025-11-04 11:46:58,649 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,649 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 11:46:58,649 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,734 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,734 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 11:46:58,734 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,759 [INFO] __main__: ============================================================
+2025-11-04 11:46:58,759 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 11:46:58,759 [INFO] __main__: ============================================================
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+2025-11-04 11:47:34,538 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 11:47:34,631 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 11:47:34,631 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 11:47:34,632 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=16,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f62acd24e00>, <lib.callbacks.InspectCallback object at 0x7f62ada94470>]}
+2025-11-04 11:47:34,632 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+2025-11-04 11:47:34,786 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+2025-11-04 11:47:34,853 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 11:47:35,144 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 11:47:35,144 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 11:47:35,145 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=2,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=16,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f5d65afaf30>, <lib.callbacks.InspectCallback object at 0x7f5d65afac00>]}
+2025-11-04 11:47:35,145 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 11:47:35,192 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 11:47:35,192 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 11:47:35,193 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=1,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=16,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f02088f7950>, <lib.callbacks.InspectCallback object at 0x7f02088d2b70>]}
+2025-11-04 11:47:35,193 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+2025-11-04 11:47:36,343 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 11:47:36,628 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+2025-11-04 11:47:36,882 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 11:47:36,885 [INFO] lib.training: Старт обучения
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 11:47:36,886 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 11:47:36,887 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 11:47:36,888 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=3,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=16,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f7c51b66ff0>, <lib.callbacks.InspectCallback object at 0x7f7c51b67050>]}
+2025-11-04 11:47:36,888 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
+2025-11-04 11:47:37,012 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 11:47:37,018 [INFO] lib.training: Старт обучения
+wandb: Tracking run with wandb version 0.19.10
+wandb: Run data is saved locally in /app/hw2_parallel_pretrain/wandb/run-20251104_114737-ghstkogd
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run bs16_ga4_FSDP_full_shard_v5
+wandb: ⭐️ View project at https://wandb.ai/ksorzz/llm_hw2-aylesnov
+wandb: 🚀 View run at https://wandb.ai/ksorzz/llm_hw2-aylesnov/runs/ghstkogd
+2025-11-04 11:47:38,340 [INFO] __main__: Setup создан успешно
+2025-11-04 11:47:38,341 [INFO] __main__: Конфигурация: {'output_dir': '/app/output_dir/gpt2-1b-russian', 'optim': 'adamw_torch', 'num_train_epochs': 1, 'per_device_train_batch_size': 16, 'save_steps': 2500, 'save_total_limit': 2, 'learning_rate': 5e-05, 'weight_decay': 0.01, 'logging_steps': 5, 'eval_steps': 2500, 'eval_strategy': 'steps', 'load_best_model_at_end': True, 'metric_for_best_model': 'eval_loss', 'gradient_checkpointing': True, 'gradient_accumulation_steps': 4, 'per_device_eval_batch_size': 4, 'dataloader_num_workers': 4, 'torch_compile': False, 'report_to': 'wandb', 'bf16': True}
+2025-11-04 11:47:38,341 [INFO] __main__: Старт обучения...
+2025-11-04 11:47:38,341 [INFO] lib.training: Старт обучения
+2025-11-04 11:47:38,552 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 11:47:38,555 [INFO] lib.training: Старт обучения
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1731: UserWarning: Upcasted low precision parameters in Qwen3ForCausalLM because mixed precision turned on in FSDP. Affects: model.embed_tokens.weight, model.norm.weight, lm_head.weight.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1731: UserWarning: Upcasted low precision parameters in Qwen3DecoderLayer because mixed precision turned on in FSDP. Affects: self_attn.q_proj.weight, self_attn.k_proj.weight, self_attn.v_proj.weight, self_attn.o_proj.weight, self_attn.q_norm.weight, self_attn.k_norm.weight, mlp.gate_proj.weight, mlp.up_proj.weight, mlp.down_proj.weight, input_layernorm.weight, post_attention_layernorm.weight.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1737: UserWarning: FSDP upcast of low precision parameters may affect the precision of model checkpoints.
+  warnings.warn(
+2025-11-04 11:47:40,133 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 11:47:40,133 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 11:47:40,133 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 11:47:40,133 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+2025-11-04 11:47:40,134 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 11:47:40,134 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 11:47:40,134 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 11:47:40,134 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+wandb: WARNING The `run_name` is currently set to the same value as `TrainingArguments.output_dir`. If this was not intended, please specify a different run name by setting the `TrainingArguments.run_name` parameter.
+2025-11-04 11:47:40,135 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 11:47:40,135 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 11:47:40,136 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 11:47:40,136 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+2025-11-04 11:47:40,142 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 11:47:40,142 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 11:47:40,142 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 11:47:40,143 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+  0%|          | 0/7579 [00:00<?, ?it/s]`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+  0%|          | 1/7579 [00:04<9:15:01,  4.39s/it]  0%|          | 2/7579 [00:07<7:33:13,  3.59s/it]  0%|          | 3/7579 [00:10<7:01:10,  3.34s/it]  0%|          | 4/7579 [00:13<6:45:26,  3.21s/it]  0%|          | 5/7579 [00:16<6:36:58,  3.14s/it]                                                  {'loss': 10.8027, 'grad_norm': 4.586697101593018, 'learning_rate': 4.9973611294366015e-05, 'epoch': 0.0}
+  0%|          | 5/7579 [00:16<6:36:58,  3.14s/it]  0%|          | 6/7579 [00:19<6:31:33,  3.10s/it]  0%|          | 7/7579 [00:22<6:28:07,  3.08s/it]  0%|          | 8/7579 [00:25<6:25:45,  3.06s/it]  0%|          | 9/7579 [00:28<6:24:07,  3.04s/it]  0%|          | 10/7579 [00:31<6:23:17,  3.04s/it]                                                   {'loss': 9.6163, 'grad_norm': 6.306763172149658, 'learning_rate': 4.9940625412323525e-05, 'epoch': 0.0}
+  0%|          | 10/7579 [00:31<6:23:17,  3.04s/it]  0%|          | 11/7579 [00:34<6:22:59,  3.04s/it]  0%|          | 12/7579 [00:37<6:22:38,  3.03s/it]  0%|          | 13/7579 [00:40<6:22:11,  3.03s/it]  0%|          | 14/7579 [00:43<6:21:49,  3.03s/it]  0%|          | 15/7579 [00:46<6:21:26,  3.03s/it]                                                   {'loss': 8.9183, 'grad_norm': 5.24174690246582, 'learning_rate': 4.990763953028104e-05, 'epoch': 0.0}
+  0%|          | 15/7579 [00:46<6:21:26,  3.03s/it]  0%|          | 16/7579 [00:49<6:21:10,  3.02s/it]  0%|          | 17/7579 [00:52<6:21:15,  3.03s/it]  0%|          | 18/7579 [00:55<6:20:52,  3.02s/it]  0%|          | 19/7579 [00:58<6:20:57,  3.02s/it]  0%|          | 20/7579 [01:01<6:21:00,  3.02s/it]                                                   {'loss': 8.4913, 'grad_norm': 1.1347461938858032, 'learning_rate': 4.987465364823855e-05, 'epoch': 0.0}
+  0%|          | 20/7579 [01:01<6:21:00,  3.02s/it]  0%|          | 21/7579 [01:04<6:20:53,  3.02s/it]  0%|          | 22/7579 [01:07<6:21:08,  3.03s/it]  0%|          | 23/7579 [01:10<6:21:11,  3.03s/it]  0%|          | 24/7579 [01:13<6:21:28,  3.03s/it]  0%|          | 25/7579 [01:16<6:21:27,  3.03s/it]                                                   {'loss': 8.2258, 'grad_norm': 1.0515797138214111, 'learning_rate': 4.984166776619607e-05, 'epoch': 0.0}
+  0%|          | 25/7579 [01:16<6:21:27,  3.03s/it]  0%|          | 26/7579 [01:20<6:21:10,  3.03s/it]  0%|          | 27/7579 [01:23<6:20:51,  3.03s/it]  0%|          | 28/7579 [01:26<6:20:40,  3.02s/it]  0%|          | 29/7579 [01:29<6:20:35,  3.02s/it]  0%|          | 30/7579 [01:32<6:20:52,  3.03s/it]                                                   {'loss': 7.9461, 'grad_norm': 0.7152884602546692, 'learning_rate': 4.980868188415359e-05, 'epoch': 0.0}
+  0%|          | 30/7579 [01:32<6:20:52,  3.03s/it]  0%|          | 31/7579 [01:35<6:21:16,  3.03s/it]  0%|          | 32/7579 [01:38<6:21:05,  3.03s/it]  0%|          | 33/7579 [01:41<6:21:02,  3.03s/it]  0%|          | 34/7579 [01:44<6:20:50,  3.03s/it]  0%|          | 35/7579 [01:47<6:20:30,  3.03s/it]                                                   {'loss': 7.7576, 'grad_norm': 0.5936956405639648, 'learning_rate': 4.97756960021111e-05, 'epoch': 0.0}
+  0%|          | 35/7579 [01:47<6:20:30,  3.03s/it]  0%|          | 36/7579 [01:50<6:20:34,  3.03s/it]  0%|          | 37/7579 [01:53<6:20:25,  3.03s/it]  1%|          | 38/7579 [01:56<6:20:14,  3.03s/it]  1%|          | 39/7579 [01:59<6:20:10,  3.03s/it]  1%|          | 40/7579 [02:02<6:20:07,  3.03s/it]                                                   {'loss': 7.6796, 'grad_norm': 0.5643001794815063, 'learning_rate': 4.9742710120068616e-05, 'epoch': 0.01}
+  1%|          | 40/7579 [02:02<6:20:07,  3.03s/it]  1%|          | 41/7579 [02:05<6:20:12,  3.03s/it]  1%|          | 42/7579 [02:08<6:19:58,  3.02s/it]  1%|          | 43/7579 [02:11<6:20:02,  3.03s/it]  1%|          | 44/7579 [02:14<6:20:04,  3.03s/it]  1%|          | 45/7579 [02:17<6:20:06,  3.03s/it]                                                   {'loss': 7.6208, 'grad_norm': 1.2450945377349854, 'learning_rate': 4.9709724238026126e-05, 'epoch': 0.01}
+  1%|          | 45/7579 [02:17<6:20:06,  3.03s/it]  1%|          | 46/7579 [02:20<6:19:56,  3.03s/it]  1%|          | 47/7579 [02:23<6:20:01,  3.03s/it]  1%|          | 48/7579 [02:26<6:19:50,  3.03s/it]  1%|          | 49/7579 [02:29<6:19:30,  3.02s/it]  1%|          | 50/7579 [02:32<6:19:40,  3.03s/it]                                                   {'loss': 7.5114, 'grad_norm': 1.365601658821106, 'learning_rate': 4.9676738355983644e-05, 'epoch': 0.01}
+  1%|          | 50/7579 [02:32<6:19:40,  3.03s/it]  1%|          | 51/7579 [02:35<6:20:09,  3.03s/it]  1%|          | 52/7579 [02:38<6:20:03,  3.03s/it]  1%|          | 53/7579 [02:41<6:19:54,  3.03s/it]  1%|          | 54/7579 [02:44<6:20:04,  3.03s/it]  1%|          | 55/7579 [02:47<6:20:03,  3.03s/it]                                                   {'loss': 7.4076, 'grad_norm': 1.1779508590698242, 'learning_rate': 4.964375247394116e-05, 'epoch': 0.01}
+  1%|          | 55/7579 [02:47<6:20:03,  3.03s/it]  1%|          | 56/7579 [02:50<6:20:01,  3.03s/it]  1%|          | 57/7579 [02:53<6:19:51,  3.03s/it]  1%|          | 58/7579 [02:56<6:19:38,  3.03s/it]  1%|          | 59/7579 [02:59<6:19:52,  3.03s/it]  1%|          | 60/7579 [03:02<6:19:34,  3.03s/it]                                                   {'loss': 7.3456, 'grad_norm': 0.8417869806289673, 'learning_rate': 4.961076659189867e-05, 'epoch': 0.01}
+  1%|          | 60/7579 [03:02<6:19:34,  3.03s/it]  1%|          | 61/7579 [03:05<6:19:31,  3.03s/it]  1%|          | 62/7579 [03:09<6:19:23,  3.03s/it]  1%|          | 63/7579 [03:12<6:19:30,  3.03s/it]  1%|          | 64/7579 [03:15<6:19:30,  3.03s/it]  1%|          | 65/7579 [03:18<6:19:35,  3.03s/it]                                                   {'loss': 7.1598, 'grad_norm': 0.7008211612701416, 'learning_rate': 4.957778070985619e-05, 'epoch': 0.01}
+  1%|          | 65/7579 [03:18<6:19:35,  3.03s/it]  1%|          | 66/7579 [03:21<6:19:37,  3.03s/it]  1%|          | 67/7579 [03:24<6:19:16,  3.03s/it]  1%|          | 68/7579 [03:27<6:19:14,  3.03s/it]  1%|          | 69/7579 [03:30<6:19:14,  3.03s/it]  1%|          | 70/7579 [03:33<6:19:11,  3.03s/it]                                                   {'loss': 7.1688, 'grad_norm': 0.6059408783912659, 'learning_rate': 4.95447948278137e-05, 'epoch': 0.01}
+  1%|          | 70/7579 [03:33<6:19:11,  3.03s/it]  1%|          | 71/7579 [03:36<6:19:31,  3.03s/it]  1%|          | 72/7579 [03:39<6:19:28,  3.03s/it]  1%|          | 73/7579 [03:42<6:19:23,  3.03s/it]  1%|          | 74/7579 [03:45<6:19:26,  3.03s/it]  1%|          | 75/7579 [03:48<6:19:23,  3.03s/it]                                                   {'loss': 7.043, 'grad_norm': 0.6711352467536926, 'learning_rate': 4.951180894577121e-05, 'epoch': 0.01}
+  1%|          | 75/7579 [03:48<6:19:23,  3.03s/it]  1%|          | 76/7579 [03:51<6:19:30,  3.03s/it]  1%|          | 77/7579 [03:54<6:19:22,  3.03s/it]  1%|          | 78/7579 [03:57<6:19:01,  3.03s/it]  1%|          | 79/7579 [04:00<6:18:44,  3.03s/it]  1%|          | 80/7579 [04:03<6:18:41,  3.03s/it]                                                   {'loss': 6.9435, 'grad_norm': 0.6640428900718689, 'learning_rate': 4.947882306372873e-05, 'epoch': 0.01}
+  1%|          | 80/7579 [04:03<6:18:41,  3.03s/it]  1%|          | 81/7579 [04:06<6:18:41,  3.03s/it]  1%|          | 82/7579 [04:09<6:18:36,  3.03s/it]  1%|          | 83/7579 [04:12<6:18:46,  3.03s/it]  1%|          | 84/7579 [04:15<6:18:25,  3.03s/it]  1%|          | 85/7579 [04:18<6:18:21,  3.03s/it]                                                   {'loss': 6.8175, 'grad_norm': 0.6854327321052551, 'learning_rate': 4.944583718168624e-05, 'epoch': 0.01}
+  1%|          | 85/7579 [04:18<6:18:21,  3.03s/it]  1%|          | 86/7579 [04:21<6:18:15,  3.03s/it]  1%|          | 87/7579 [04:24<6:18:07,  3.03s/it]  1%|          | 88/7579 [04:27<6:17:58,  3.03s/it]  1%|          | 89/7579 [04:30<6:18:01,  3.03s/it]  1%|          | 90/7579 [04:33<6:17:51,  3.03s/it]                                                   {'loss': 6.8025, 'grad_norm': 0.8130162954330444, 'learning_rate': 4.9412851299643755e-05, 'epoch': 0.01}
+  1%|          | 90/7579 [04:33<6:17:51,  3.03s/it]  1%|          | 91/7579 [04:36<6:18:14,  3.03s/it]  1%|          | 92/7579 [04:39<6:18:02,  3.03s/it]  1%|          | 93/7579 [04:42<6:17:49,  3.03s/it]  1%|          | 94/7579 [04:45<6:17:55,  3.03s/it]  1%|▏         | 95/7579 [04:49<6:17:57,  3.03s/it]                                                   {'loss': 6.631, 'grad_norm': 0.6197493672370911, 'learning_rate': 4.9379865417601265e-05, 'epoch': 0.01}
+  1%|▏         | 95/7579 [04:49<6:17:57,  3.03s/it]  1%|▏         | 96/7579 [04:52<6:17:59,  3.03s/it]  1%|▏         | 97/7579 [04:55<6:17:40,  3.03s/it]  1%|▏         | 98/7579 [04:58<6:17:36,  3.03s/it]  1%|▏         | 99/7579 [05:01<6:17:39,  3.03s/it]  1%|▏         | 100/7579 [05:04<6:17:32,  3.03s/it]                                                    {'loss': 6.6165, 'grad_norm': 0.6432830095291138, 'learning_rate': 4.934687953555878e-05, 'epoch': 0.01}
+  1%|▏         | 100/7579 [05:04<6:17:32,  3.03s/it]  1%|▏         | 101/7579 [05:07<6:17:34,  3.03s/it]  1%|▏         | 102/7579 [05:10<6:17:32,  3.03s/it]  1%|▏         | 103/7579 [05:13<6:17:40,  3.03s/it]  1%|▏         | 104/7579 [05:16<6:17:34,  3.03s/it]  1%|▏         | 105/7579 [05:19<6:17:29,  3.03s/it]                                                    {'loss': 6.5116, 'grad_norm': 0.8761367797851562, 'learning_rate': 4.931389365351629e-05, 'epoch': 0.01}
+  1%|▏         | 105/7579 [05:19<6:17:29,  3.03s/it]  1%|▏         | 106/7579 [05:22<6:17:27,  3.03s/it]  1%|▏         | 107/7579 [05:25<6:17:17,  3.03s/it]  1%|▏         | 108/7579 [05:28<6:17:08,  3.03s/it]  1%|▏         | 109/7579 [05:31<6:16:54,  3.03s/it]  1%|▏         | 110/7579 [05:34<6:16:56,  3.03s/it]                                                    {'loss': 6.3925, 'grad_norm': 0.885035514831543, 'learning_rate': 4.928090777147381e-05, 'epoch': 0.01}
+  1%|▏         | 110/7579 [05:34<6:16:56,  3.03s/it]  1%|▏         | 111/7579 [05:37<6:17:13,  3.03s/it]  1%|▏         | 112/7579 [05:40<6:16:59,  3.03s/it]  1%|▏         | 113/7579 [05:43<6:16:58,  3.03s/it]  2%|▏         | 114/7579 [05:46<6:16:55,  3.03s/it]  2%|▏         | 115/7579 [05:49<6:16:48,  3.03s/it]                                                    {'loss': 6.3334, 'grad_norm': 0.7607801556587219, 'learning_rate': 4.924792188943133e-05, 'epoch': 0.02}
+  2%|▏         | 115/7579 [05:49<6:16:48,  3.03s/it]  2%|▏         | 116/7579 [05:52<6:16:38,  3.03s/it]  2%|▏         | 117/7579 [05:55<6:16:38,  3.03s/it]  2%|▏         | 118/7579 [05:58<6:16:36,  3.03s/it]  2%|▏         | 119/7579 [06:01<6:16:21,  3.03s/it]  2%|▏         | 120/7579 [06:04<6:16:27,  3.03s/it]                                                    {'loss': 6.3173, 'grad_norm': 0.9142106175422668, 'learning_rate': 4.921493600738884e-05, 'epoch': 0.02}
+  2%|▏         | 120/7579 [06:04<6:16:27,  3.03s/it]  2%|▏         | 121/7579 [06:07<6:16:33,  3.03s/it]  2%|▏         | 122/7579 [06:10<6:16:29,  3.03s/it]  2%|▏         | 123/7579 [06:13<6:16:27,  3.03s/it]  2%|▏         | 124/7579 [06:16<6:16:29,  3.03s/it]  2%|▏         | 125/7579 [06:19<6:16:33,  3.03s/it]                                                    {'loss': 6.2145, 'grad_norm': 1.0596824884414673, 'learning_rate': 4.9181950125346356e-05, 'epoch': 0.02}
+  2%|▏         | 125/7579 [06:19<6:16:33,  3.03s/it]  2%|▏         | 126/7579 [06:22<6:16:31,  3.03s/it]  2%|▏         | 127/7579 [06:25<6:16:15,  3.03s/it]  2%|▏         | 128/7579 [06:28<6:16:07,  3.03s/it]  2%|▏         | 129/7579 [06:32<6:16:13,  3.03s/it]  2%|▏         | 130/7579 [06:35<6:16:27,  3.03s/it]                                                    {'loss': 6.1553, 'grad_norm': 0.8018634915351868, 'learning_rate': 4.9148964243303866e-05, 'epoch': 0.02}
+  2%|▏         | 130/7579 [06:35<6:16:27,  3.03s/it]  2%|▏         | 131/7579 [06:38<6:16:52,  3.04s/it]  2%|▏         | 132/7579 [06:41<6:16:36,  3.03s/it]  2%|▏         | 133/7579 [06:44<6:16:15,  3.03s/it]  2%|▏         | 134/7579 [06:47<6:16:20,  3.03s/it]  2%|▏         | 135/7579 [06:50<6:16:03,  3.03s/it]                                                    {'loss': 6.1139, 'grad_norm': 0.8045076131820679, 'learning_rate': 4.9115978361261383e-05, 'epoch': 0.02}
+  2%|▏         | 135/7579 [06:50<6:16:03,  3.03s/it]  2%|▏         | 136/7579 [06:53<6:16:19,  3.03s/it]  2%|▏         | 137/7579 [06:56<6:16:07,  3.03s/it]  2%|▏         | 138/7579 [06:59<6:15:58,  3.03s/it]  2%|▏         | 139/7579 [07:02<6:15:53,  3.03s/it]  2%|▏         | 140/7579 [07:05<6:15:56,  3.03s/it]                                                    {'loss': 6.0358, 'grad_norm': 0.7795698046684265, 'learning_rate': 4.90829924792189e-05, 'epoch': 0.02}
+  2%|▏         | 140/7579 [07:05<6:15:56,  3.03s/it]  2%|▏         | 141/7579 [07:08<6:16:09,  3.03s/it]  2%|▏         | 142/7579 [07:11<6:15:39,  3.03s/it]  2%|▏         | 143/7579 [07:14<6:15:34,  3.03s/it]  2%|▏         | 144/7579 [07:17<6:15:41,  3.03s/it]  2%|▏         | 145/7579 [07:20<6:15:47,  3.03s/it]                                                    {'loss': 5.9301, 'grad_norm': 0.6823263764381409, 'learning_rate': 4.905000659717641e-05, 'epoch': 0.02}
+  2%|▏         | 145/7579 [07:20<6:15:47,  3.03s/it]  2%|▏         | 146/7579 [07:23<6:15:36,  3.03s/it]  2%|▏         | 147/7579 [07:26<6:15:17,  3.03s/it]  2%|▏         | 148/7579 [07:29<6:15:09,  3.03s/it]  2%|▏         | 149/7579 [07:32<6:15:14,  3.03s/it]  2%|▏         | 150/7579 [07:35<6:15:14,  3.03s/it]                                                    {'loss': 5.9706, 'grad_norm': 0.8017715811729431, 'learning_rate': 4.901702071513393e-05, 'epoch': 0.02}
+  2%|▏         | 150/7579 [07:35<6:15:14,  3.03s/it]  2%|▏         | 151/7579 [07:38<6:15:20,  3.03s/it]  2%|▏         | 152/7579 [07:41<6:15:15,  3.03s/it]  2%|▏         | 153/7579 [07:44<6:15:13,  3.03s/it]  2%|▏         | 154/7579 [07:47<6:15:12,  3.03s/it]  2%|▏         | 155/7579 [07:50<6:15:03,  3.03s/it]                                                    {'loss': 5.9313, 'grad_norm': 0.7702471017837524, 'learning_rate': 4.898403483309144e-05, 'epoch': 0.02}
+  2%|▏         | 155/7579 [07:50<6:15:03,  3.03s/it]  2%|▏         | 156/7579 [07:53<6:15:08,  3.03s/it]  2%|▏         | 157/7579 [07:56<6:14:47,  3.03s/it]  2%|▏         | 158/7579 [07:59<6:14:37,  3.03s/it]  2%|▏         | 159/7579 [08:02<6:14:40,  3.03s/it]  2%|▏         | 160/7579 [08:05<6:14:12,  3.03s/it]                                                    {'loss': 5.862, 'grad_norm': 0.7888495922088623, 'learning_rate': 4.8951048951048956e-05, 'epoch': 0.02}
+  2%|▏         | 160/7579 [08:05<6:14:12,  3.03s/it]  2%|▏         | 161/7579 [08:09<6:14:22,  3.03s/it]  2%|▏         | 162/7579 [08:12<6:14:17,  3.03s/it]  2%|▏         | 163/7579 [08:15<6:14:16,  3.03s/it]  2%|▏         | 164/7579 [08:18<6:14:18,  3.03s/it]  2%|▏         | 165/7579 [08:21<6:14:14,  3.03s/it]                                                    {'loss': 5.8029, 'grad_norm': 0.9060655832290649, 'learning_rate': 4.891806306900647e-05, 'epoch': 0.02}
+  2%|▏         | 165/7579 [08:21<6:14:14,  3.03s/it]  2%|▏         | 166/7579 [08:24<6:14:23,  3.03s/it]  2%|▏         | 167/7579 [08:27<6:13:59,  3.03s/it]  2%|▏         | 168/7579 [08:30<6:13:51,  3.03s/it]  2%|▏         | 169/7579 [08:33<6:13:34,  3.02s/it]  2%|▏         | 170/7579 [08:36<6:13:52,  3.03s/it]                                                    {'loss': 5.7116, 'grad_norm': 0.8022943139076233, 'learning_rate': 4.8885077186963984e-05, 'epoch': 0.02}
+  2%|▏         | 170/7579 [08:36<6:13:52,  3.03s/it]  2%|▏         | 171/7579 [08:39<6:14:03,  3.03s/it]  2%|▏         | 172/7579 [08:42<6:13:55,  3.03s/it]  2%|▏         | 173/7579 [08:45<6:13:57,  3.03s/it]  2%|▏         | 174/7579 [08:48<6:14:01,  3.03s/it]  2%|▏         | 175/7579 [08:51<6:13:45,  3.03s/it]                                                    {'loss': 5.6732, 'grad_norm': 0.8389177918434143, 'learning_rate': 4.8852091304921495e-05, 'epoch': 0.02}
+  2%|▏         | 175/7579 [08:51<6:13:45,  3.03s/it]  2%|▏         | 176/7579 [08:54<6:13:52,  3.03s/it]  2%|▏         | 177/7579 [08:57<6:13:45,  3.03s/it]  2%|▏         | 178/7579 [09:00<6:13:31,  3.03s/it]  2%|▏         | 179/7579 [09:03<6:13:37,  3.03s/it]  2%|▏         | 180/7579 [09:06<6:13:29,  3.03s/it]                                                    {'loss': 5.6844, 'grad_norm': 0.790310263633728, 'learning_rate': 4.8819105422879005e-05, 'epoch': 0.02}
+  2%|▏         | 180/7579 [09:06<6:13:29,  3.03s/it]  2%|▏         | 181/7579 [09:09<6:13:39,  3.03s/it]  2%|▏         | 182/7579 [09:12<6:13:34,  3.03s/it]  2%|▏         | 183/7579 [09:15<6:13:30,  3.03s/it]  2%|▏         | 184/7579 [09:18<6:13:29,  3.03s/it]  2%|▏         | 185/7579 [09:21<6:13:28,  3.03s/it]                                                    {'loss': 5.6441, 'grad_norm': 0.9391998648643494, 'learning_rate': 4.878611954083652e-05, 'epoch': 0.02}
+  2%|▏         | 185/7579 [09:21<6:13:28,  3.03s/it]  2%|▏         | 186/7579 [09:24<6:13:20,  3.03s/it]  2%|▏         | 187/7579 [09:27<6:13:12,  3.03s/it]  2%|▏         | 188/7579 [09:30<6:13:12,  3.03s/it]  2%|▏         | 189/7579 [09:33<6:13:22,  3.03s/it]  3%|▎         | 190/7579 [09:36<6:13:12,  3.03s/it]                                                    {'loss': 5.6078, 'grad_norm': 0.7220750451087952, 'learning_rate': 4.875313365879404e-05, 'epoch': 0.03}
+  3%|▎         | 190/7579 [09:36<6:13:12,  3.03s/it]  3%|▎         | 191/7579 [09:39<6:13:14,  3.03s/it]  3%|▎         | 192/7579 [09:42<6:13:14,  3.03s/it]  3%|▎         | 193/7579 [09:45<6:13:07,  3.03s/it]  3%|▎         | 194/7579 [09:49<6:13:12,  3.03s/it]  3%|▎         | 195/7579 [09:52<6:13:12,  3.03s/it]                                                    {'loss': 5.5362, 'grad_norm': 0.8749591112136841, 'learning_rate': 4.872014777675155e-05, 'epoch': 0.03}
+  3%|▎         | 195/7579 [09:52<6:13:12,  3.03s/it]  3%|▎         | 196/7579 [09:55<6:13:00,  3.03s/it]  3%|▎         | 197/7579 [09:58<6:13:00,  3.03s/it]  3%|▎         | 198/7579 [10:01<6:12:46,  3.03s/it]  3%|▎         | 199/7579 [10:04<6:12:33,  3.03s/it]  3%|▎         | 200/7579 [10:07<6:12:41,  3.03s/it]                                                    {'loss': 5.5083, 'grad_norm': 0.8379343152046204, 'learning_rate': 4.868716189470907e-05, 'epoch': 0.03}
+  3%|▎         | 200/7579 [10:07<6:12:41,  3.03s/it]  3%|▎         | 201/7579 [10:10<6:12:43,  3.03s/it]  3%|▎         | 202/7579 [10:13<6:12:52,  3.03s/it]  3%|▎         | 203/7579 [10:16<6:12:48,  3.03s/it]  3%|▎         | 204/7579 [10:19<6:12:38,  3.03s/it]  3%|▎         | 205/7579 [10:22<6:12:55,  3.03s/it]                                                    {'loss': 5.5394, 'grad_norm': 0.9940804243087769, 'learning_rate': 4.865417601266658e-05, 'epoch': 0.03}
+  3%|▎         | 205/7579 [10:22<6:12:55,  3.03s/it]  3%|▎         | 206/7579 [10:25<6:12:41,  3.03s/it]  3%|▎         | 207/7579 [10:28<6:12:41,  3.03s/it]  3%|▎         | 208/7579 [10:31<6:12:27,  3.03s/it]  3%|▎         | 209/7579 [10:34<6:12:19,  3.03s/it]  3%|▎         | 210/7579 [10:37<6:12:11,  3.03s/it]                                                    {'loss': 5.4969, 'grad_norm': 0.7818601727485657, 'learning_rate': 4.8621190130624096e-05, 'epoch': 0.03}
+  3%|▎         | 210/7579 [10:37<6:12:11,  3.03s/it]  3%|▎         | 211/7579 [10:40<6:11:56,  3.03s/it]  3%|▎         | 212/7579 [10:43<6:11:52,  3.03s/it]  3%|▎         | 213/7579 [10:46<6:11:45,  3.03s/it]  3%|▎         | 214/7579 [10:49<6:11:52,  3.03s/it]  3%|▎         | 215/7579 [10:52<6:11:44,  3.03s/it]                                                    {'loss': 5.3507, 'grad_norm': 0.7568018436431885, 'learning_rate': 4.8588204248581606e-05, 'epoch': 0.03}
+  3%|▎         | 215/7579 [10:52<6:11:44,  3.03s/it]  3%|▎         | 216/7579 [10:55<6:11:45,  3.03s/it]  3%|▎         | 217/7579 [10:58<6:11:50,  3.03s/it]  3%|▎         | 218/7579 [11:01<6:11:41,  3.03s/it]  3%|▎         | 219/7579 [11:04<6:11:27,  3.03s/it]  3%|▎         | 220/7579 [11:07<6:11:17,  3.03s/it]                                                    {'loss': 5.3798, 'grad_norm': 1.097009301185608, 'learning_rate': 4.8555218366539123e-05, 'epoch': 0.03}
+  3%|▎         | 220/7579 [11:07<6:11:17,  3.03s/it]  3%|▎         | 221/7579 [11:10<6:11:30,  3.03s/it]  3%|▎         | 222/7579 [11:13<6:11:42,  3.03s/it]  3%|▎         | 223/7579 [11:16<6:11:28,  3.03s/it]  3%|▎         | 224/7579 [11:19<6:11:20,  3.03s/it]  3%|▎         | 225/7579 [11:22<6:11:20,  3.03s/it]                                                    {'loss': 5.3686, 'grad_norm': 0.7768962383270264, 'learning_rate': 4.852223248449664e-05, 'epoch': 0.03}
+  3%|▎         | 225/7579 [11:22<6:11:20,  3.03s/it]  3%|▎         | 226/7579 [11:25<6:11:16,  3.03s/it]  3%|▎         | 227/7579 [11:29<6:11:12,  3.03s/it]  3%|▎         | 228/7579 [11:32<6:11:23,  3.03s/it]  3%|▎         | 229/7579 [11:35<6:11:44,  3.03s/it]  3%|▎         | 230/7579 [11:38<6:11:24,  3.03s/it]                                                    {'loss': 5.3271, 'grad_norm': 0.8364092111587524, 'learning_rate': 4.848924660245415e-05, 'epoch': 0.03}
+  3%|▎         | 230/7579 [11:38<6:11:24,  3.03s/it]  3%|▎         | 231/7579 [11:41<6:11:10,  3.03s/it]  3%|▎         | 232/7579 [11:44<6:11:16,  3.03s/it]  3%|▎         | 233/7579 [11:47<6:11:12,  3.03s/it]  3%|▎         | 234/7579 [11:50<6:11:25,  3.03s/it]  3%|▎         | 235/7579 [11:53<6:11:14,  3.03s/it]                                                    {'loss': 5.2829, 'grad_norm': 0.8149890899658203, 'learning_rate': 4.845626072041167e-05, 'epoch': 0.03}
+  3%|▎         | 235/7579 [11:53<6:11:14,  3.03s/it]  3%|▎         | 236/7579 [11:56<6:11:13,  3.03s/it]  3%|▎         | 237/7579 [11:59<6:11:20,  3.03s/it]  3%|▎         | 238/7579 [12:02<6:11:04,  3.03s/it]  3%|▎         | 239/7579 [12:05<6:10:43,  3.03s/it]  3%|▎         | 240/7579 [12:08<6:10:31,  3.03s/it]                                                    {'loss': 5.3014, 'grad_norm': 0.920372486114502, 'learning_rate': 4.842327483836918e-05, 'epoch': 0.03}
+  3%|▎         | 240/7579 [12:08<6:10:31,  3.03s/it]  3%|▎         | 241/7579 [12:11<6:10:37,  3.03s/it]  3%|▎         | 242/7579 [12:14<6:10:30,  3.03s/it]  3%|▎         | 243/7579 [12:17<6:10:35,  3.03s/it]  3%|▎         | 244/7579 [12:20<6:10:24,  3.03s/it]  3%|▎         | 245/7579 [12:23<6:10:33,  3.03s/it]                                                    {'loss': 5.2265, 'grad_norm': 0.8908597826957703, 'learning_rate': 4.8390288956326696e-05, 'epoch': 0.03}
+  3%|▎         | 245/7579 [12:23<6:10:33,  3.03s/it]  3%|▎         | 246/7579 [12:26<6:10:25,  3.03s/it]  3%|▎         | 247/7579 [12:29<6:10:21,  3.03s/it]  3%|▎         | 248/7579 [12:32<6:10:14,  3.03s/it]  3%|▎         | 249/7579 [12:35<6:10:20,  3.03s/it]  3%|▎         | 250/7579 [12:38<6:10:17,  3.03s/it]                                                    {'loss': 5.2467, 'grad_norm': 0.6933526396751404, 'learning_rate': 4.8357303074284214e-05, 'epoch': 0.03}
+  3%|▎         | 250/7579 [12:38<6:10:17,  3.03s/it]  3%|▎         | 251/7579 [12:41<6:10:11,  3.03s/it]  3%|▎         | 252/7579 [12:44<6:10:13,  3.03s/it]  3%|▎         | 253/7579 [12:47<6:10:14,  3.03s/it]  3%|▎         | 254/7579 [12:50<6:10:03,  3.03s/it]  3%|▎         | 255/7579 [12:53<6:10:06,  3.03s/it]                                                    {'loss': 5.2184, 'grad_norm': 0.7761008143424988, 'learning_rate': 4.8324317192241724e-05, 'epoch': 0.03}
+  3%|▎         | 255/7579 [12:53<6:10:06,  3.03s/it]  3%|▎         | 256/7579 [12:56<6:10:14,  3.03s/it]  3%|▎         | 257/7579 [12:59<6:09:57,  3.03s/it]  3%|▎         | 258/7579 [13:02<6:09:39,  3.03s/it]  3%|▎         | 259/7579 [13:06<6:09:38,  3.03s/it]  3%|▎         | 260/7579 [13:09<6:09:32,  3.03s/it]                                                    {'loss': 5.1723, 'grad_norm': 0.7778246998786926, 'learning_rate': 4.829133131019924e-05, 'epoch': 0.03}
+  3%|▎         | 260/7579 [13:09<6:09:32,  3.03s/it]  3%|▎         | 261/7579 [13:12<6:09:36,  3.03s/it]  3%|▎         | 262/7579 [13:15<6:09:32,  3.03s/it]  3%|▎         | 263/7579 [13:18<6:09:22,  3.03s/it]  3%|▎         | 264/7579 [13:21<6:09:27,  3.03s/it]  3%|▎         | 265/7579 [13:24<6:09:40,  3.03s/it]                                                    {'loss': 5.1216, 'grad_norm': 0.7657158970832825, 'learning_rate': 4.825834542815675e-05, 'epoch': 0.03}
+  3%|▎         | 265/7579 [13:24<6:09:40,  3.03s/it]  4%|▎         | 266/7579 [13:27<6:09:33,  3.03s/it]  4%|▎         | 267/7579 [13:30<6:09:26,  3.03s/it]  4%|▎         | 268/7579 [13:33<6:09:19,  3.03s/it]  4%|▎         | 269/7579 [13:36<6:09:31,  3.03s/it]  4%|▎         | 270/7579 [13:39<6:09:16,  3.03s/it]                                                    {'loss': 5.1018, 'grad_norm': 0.7672592401504517, 'learning_rate': 4.822535954611426e-05, 'epoch': 0.04}
+  4%|▎         | 270/7579 [13:39<6:09:16,  3.03s/it]  4%|▎         | 271/7579 [13:42<6:09:06,  3.03s/it]  4%|▎         | 272/7579 [13:45<6:09:05,  3.03s/it]  4%|▎         | 273/7579 [13:48<6:09:02,  3.03s/it]  4%|▎         | 274/7579 [13:51<6:08:53,  3.03s/it]  4%|▎         | 275/7579 [13:54<6:08:52,  3.03s/it]                                                    {'loss': 5.0823, 'grad_norm': 0.7466782331466675, 'learning_rate': 4.819237366407178e-05, 'epoch': 0.04}
+  4%|▎         | 275/7579 [13:54<6:08:52,  3.03s/it]  4%|▎         | 276/7579 [13:57<6:09:07,  3.03s/it]  4%|▎         | 277/7579 [14:00<6:08:46,  3.03s/it]  4%|▎         | 278/7579 [14:03<6:08:41,  3.03s/it]  4%|▎         | 279/7579 [14:06<6:08:45,  3.03s/it]  4%|▎         | 280/7579 [14:09<6:08:41,  3.03s/it]                                                    {'loss': 5.0624, 'grad_norm': 0.8196761608123779, 'learning_rate': 4.815938778202929e-05, 'epoch': 0.04}
+  4%|▎         | 280/7579 [14:09<6:08:41,  3.03s/it]  4%|▎         | 281/7579 [14:12<6:08:50,  3.03s/it]  4%|▎         | 282/7579 [14:15<6:08:48,  3.03s/it]  4%|▎         | 283/7579 [14:18<6:08:35,  3.03s/it]  4%|▎         | 284/7579 [14:21<6:08:26,  3.03s/it]  4%|▍         | 285/7579 [14:24<6:08:15,  3.03s/it]                                                    {'loss': 5.0765, 'grad_norm': 0.8104023337364197, 'learning_rate': 4.812640189998681e-05, 'epoch': 0.04}
+  4%|▍         | 285/7579 [14:24<6:08:15,  3.03s/it]  4%|▍         | 286/7579 [14:27<6:08:20,  3.03s/it]  4%|▍         | 287/7579 [14:30<6:08:23,  3.03s/it]  4%|▍         | 288/7579 [14:33<6:08:10,  3.03s/it]  4%|▍         | 289/7579 [14:36<6:08:05,  3.03s/it]  4%|▍         | 290/7579 [14:39<6:08:01,  3.03s/it]                                                    {'loss': 5.0284, 'grad_norm': 0.7986648678779602, 'learning_rate': 4.809341601794432e-05, 'epoch': 0.04}
+  4%|▍         | 290/7579 [14:39<6:08:01,  3.03s/it]  4%|▍         | 291/7579 [14:43<6:08:15,  3.03s/it]  4%|▍         | 292/7579 [14:46<6:08:13,  3.03s/it]  4%|▍         | 293/7579 [14:49<6:08:03,  3.03s/it]  4%|▍         | 294/7579 [14:52<6:07:59,  3.03s/it]  4%|▍         | 295/7579 [14:55<6:08:01,  3.03s/it]                                                    {'loss': 4.9949, 'grad_norm': 0.933010458946228, 'learning_rate': 4.8060430135901836e-05, 'epoch': 0.04}
+  4%|▍         | 295/7579 [14:55<6:08:01,  3.03s/it]  4%|▍         | 296/7579 [14:58<6:08:22,  3.03s/it]  4%|▍         | 297/7579 [15:01<6:07:54,  3.03s/it]  4%|▍         | 298/7579 [15:04<6:07:43,  3.03s/it]  4%|▍         | 299/7579 [15:07<6:07:31,  3.03s/it]  4%|▍         | 300/7579 [15:10<6:07:21,  3.03s/it]                                                    {'loss': 4.9568, 'grad_norm': 0.8212350606918335, 'learning_rate': 4.8027444253859346e-05, 'epoch': 0.04}
+  4%|▍         | 300/7579 [15:10<6:07:21,  3.03s/it]  4%|▍         | 301/7579 [15:13<6:07:40,  3.03s/it]  4%|▍         | 302/7579 [15:16<6:07:39,  3.03s/it]  4%|▍         | 303/7579 [15:19<6:07:26,  3.03s/it]  4%|▍         | 304/7579 [15:22<6:07:13,  3.03s/it]  4%|▍         | 305/7579 [15:25<6:07:16,  3.03s/it]                                                    {'loss': 4.9933, 'grad_norm': 0.941548764705658, 'learning_rate': 4.799445837181686e-05, 'epoch': 0.04}
+  4%|▍         | 305/7579 [15:25<6:07:16,  3.03s/it]  4%|▍         | 306/7579 [15:28<6:07:05,  3.03s/it]  4%|▍         | 307/7579 [15:31<6:06:54,  3.03s/it]  4%|▍         | 308/7579 [15:34<6:06:42,  3.03s/it]  4%|▍         | 309/7579 [15:37<6:06:43,  3.03s/it]  4%|▍         | 310/7579 [15:40<6:06:40,  3.03s/it]                                                    {'loss': 4.9629, 'grad_norm': 1.1764225959777832, 'learning_rate': 4.796147248977438e-05, 'epoch': 0.04}
+  4%|▍         | 310/7579 [15:40<6:06:40,  3.03s/it]  4%|▍         | 311/7579 [15:43<6:06:50,  3.03s/it]  4%|▍         | 312/7579 [15:46<6:06:53,  3.03s/it]  4%|▍         | 313/7579 [15:49<6:06:44,  3.03s/it]  4%|▍         | 314/7579 [15:52<6:06:51,  3.03s/it]  4%|▍         | 315/7579 [15:55<6:06:34,  3.03s/it]                                                    {'loss': 4.9448, 'grad_norm': 0.8721638917922974, 'learning_rate': 4.792848660773189e-05, 'epoch': 0.04}
+  4%|▍         | 315/7579 [15:55<6:06:34,  3.03s/it]  4%|▍         | 316/7579 [15:58<6:06:47,  3.03s/it]  4%|▍         | 317/7579 [16:01<6:06:42,  3.03s/it]  4%|▍         | 318/7579 [16:04<6:06:32,  3.03s/it]  4%|▍         | 319/7579 [16:07<6:06:36,  3.03s/it]  4%|▍         | 320/7579 [16:10<6:06:28,  3.03s/it]                                                    {'loss': 4.9428, 'grad_norm': 0.8254676461219788, 'learning_rate': 4.789550072568941e-05, 'epoch': 0.04}
+  4%|▍         | 320/7579 [16:10<6:06:28,  3.03s/it]  4%|▍         | 321/7579 [16:13<6:06:30,  3.03s/it]  4%|▍         | 322/7579 [16:16<6:06:16,  3.03s/it]  4%|▍         | 323/7579 [16:19<6:06:23,  3.03s/it]  4%|▍         | 324/7579 [16:22<6:06:58,  3.03s/it]  4%|▍         | 325/7579 [16:26<6:07:04,  3.04s/it]                                                    {'loss': 4.9559, 'grad_norm': 0.7755318284034729, 'learning_rate': 4.786251484364692e-05, 'epoch': 0.04}
+  4%|▍         | 325/7579 [16:26<6:07:04,  3.04s/it]  4%|▍         | 326/7579 [16:29<6:07:10,  3.04s/it]  4%|▍         | 327/7579 [16:32<6:07:10,  3.04s/it]  4%|▍         | 328/7579 [16:35<6:07:12,  3.04s/it]  4%|▍         | 329/7579 [16:38<6:07:14,  3.04s/it]  4%|▍         | 330/7579 [16:41<6:07:01,  3.04s/it]                                                    {'loss': 4.9159, 'grad_norm': 0.7912365794181824, 'learning_rate': 4.7829528961604436e-05, 'epoch': 0.04}
+  4%|▍         | 330/7579 [16:41<6:07:01,  3.04s/it]  4%|▍         | 331/7579 [16:44<6:06:56,  3.04s/it]  4%|▍         | 332/7579 [16:47<6:06:27,  3.03s/it]  4%|▍         | 333/7579 [16:50<6:06:00,  3.03s/it]  4%|▍         | 334/7579 [16:53<6:05:59,  3.03s/it]  4%|▍         | 335/7579 [16:56<6:05:44,  3.03s/it]                                                    {'loss': 4.8944, 'grad_norm': 0.7777007818222046, 'learning_rate': 4.7796543079561954e-05, 'epoch': 0.04}
+  4%|▍         | 335/7579 [16:56<6:05:44,  3.03s/it]  4%|▍         | 336/7579 [16:59<6:05:45,  3.03s/it]  4%|▍         | 337/7579 [17:02<6:05:31,  3.03s/it]  4%|▍         | 338/7579 [17:05<6:05:24,  3.03s/it]  4%|▍         | 339/7579 [17:08<6:05:31,  3.03s/it]  4%|▍         | 340/7579 [17:11<6:05:34,  3.03s/it]                                                    {'loss': 4.8021, 'grad_norm': 0.797046959400177, 'learning_rate': 4.7763557197519464e-05, 'epoch': 0.04}
+  4%|▍         | 340/7579 [17:11<6:05:34,  3.03s/it]  4%|▍         | 341/7579 [17:14<6:05:43,  3.03s/it]  5%|▍         | 342/7579 [17:17<6:05:50,  3.03s/it]  5%|▍         | 343/7579 [17:20<6:05:45,  3.03s/it]  5%|▍         | 344/7579 [17:23<6:05:36,  3.03s/it]  5%|▍         | 345/7579 [17:26<6:05:35,  3.03s/it]                                                    {'loss': 4.879, 'grad_norm': 0.8685548901557922, 'learning_rate': 4.773057131547698e-05, 'epoch': 0.05}
+  5%|▍         | 345/7579 [17:26<6:05:35,  3.03s/it]  5%|▍         | 346/7579 [17:29<6:05:23,  3.03s/it]  5%|▍         | 347/7579 [17:32<6:05:16,  3.03s/it]  5%|▍         | 348/7579 [17:35<6:05:11,  3.03s/it]  5%|▍         | 349/7579 [17:38<6:05:02,  3.03s/it]  5%|▍         | 350/7579 [17:41<6:04:41,  3.03s/it]                                                    {'loss': 4.8531, 'grad_norm': 0.9361977577209473, 'learning_rate': 4.769758543343449e-05, 'epoch': 0.05}
+  5%|▍         | 350/7579 [17:41<6:04:41,  3.03s/it]  5%|▍         | 351/7579 [17:44<6:04:47,  3.03s/it]  5%|▍         | 352/7579 [17:47<6:04:46,  3.03s/it]  5%|▍         | 353/7579 [17:50<6:04:46,  3.03s/it]  5%|▍         | 354/7579 [17:53<6:04:43,  3.03s/it]  5%|▍         | 355/7579 [17:56<6:04:46,  3.03s/it]                                                    {'loss': 4.8807, 'grad_norm': 0.9164804220199585, 'learning_rate': 4.766459955139201e-05, 'epoch': 0.05}
+  5%|▍         | 355/7579 [17:56<6:04:46,  3.03s/it]  5%|▍         | 356/7579 [17:59<6:04:33,  3.03s/it]  5%|▍         | 357/7579 [18:03<6:04:20,  3.03s/it]  5%|▍         | 358/7579 [18:06<6:04:07,  3.03s/it]  5%|▍         | 359/7579 [18:09<6:03:57,  3.02s/it]  5%|▍         | 360/7579 [18:12<6:04:21,  3.03s/it]                                                    {'loss': 4.7962, 'grad_norm': 0.8144111633300781, 'learning_rate': 4.763161366934952e-05, 'epoch': 0.05}
+  5%|▍         | 360/7579 [18:12<6:04:21,  3.03s/it]  5%|▍         | 361/7579 [18:15<6:04:13,  3.03s/it]  5%|▍         | 362/7579 [18:18<6:04:23,  3.03s/it]  5%|▍         | 363/7579 [18:21<6:04:14,  3.03s/it]  5%|▍         | 364/7579 [18:24<6:04:12,  3.03s/it]  5%|▍         | 365/7579 [18:27<6:04:21,  3.03s/it]                                                    {'loss': 4.7292, 'grad_norm': 0.8306987881660461, 'learning_rate': 4.759862778730704e-05, 'epoch': 0.05}
+  5%|▍         | 365/7579 [18:27<6:04:21,  3.03s/it]  5%|▍         | 366/7579 [18:30<6:04:24,  3.03s/it]  5%|▍         | 367/7579 [18:33<6:04:14,  3.03s/it]  5%|▍         | 368/7579 [18:36<6:04:14,  3.03s/it]  5%|▍         | 369/7579 [18:39<6:04:12,  3.03s/it]  5%|▍         | 370/7579 [18:42<6:04:17,  3.03s/it]                                                    {'loss': 4.785, 'grad_norm': 0.8401136994361877, 'learning_rate': 4.756564190526455e-05, 'epoch': 0.05}
+  5%|▍         | 370/7579 [18:42<6:04:17,  3.03s/it]  5%|▍         | 371/7579 [18:45<6:03:59,  3.03s/it]  5%|▍         | 372/7579 [18:48<6:04:01,  3.03s/it]  5%|▍         | 373/7579 [18:51<6:03:53,  3.03s/it]  5%|▍         | 374/7579 [18:54<6:03:52,  3.03s/it]  5%|▍         | 375/7579 [18:57<6:03:36,  3.03s/it]                                                    {'loss': 4.7089, 'grad_norm': 0.8052535057067871, 'learning_rate': 4.753265602322206e-05, 'epoch': 0.05}
+  5%|▍         | 375/7579 [18:57<6:03:36,  3.03s/it]  5%|▍         | 376/7579 [19:00<6:03:40,  3.03s/it]  5%|▍         | 377/7579 [19:03<6:03:40,  3.03s/it]  5%|▍         | 378/7579 [19:06<6:03:32,  3.03s/it]  5%|▌         | 379/7579 [19:09<6:03:21,  3.03s/it]  5%|▌         | 380/7579 [19:12<6:03:19,  3.03s/it]                                                    {'loss': 4.7585, 'grad_norm': 0.9728232026100159, 'learning_rate': 4.7499670141179575e-05, 'epoch': 0.05}
+  5%|▌         | 380/7579 [19:12<6:03:19,  3.03s/it]  5%|▌         | 381/7579 [19:15<6:03:09,  3.03s/it]  5%|▌         | 382/7579 [19:18<6:02:58,  3.03s/it]  5%|▌         | 383/7579 [19:21<6:03:02,  3.03s/it]  5%|▌         | 384/7579 [19:24<6:03:06,  3.03s/it]  5%|▌         | 385/7579 [19:27<6:03:13,  3.03s/it]                                                    {'loss': 4.7343, 'grad_norm': 0.8734872937202454, 'learning_rate': 4.746668425913709e-05, 'epoch': 0.05}
+  5%|▌         | 385/7579 [19:27<6:03:13,  3.03s/it]  5%|▌         | 386/7579 [19:30<6:03:05,  3.03s/it]  5%|▌         | 387/7579 [19:33<6:03:04,  3.03s/it]  5%|▌         | 388/7579 [19:36<6:02:51,  3.03s/it]  5%|▌         | 389/7579 [19:39<6:02:39,  3.03s/it]  5%|▌         | 390/7579 [19:42<6:02:39,  3.03s/it]                                                    {'loss': 4.679, 'grad_norm': 0.7148551940917969, 'learning_rate': 4.74336983770946e-05, 'epoch': 0.05}
+  5%|▌         | 390/7579 [19:42<6:02:39,  3.03s/it]  5%|▌         | 391/7579 [19:45<6:02:53,  3.03s/it]  5%|▌         | 392/7579 [19:49<6:02:41,  3.03s/it]  5%|▌         | 393/7579 [19:52<6:02:43,  3.03s/it]  5%|▌         | 394/7579 [19:55<6:02:30,  3.03s/it]  5%|▌         | 395/7579 [19:58<6:02:41,  3.03s/it]                                                    {'loss': 4.6792, 'grad_norm': 0.8742380738258362, 'learning_rate': 4.740071249505212e-05, 'epoch': 0.05}
+  5%|▌         | 395/7579 [19:58<6:02:41,  3.03s/it]  5%|▌         | 396/7579 [20:01<6:02:38,  3.03s/it]  5%|▌         | 397/7579 [20:04<6:02:39,  3.03s/it]  5%|▌         | 398/7579 [20:07<6:02:46,  3.03s/it]  5%|▌         | 399/7579 [20:10<6:02:24,  3.03s/it]  5%|▌         | 400/7579 [20:13<6:02:41,  3.03s/it]                                                    {'loss': 4.6745, 'grad_norm': 0.8268457055091858, 'learning_rate': 4.736772661300963e-05, 'epoch': 0.05}
+  5%|▌         | 400/7579 [20:13<6:02:41,  3.03s/it]  5%|▌         | 401/7579 [20:16<6:02:34,  3.03s/it]  5%|▌         | 402/7579 [20:19<6:02:41,  3.03s/it]  5%|▌         | 403/7579 [20:22<6:02:30,  3.03s/it]  5%|▌         | 404/7579 [20:25<6:02:40,  3.03s/it]  5%|▌         | 405/7579 [20:28<6:02:38,  3.03s/it]                                                    {'loss': 4.6184, 'grad_norm': 0.7354267835617065, 'learning_rate': 4.733474073096715e-05, 'epoch': 0.05}
+  5%|▌         | 405/7579 [20:28<6:02:38,  3.03s/it]  5%|▌         | 406/7579 [20:31<6:02:38,  3.03s/it]  5%|▌         | 407/7579 [20:34<6:02:34,  3.03s/it]  5%|▌         | 408/7579 [20:37<6:02:17,  3.03s/it]  5%|▌         | 409/7579 [20:40<6:02:05,  3.03s/it]  5%|▌         | 410/7579 [20:43<6:01:57,  3.03s/it]                                                    {'loss': 4.6631, 'grad_norm': 1.017383098602295, 'learning_rate': 4.730175484892466e-05, 'epoch': 0.05}
+  5%|▌         | 410/7579 [20:43<6:01:57,  3.03s/it]  5%|▌         | 411/7579 [20:46<6:02:00,  3.03s/it]  5%|▌         | 412/7579 [20:49<6:01:51,  3.03s/it]  5%|▌         | 413/7579 [20:52<6:01:45,  3.03s/it]  5%|▌         | 414/7579 [20:55<6:01:54,  3.03s/it]  5%|▌         | 415/7579 [20:58<6:02:00,  3.03s/it]                                                    {'loss': 4.7099, 'grad_norm': 1.0424304008483887, 'learning_rate': 4.7268768966882176e-05, 'epoch': 0.05}
+  5%|▌         | 415/7579 [20:58<6:02:00,  3.03s/it]  5%|▌         | 416/7579 [21:01<6:02:00,  3.03s/it]  6%|▌         | 417/7579 [21:04<6:01:59,  3.03s/it]  6%|▌         | 418/7579 [21:07<6:01:58,  3.03s/it]  6%|▌         | 419/7579 [21:10<6:01:39,  3.03s/it]  6%|▌         | 420/7579 [21:13<6:01:47,  3.03s/it]                                                    {'loss': 4.6057, 'grad_norm': 1.0217599868774414, 'learning_rate': 4.7235783084839694e-05, 'epoch': 0.06}
+  6%|▌         | 420/7579 [21:13<6:01:47,  3.03s/it]  6%|▌         | 421/7579 [21:16<6:01:40,  3.03s/it]  6%|▌         | 422/7579 [21:19<6:01:40,  3.03s/it]  6%|▌         | 423/7579 [21:22<6:01:37,  3.03s/it]  6%|▌         | 424/7579 [21:26<6:01:18,  3.03s/it]  6%|▌         | 425/7579 [21:29<6:01:20,  3.03s/it]                                                    {'loss': 4.6321, 'grad_norm': 0.7887975573539734, 'learning_rate': 4.7202797202797204e-05, 'epoch': 0.06}
+  6%|▌         | 425/7579 [21:29<6:01:20,  3.03s/it]  6%|▌         | 426/7579 [21:32<6:01:19,  3.03s/it]  6%|▌         | 427/7579 [21:35<6:01:09,  3.03s/it]  6%|▌         | 428/7579 [21:38<6:00:59,  3.03s/it]  6%|▌         | 429/7579 [21:41<6:00:51,  3.03s/it]  6%|▌         | 430/7579 [21:44<6:00:41,  3.03s/it]                                                    {'loss': 4.603, 'grad_norm': 0.7483492493629456, 'learning_rate': 4.716981132075472e-05, 'epoch': 0.06}
+  6%|▌         | 430/7579 [21:44<6:00:41,  3.03s/it]  6%|▌         | 431/7579 [21:47<6:00:48,  3.03s/it]  6%|▌         | 432/7579 [21:50<6:00:39,  3.03s/it]  6%|▌         | 433/7579 [21:53<6:00:39,  3.03s/it]  6%|▌         | 434/7579 [21:56<6:00:39,  3.03s/it]  6%|▌         | 435/7579 [21:59<6:00:35,  3.03s/it]                                                    {'loss': 4.5732, 'grad_norm': 0.8815250992774963, 'learning_rate': 4.713682543871223e-05, 'epoch': 0.06}
+  6%|▌         | 435/7579 [21:59<6:00:35,  3.03s/it]  6%|▌         | 436/7579 [22:02<6:00:33,  3.03s/it]  6%|▌         | 437/7579 [22:05<6:00:32,  3.03s/it]  6%|▌         | 438/7579 [22:08<6:00:21,  3.03s/it]  6%|▌         | 439/7579 [22:11<6:00:08,  3.03s/it]  6%|▌         | 440/7579 [22:14<5:59:51,  3.02s/it]                                                    {'loss': 4.5634, 'grad_norm': 0.8224893808364868, 'learning_rate': 4.710383955666975e-05, 'epoch': 0.06}
+  6%|▌         | 440/7579 [22:14<5:59:51,  3.02s/it]  6%|▌         | 441/7579 [22:17<5:59:57,  3.03s/it]  6%|▌         | 442/7579 [22:20<6:00:07,  3.03s/it]  6%|▌         | 443/7579 [22:23<6:00:19,  3.03s/it]  6%|▌         | 444/7579 [22:26<6:00:04,  3.03s/it]  6%|▌         | 445/7579 [22:29<6:00:02,  3.03s/it]                                                    {'loss': 4.5401, 'grad_norm': 0.8361169099807739, 'learning_rate': 4.7070853674627267e-05, 'epoch': 0.06}
+  6%|▌         | 445/7579 [22:29<6:00:02,  3.03s/it]  6%|▌         | 446/7579 [22:32<6:00:06,  3.03s/it]  6%|▌         | 447/7579 [22:35<6:00:12,  3.03s/it]  6%|▌         | 448/7579 [22:38<6:00:03,  3.03s/it]  6%|▌         | 449/7579 [22:41<6:00:01,  3.03s/it]  6%|▌         | 450/7579 [22:44<6:00:07,  3.03s/it]                                                    {'loss': 4.5525, 'grad_norm': 0.7538508176803589, 'learning_rate': 4.703786779258478e-05, 'epoch': 0.06}
+  6%|▌         | 450/7579 [22:44<6:00:07,  3.03s/it]  6%|▌         | 451/7579 [22:47<6:00:07,  3.03s/it]  6%|▌         | 452/7579 [22:50<6:00:12,  3.03s/it]  6%|▌         | 453/7579 [22:53<6:00:06,  3.03s/it]  6%|▌         | 454/7579 [22:56<6:00:09,  3.03s/it]  6%|▌         | 455/7579 [22:59<6:00:10,  3.03s/it]                                                    {'loss': 4.5896, 'grad_norm': 0.8097637295722961, 'learning_rate': 4.7004881910542294e-05, 'epoch': 0.06}
+  6%|▌         | 455/7579 [22:59<6:00:10,  3.03s/it]  6%|▌         | 456/7579 [23:02<6:00:07,  3.03s/it]  6%|▌         | 457/7579 [23:05<5:59:42,  3.03s/it]  6%|▌         | 458/7579 [23:09<5:59:45,  3.03s/it]  6%|▌         | 459/7579 [23:12<5:59:42,  3.03s/it]  6%|▌         | 460/7579 [23:15<5:59:24,  3.03s/it]                                                    {'loss': 4.5248, 'grad_norm': 0.8233209252357483, 'learning_rate': 4.6971896028499805e-05, 'epoch': 0.06}
+  6%|▌         | 460/7579 [23:15<5:59:24,  3.03s/it]  6%|▌         | 461/7579 [23:18<5:59:19,  3.03s/it]  6%|▌         | 462/7579 [23:21<5:59:30,  3.03s/it]  6%|▌         | 463/7579 [23:24<5:59:28,  3.03s/it]  6%|▌         | 464/7579 [23:27<5:59:27,  3.03s/it]  6%|▌         | 465/7579 [23:30<5:59:22,  3.03s/it]                                                    {'loss': 4.5515, 'grad_norm': 0.7345536351203918, 'learning_rate': 4.693891014645732e-05, 'epoch': 0.06}
+  6%|▌         | 465/7579 [23:30<5:59:22,  3.03s/it]  6%|▌         | 466/7579 [23:33<5:59:17,  3.03s/it]  6%|▌         | 467/7579 [23:36<5:59:24,  3.03s/it]  6%|▌         | 468/7579 [23:39<5:59:11,  3.03s/it]  6%|▌         | 469/7579 [23:42<5:58:58,  3.03s/it]  6%|▌         | 470/7579 [23:45<5:58:58,  3.03s/it]                                                    {'loss': 4.4931, 'grad_norm': 0.6971938610076904, 'learning_rate': 4.690592426441483e-05, 'epoch': 0.06}
+  6%|▌         | 470/7579 [23:45<5:58:58,  3.03s/it]  6%|▌         | 471/7579 [23:48<5:59:04,  3.03s/it]  6%|▌         | 472/7579 [23:51<5:58:51,  3.03s/it]  6%|▌         | 473/7579 [23:54<5:58:40,  3.03s/it]  6%|▋         | 474/7579 [23:57<5:58:42,  3.03s/it]  6%|▋         | 475/7579 [24:00<5:58:35,  3.03s/it]                                                    {'loss': 4.5092, 'grad_norm': 0.8435736298561096, 'learning_rate': 4.687293838237234e-05, 'epoch': 0.06}
+  6%|▋         | 475/7579 [24:00<5:58:35,  3.03s/it]  6%|▋         | 476/7579 [24:03<5:58:31,  3.03s/it]  6%|▋         | 477/7579 [24:06<5:58:28,  3.03s/it]  6%|▋         | 478/7579 [24:09<5:58:21,  3.03s/it]  6%|▋         | 479/7579 [24:12<5:58:22,  3.03s/it]  6%|▋         | 480/7579 [24:15<5:58:23,  3.03s/it]                                                    {'loss': 4.4431, 'grad_norm': 1.0269577503204346, 'learning_rate': 4.683995250032986e-05, 'epoch': 0.06}
+  6%|▋         | 480/7579 [24:15<5:58:23,  3.03s/it]  6%|▋         | 481/7579 [24:18<5:58:25,  3.03s/it]  6%|▋         | 482/7579 [24:21<5:58:20,  3.03s/it]  6%|▋         | 483/7579 [24:24<5:58:14,  3.03s/it]  6%|▋         | 484/7579 [24:27<5:58:12,  3.03s/it]  6%|▋         | 485/7579 [24:30<5:58:10,  3.03s/it]                                                    {'loss': 4.4922, 'grad_norm': 0.9984848499298096, 'learning_rate': 4.680696661828737e-05, 'epoch': 0.06}
+  6%|▋         | 485/7579 [24:30<5:58:10,  3.03s/it]  6%|▋         | 486/7579 [24:33<5:58:19,  3.03s/it]  6%|▋         | 487/7579 [24:36<5:58:18,  3.03s/it]  6%|▋         | 488/7579 [24:39<5:58:15,  3.03s/it]  6%|▋         | 489/7579 [24:42<5:58:16,  3.03s/it]  6%|▋         | 490/7579 [24:45<5:58:06,  3.03s/it]                                                    {'loss': 4.5192, 'grad_norm': 0.8703465461730957, 'learning_rate': 4.677398073624489e-05, 'epoch': 0.06}
+  6%|▋         | 490/7579 [24:45<5:58:06,  3.03s/it]  6%|▋         | 491/7579 [24:49<5:58:13,  3.03s/it]  6%|▋         | 492/7579 [24:52<5:57:53,  3.03s/it]  7%|▋         | 493/7579 [24:55<5:57:52,  3.03s/it]  7%|▋         | 494/7579 [24:58<5:57:51,  3.03s/it]  7%|▋         | 495/7579 [25:01<5:57:52,  3.03s/it]                                                    {'loss': 4.4828, 'grad_norm': 0.8682764172554016, 'learning_rate': 4.6740994854202406e-05, 'epoch': 0.07}
+  7%|▋         | 495/7579 [25:01<5:57:52,  3.03s/it]  7%|▋         | 496/7579 [25:04<5:57:58,  3.03s/it]  7%|▋         | 497/7579 [25:07<5:57:38,  3.03s/it]  7%|▋         | 498/7579 [25:10<5:57:18,  3.03s/it]  7%|▋         | 499/7579 [25:13<5:57:31,  3.03s/it]  7%|▋         | 500/7579 [25:16<5:57:23,  3.03s/it]                                                    {'loss': 4.4781, 'grad_norm': 0.8108975291252136, 'learning_rate': 4.6708008972159916e-05, 'epoch': 0.07}
+  7%|▋         | 500/7579 [25:16<5:57:23,  3.03s/it]  7%|▋         | 501/7579 [25:19<5:57:17,  3.03s/it]  7%|▋         | 502/7579 [25:22<6:09:35,  3.13s/it]  7%|▋         | 503/7579 [25:25<6:05:55,  3.10s/it]  7%|▋         | 504/7579 [25:28<6:03:11,  3.08s/it]  7%|▋         | 505/7579 [25:31<6:01:29,  3.07s/it]                                                    {'loss': 4.4139, 'grad_norm': 0.7722007036209106, 'learning_rate': 4.6675023090117434e-05, 'epoch': 0.07}
+  7%|▋         | 505/7579 [25:31<6:01:29,  3.07s/it]  7%|▋         | 506/7579 [25:34<6:00:12,  3.06s/it]  7%|▋         | 507/7579 [25:37<5:59:14,  3.05s/it]  7%|▋         | 508/7579 [25:40<5:58:39,  3.04s/it]  7%|▋         | 509/7579 [25:43<5:57:59,  3.04s/it]  7%|▋         | 510/7579 [25:46<5:57:30,  3.03s/it]                                                    {'loss': 4.4017, 'grad_norm': 0.8667240738868713, 'learning_rate': 4.6642037208074944e-05, 'epoch': 0.07}
+  7%|▋         | 510/7579 [25:46<5:57:30,  3.03s/it]  7%|▋         | 511/7579 [25:49<5:57:24,  3.03s/it]  7%|▋         | 512/7579 [25:52<5:57:15,  3.03s/it]  7%|▋         | 513/7579 [25:56<5:56:50,  3.03s/it]  7%|▋         | 514/7579 [25:59<5:56:43,  3.03s/it]  7%|▋         | 515/7579 [26:02<5:56:52,  3.03s/it]                                                    {'loss': 4.4068, 'grad_norm': 0.9011518955230713, 'learning_rate': 4.660905132603246e-05, 'epoch': 0.07}
+  7%|▋         | 515/7579 [26:02<5:56:52,  3.03s/it]  7%|▋         | 516/7579 [26:05<5:56:48,  3.03s/it]  7%|▋         | 517/7579 [26:08<5:56:44,  3.03s/it]  7%|▋         | 518/7579 [26:11<5:56:29,  3.03s/it]  7%|▋         | 519/7579 [26:14<5:56:31,  3.03s/it]  7%|▋         | 520/7579 [26:17<5:56:23,  3.03s/it]                                                    {'loss': 4.402, 'grad_norm': 0.8163943290710449, 'learning_rate': 4.657606544398997e-05, 'epoch': 0.07}
+  7%|▋         | 520/7579 [26:17<5:56:23,  3.03s/it]  7%|▋         | 521/7579 [26:20<5:56:24,  3.03s/it]  7%|▋         | 522/7579 [26:23<5:56:18,  3.03s/it]  7%|▋         | 523/7579 [26:26<5:56:17,  3.03s/it]  7%|▋         | 524/7579 [26:29<5:56:10,  3.03s/it]  7%|▋         | 525/7579 [26:32<5:56:20,  3.03s/it]                                                    {'loss': 4.3737, 'grad_norm': 0.9523839354515076, 'learning_rate': 4.654307956194749e-05, 'epoch': 0.07}
+  7%|▋         | 525/7579 [26:32<5:56:20,  3.03s/it]  7%|▋         | 526/7579 [26:35<5:56:16,  3.03s/it]  7%|▋         | 527/7579 [26:38<5:56:15,  3.03s/it]  7%|▋         | 528/7579 [26:41<5:56:10,  3.03s/it]  7%|▋         | 529/7579 [26:44<5:56:01,  3.03s/it]  7%|▋         | 530/7579 [26:47<5:55:47,  3.03s/it]                                                    {'loss': 4.3149, 'grad_norm': 1.0666433572769165, 'learning_rate': 4.6510093679905007e-05, 'epoch': 0.07}
+  7%|▋         | 530/7579 [26:47<5:55:47,  3.03s/it]  7%|▋         | 531/7579 [26:50<5:55:41,  3.03s/it]  7%|▋         | 532/7579 [26:53<5:55:41,  3.03s/it]  7%|▋         | 533/7579 [26:56<5:55:47,  3.03s/it]  7%|▋         | 534/7579 [26:59<5:55:50,  3.03s/it]  7%|▋         | 535/7579 [27:02<5:55:55,  3.03s/it]                                                    {'loss': 4.4022, 'grad_norm': 0.8346560597419739, 'learning_rate': 4.647710779786252e-05, 'epoch': 0.07}
+  7%|▋         | 535/7579 [27:02<5:55:55,  3.03s/it]  7%|▋         | 536/7579 [27:05<5:55:49,  3.03s/it]  7%|▋         | 537/7579 [27:08<5:55:36,  3.03s/it]  7%|▋         | 538/7579 [27:11<5:55:34,  3.03s/it]  7%|▋         | 539/7579 [27:15<6:31:46,  3.34s/it]  7%|▋         | 540/7579 [27:18<6:20:30,  3.24s/it]                                                    {'loss': 4.3627, 'grad_norm': 0.7362038493156433, 'learning_rate': 4.6444121915820034e-05, 'epoch': 0.07}
+  7%|▋         | 540/7579 [27:18<6:20:30,  3.24s/it]  7%|▋         | 541/7579 [27:21<6:13:25,  3.18s/it]  7%|▋         | 542/7579 [27:24<6:08:06,  3.14s/it]  7%|▋         | 543/7579 [27:27<6:04:19,  3.11s/it]  7%|▋         | 544/7579 [27:30<6:01:33,  3.08s/it]  7%|▋         | 545/7579 [27:34<5:59:37,  3.07s/it]                                                    {'loss': 4.3524, 'grad_norm': 0.8186846375465393, 'learning_rate': 4.6411136033777545e-05, 'epoch': 0.07}
+  7%|▋         | 545/7579 [27:34<5:59:37,  3.07s/it]  7%|▋         | 546/7579 [27:37<5:58:35,  3.06s/it]  7%|▋         | 547/7579 [27:40<5:57:29,  3.05s/it]  7%|▋         | 548/7579 [27:43<5:56:42,  3.04s/it]  7%|▋         | 549/7579 [27:46<5:56:03,  3.04s/it]  7%|▋         | 550/7579 [27:49<5:55:31,  3.03s/it]                                                    {'loss': 4.367, 'grad_norm': 0.7627508044242859, 'learning_rate': 4.637815015173506e-05, 'epoch': 0.07}
+  7%|▋         | 550/7579 [27:49<5:55:31,  3.03s/it]  7%|▋         | 551/7579 [27:52<5:55:27,  3.03s/it]  7%|▋         | 552/7579 [27:55<5:55:01,  3.03s/it]  7%|▋         | 553/7579 [27:58<5:55:01,  3.03s/it]  7%|▋         | 554/7579 [28:01<5:54:51,  3.03s/it]  7%|▋         | 555/7579 [28:04<5:54:46,  3.03s/it]                                                    {'loss': 4.3736, 'grad_norm': 0.7365829944610596, 'learning_rate': 4.634516426969257e-05, 'epoch': 0.07}
+  7%|▋         | 555/7579 [28:04<5:54:46,  3.03s/it]  7%|▋         | 556/7579 [28:07<5:54:44,  3.03s/it]  7%|▋         | 557/7579 [28:10<5:54:30,  3.03s/it]  7%|▋         | 558/7579 [28:13<5:54:28,  3.03s/it]  7%|▋         | 559/7579 [28:16<5:54:18,  3.03s/it]  7%|▋         | 560/7579 [28:19<5:54:21,  3.03s/it]                                                    {'loss': 4.296, 'grad_norm': 0.7423951625823975, 'learning_rate': 4.631217838765009e-05, 'epoch': 0.07}
+  7%|▋         | 560/7579 [28:19<5:54:21,  3.03s/it]  7%|▋         | 561/7579 [28:22<5:54:17,  3.03s/it]  7%|▋         | 562/7579 [28:25<5:54:28,  3.03s/it]  7%|▋         | 563/7579 [28:28<5:54:34,  3.03s/it]  7%|▋         | 564/7579 [28:31<5:54:32,  3.03s/it]  7%|▋         | 565/7579 [28:34<5:54:24,  3.03s/it]                                                    {'loss': 4.2858, 'grad_norm': 0.811992347240448, 'learning_rate': 4.627919250560761e-05, 'epoch': 0.07}
+  7%|▋         | 565/7579 [28:34<5:54:24,  3.03s/it]  7%|▋         | 566/7579 [28:37<5:54:34,  3.03s/it]  7%|▋         | 567/7579 [28:40<5:54:14,  3.03s/it]  7%|▋         | 568/7579 [28:43<5:54:00,  3.03s/it]  8%|▊         | 569/7579 [28:46<5:53:42,  3.03s/it]  8%|▊         | 570/7579 [28:49<5:53:51,  3.03s/it]                                                    {'loss': 4.2951, 'grad_norm': 0.7100083231925964, 'learning_rate': 4.624620662356511e-05, 'epoch': 0.08}
+  8%|▊         | 570/7579 [28:49<5:53:51,  3.03s/it]  8%|▊         | 571/7579 [28:52<5:54:07,  3.03s/it]  8%|▊         | 572/7579 [28:55<5:54:07,  3.03s/it]  8%|▊         | 573/7579 [28:58<5:54:03,  3.03s/it]  8%|▊         | 574/7579 [29:01<5:54:00,  3.03s/it]  8%|▊         | 575/7579 [29:04<5:53:55,  3.03s/it]                                                    {'loss': 4.2696, 'grad_norm': 0.8507101535797119, 'learning_rate': 4.621322074152263e-05, 'epoch': 0.08}
+  8%|▊         | 575/7579 [29:04<5:53:55,  3.03s/it]  8%|▊         | 576/7579 [29:07<5:53:51,  3.03s/it]  8%|▊         | 577/7579 [29:10<5:53:41,  3.03s/it]  8%|▊         | 578/7579 [29:14<5:53:37,  3.03s/it]  8%|▊         | 579/7579 [29:17<5:53:46,  3.03s/it]  8%|▊         | 580/7579 [29:20<5:53:44,  3.03s/it]                                                    {'loss': 4.3686, 'grad_norm': 0.8241246342658997, 'learning_rate': 4.6180234859480146e-05, 'epoch': 0.08}
+  8%|▊         | 580/7579 [29:20<5:53:44,  3.03s/it]  8%|▊         | 581/7579 [29:23<5:53:50,  3.03s/it]  8%|▊         | 582/7579 [29:26<5:53:40,  3.03s/it]  8%|▊         | 583/7579 [29:29<5:53:33,  3.03s/it]  8%|▊         | 584/7579 [29:32<5:53:25,  3.03s/it]  8%|▊         | 585/7579 [29:35<5:53:43,  3.03s/it]                                                    {'loss': 4.2828, 'grad_norm': 0.865728497505188, 'learning_rate': 4.6147248977437656e-05, 'epoch': 0.08}
+  8%|▊         | 585/7579 [29:35<5:53:43,  3.03s/it]  8%|▊         | 586/7579 [29:38<5:53:35,  3.03s/it]  8%|▊         | 587/7579 [29:41<5:53:04,  3.03s/it]  8%|▊         | 588/7579 [29:44<5:52:57,  3.03s/it]  8%|▊         | 589/7579 [29:47<5:52:43,  3.03s/it]  8%|▊         | 590/7579 [29:50<5:52:38,  3.03s/it]                                                    {'loss': 4.3112, 'grad_norm': 0.933724582195282, 'learning_rate': 4.6114263095395173e-05, 'epoch': 0.08}
+  8%|▊         | 590/7579 [29:50<5:52:38,  3.03s/it]  8%|▊         | 591/7579 [29:53<5:52:30,  3.03s/it]  8%|▊         | 592/7579 [29:56<5:52:36,  3.03s/it]  8%|▊         | 593/7579 [29:59<5:52:34,  3.03s/it]2025-11-04 12:17:42,647 [INFO] lib.callbacks: Принудительная остановка обучения по таймауту: 1802.50 c
+  8%|▊         | 594/7579 [30:02<5:52:42,  3.03s/it]                                                    {'train_runtime': 1802.5154, 'train_samples_per_second': 1076.309, 'train_steps_per_second': 4.205, 'train_loss': 5.4477788527003845, 'epoch': 0.08}
+  8%|▊         | 594/7579 [30:02<5:52:42,  3.03s/it]  8%|▊         | 594/7579 [30:02<5:53:16,  3.03s/it]
+2025-11-04 12:17:42,786 [INFO] lib.training: Финальная валидация
+2025-11-04 12:17:42,796 [INFO] lib.training: Финальная валидация
+2025-11-04 12:17:42,806 [INFO] lib.training: Финальная валидация
+2025-11-04 12:17:42,811 [INFO] lib.training: Финальная валидация
+  0%|          | 0/313 [00:00<?, ?it/s]  1%|          | 2/313 [00:00<00:26, 11.74it/s]  1%|▏         | 4/313 [00:00<00:42,  7.26it/s]  2%|▏         | 5/313 [00:00<00:45,  6.72it/s]  2%|▏         | 6/313 [00:00<00:48,  6.38it/s]  2%|▏         | 7/313 [00:01<00:49,  6.17it/s]  3%|▎         | 8/313 [00:01<00:50,  6.05it/s]  3%|▎         | 9/313 [00:01<00:51,  5.96it/s]  3%|▎         | 10/313 [00:01<00:51,  5.90it/s]  4%|▎         | 11/313 [00:01<00:51,  5.87it/s]  4%|▍         | 12/313 [00:01<00:51,  5.84it/s]  4%|▍         | 13/313 [00:02<00:51,  5.81it/s]  4%|▍         | 14/313 [00:02<00:51,  5.80it/s]  5%|▍         | 15/313 [00:02<00:51,  5.80it/s]  5%|▌         | 16/313 [00:02<00:51,  5.79it/s]  5%|▌         | 17/313 [00:02<00:51,  5.78it/s]  6%|▌         | 18/313 [00:02<00:51,  5.78it/s]  6%|▌         | 19/313 [00:03<00:50,  5.78it/s]  6%|▋         | 20/313 [00:03<00:50,  5.78it/s]  7%|▋         | 21/313 [00:03<00:50,  5.77it/s]  7%|▋         | 22/313 [00:03<00:50,  5.77it/s]  7%|▋         | 23/313 [00:03<00:50,  5.76it/s]  8%|▊         | 24/313 [00:03<00:50,  5.77it/s]  8%|▊         | 25/313 [00:04<00:49,  5.77it/s]  8%|▊         | 26/313 [00:04<00:49,  5.77it/s]  9%|▊         | 27/313 [00:04<00:49,  5.77it/s]  9%|▉         | 28/313 [00:04<00:49,  5.77it/s]  9%|▉         | 29/313 [00:04<00:49,  5.77it/s] 10%|▉         | 30/313 [00:05<00:48,  5.78it/s] 10%|▉         | 31/313 [00:05<00:48,  5.77it/s] 10%|█         | 32/313 [00:05<00:48,  5.78it/s] 11%|█         | 33/313 [00:05<00:48,  5.77it/s] 11%|█         | 34/313 [00:05<00:48,  5.77it/s] 11%|█         | 35/313 [00:05<00:48,  5.77it/s] 12%|█▏        | 36/313 [00:06<00:47,  5.77it/s] 12%|█▏        | 37/313 [00:06<00:47,  5.77it/s] 12%|█▏        | 38/313 [00:06<00:47,  5.76it/s] 12%|█▏        | 39/313 [00:06<00:47,  5.77it/s] 13%|█▎        | 40/313 [00:06<00:47,  5.78it/s] 13%|█▎        | 41/313 [00:06<00:47,  5.77it/s] 13%|█▎        | 42/313 [00:07<00:46,  5.77it/s] 14%|█▎        | 43/313 [00:07<00:46,  5.77it/s] 14%|█▍        | 44/313 [00:07<00:46,  5.77it/s] 14%|█▍        | 45/313 [00:07<00:46,  5.76it/s] 15%|█▍        | 46/313 [00:07<00:46,  5.77it/s] 15%|█▌        | 47/313 [00:07<00:46,  5.77it/s] 15%|█▌        | 48/313 [00:08<00:45,  5.78it/s] 16%|█▌        | 49/313 [00:08<00:45,  5.77it/s] 16%|█▌        | 50/313 [00:08<00:45,  5.77it/s] 16%|█▋        | 51/313 [00:08<00:45,  5.77it/s] 17%|█▋        | 52/313 [00:08<00:45,  5.76it/s] 17%|█▋        | 53/313 [00:09<00:45,  5.77it/s] 17%|█▋        | 54/313 [00:09<00:44,  5.78it/s] 18%|█▊        | 55/313 [00:09<00:44,  5.77it/s] 18%|█▊        | 56/313 [00:09<00:44,  5.77it/s] 18%|█▊        | 57/313 [00:09<00:44,  5.77it/s] 19%|█▊        | 58/313 [00:09<00:44,  5.77it/s] 19%|█▉        | 59/313 [00:10<00:44,  5.77it/s] 19%|█▉        | 60/313 [00:10<00:43,  5.78it/s] 19%|█▉        | 61/313 [00:10<00:43,  5.77it/s] 20%|█▉        | 62/313 [00:10<00:43,  5.77it/s] 20%|██        | 63/313 [00:10<00:43,  5.77it/s] 20%|██        | 64/313 [00:10<00:43,  5.77it/s] 21%|██        | 65/313 [00:11<00:42,  5.77it/s] 21%|██        | 66/313 [00:11<00:42,  5.78it/s] 21%|██▏       | 67/313 [00:11<00:42,  5.76it/s] 22%|██▏       | 68/313 [00:11<00:42,  5.77it/s] 22%|██▏       | 69/313 [00:11<00:42,  5.77it/s] 22%|██▏       | 70/313 [00:11<00:42,  5.77it/s] 23%|██▎       | 71/313 [00:12<00:41,  5.77it/s] 23%|██▎       | 72/313 [00:12<00:41,  5.77it/s] 23%|██▎       | 73/313 [00:12<00:41,  5.77it/s] 24%|██▎       | 74/313 [00:12<00:41,  5.77it/s] 24%|██▍       | 75/313 [00:12<00:41,  5.77it/s] 24%|██▍       | 76/313 [00:13<00:41,  5.77it/s] 25%|██▍       | 77/313 [00:13<00:40,  5.77it/s] 25%|██▍       | 78/313 [00:13<00:40,  5.78it/s] 25%|██▌       | 79/313 [00:13<00:40,  5.76it/s] 26%|██▌       | 80/313 [00:13<00:40,  5.76it/s] 26%|██▌       | 81/313 [00:13<00:40,  5.77it/s] 26%|██▌       | 82/313 [00:14<00:40,  5.77it/s] 27%|██▋       | 83/313 [00:14<00:39,  5.76it/s] 27%|██▋       | 84/313 [00:14<00:39,  5.77it/s] 27%|██▋       | 85/313 [00:14<00:39,  5.77it/s] 27%|██▋       | 86/313 [00:14<00:39,  5.77it/s] 28%|██▊       | 87/313 [00:14<00:39,  5.77it/s] 28%|██▊       | 88/313 [00:15<00:38,  5.77it/s] 28%|██▊       | 89/313 [00:15<00:38,  5.77it/s] 29%|██▉       | 90/313 [00:15<00:38,  5.78it/s] 29%|██▉       | 91/313 [00:15<00:38,  5.77it/s] 29%|██▉       | 92/313 [00:15<00:38,  5.78it/s] 30%|██▉       | 93/313 [00:15<00:38,  5.77it/s] 30%|███       | 94/313 [00:16<00:37,  5.78it/s] 30%|███       | 95/313 [00:16<00:37,  5.77it/s] 31%|███       | 96/313 [00:16<00:37,  5.77it/s] 31%|███       | 97/313 [00:16<00:37,  5.77it/s] 31%|███▏      | 98/313 [00:16<00:37,  5.77it/s] 32%|███▏      | 99/313 [00:16<00:37,  5.77it/s] 32%|███▏      | 100/313 [00:17<00:36,  5.77it/s] 32%|███▏      | 101/313 [00:17<00:36,  5.77it/s] 33%|███▎      | 102/313 [00:17<00:36,  5.78it/s] 33%|███▎      | 103/313 [00:17<00:36,  5.78it/s] 33%|███▎      | 104/313 [00:17<00:36,  5.77it/s] 34%|███▎      | 105/313 [00:18<00:36,  5.77it/s] 34%|███▍      | 106/313 [00:18<00:35,  5.77it/s] 34%|███▍      | 107/313 [00:18<00:35,  5.76it/s] 35%|███▍      | 108/313 [00:18<00:35,  5.76it/s] 35%|███▍      | 109/313 [00:18<00:35,  5.77it/s] 35%|███▌      | 110/313 [00:18<00:35,  5.76it/s] 35%|███▌      | 111/313 [00:19<00:34,  5.77it/s] 36%|███▌      | 112/313 [00:19<00:34,  5.77it/s] 36%|███▌      | 113/313 [00:19<00:34,  5.77it/s] 36%|███▋      | 114/313 [00:19<00:34,  5.78it/s] 37%|███▋      | 115/313 [00:19<00:34,  5.78it/s] 37%|███▋      | 116/313 [00:19<00:34,  5.78it/s] 37%|███▋      | 117/313 [00:20<00:33,  5.77it/s] 38%|███▊      | 118/313 [00:20<00:33,  5.78it/s] 38%|███▊      | 119/313 [00:20<00:33,  5.77it/s] 38%|███▊      | 120/313 [00:20<00:33,  5.77it/s] 39%|███▊      | 121/313 [00:20<00:33,  5.78it/s] 39%|███▉      | 122/313 [00:20<00:33,  5.78it/s] 39%|███▉      | 123/313 [00:21<00:32,  5.77it/s] 40%|███▉      | 124/313 [00:21<00:32,  5.77it/s] 40%|███▉      | 125/313 [00:21<00:32,  5.76it/s] 40%|████      | 126/313 [00:21<00:32,  5.76it/s] 41%|████      | 127/313 [00:21<00:32,  5.77it/s] 41%|████      | 128/313 [00:22<00:32,  5.78it/s] 41%|████      | 129/313 [00:22<00:31,  5.78it/s] 42%|████▏     | 130/313 [00:22<00:31,  5.78it/s] 42%|████▏     | 131/313 [00:22<00:31,  5.77it/s] 42%|████▏     | 132/313 [00:22<00:31,  5.77it/s] 42%|████▏     | 133/313 [00:22<00:31,  5.78it/s] 43%|████▎     | 134/313 [00:23<00:31,  5.77it/s] 43%|████▎     | 135/313 [00:23<00:30,  5.77it/s] 43%|████▎     | 136/313 [00:23<00:30,  5.77it/s] 44%|████▍     | 137/313 [00:23<00:30,  5.77it/s] 44%|████▍     | 138/313 [00:23<00:30,  5.77it/s] 44%|████▍     | 139/313 [00:23<00:30,  5.77it/s] 45%|████▍     | 140/313 [00:24<00:29,  5.77it/s] 45%|████▌     | 141/313 [00:24<00:29,  5.77it/s] 45%|████▌     | 142/313 [00:24<00:29,  5.77it/s] 46%|████▌     | 143/313 [00:24<00:29,  5.77it/s] 46%|████▌     | 144/313 [00:24<00:29,  5.78it/s] 46%|████▋     | 145/313 [00:24<00:29,  5.77it/s] 47%|████▋     | 146/313 [00:25<00:28,  5.77it/s] 47%|████▋     | 147/313 [00:25<00:28,  5.78it/s] 47%|████▋     | 148/313 [00:25<00:28,  5.78it/s] 48%|████▊     | 149/313 [00:25<00:28,  5.78it/s] 48%|████▊     | 150/313 [00:25<00:28,  5.78it/s] 48%|████▊     | 151/313 [00:25<00:28,  5.77it/s] 49%|████▊     | 152/313 [00:26<00:27,  5.77it/s] 49%|████▉     | 153/313 [00:26<00:27,  5.77it/s] 49%|████▉     | 154/313 [00:26<00:27,  5.77it/s] 50%|████▉     | 155/313 [00:26<00:27,  5.77it/s] 50%|████▉     | 156/313 [00:26<00:27,  5.77it/s] 50%|█████     | 157/313 [00:27<00:27,  5.77it/s] 50%|█████     | 158/313 [00:27<00:26,  5.77it/s] 51%|█████     | 159/313 [00:27<00:26,  5.78it/s] 51%|█████     | 160/313 [00:27<00:26,  5.78it/s] 51%|█████▏    | 161/313 [00:27<00:26,  5.78it/s] 52%|█████▏    | 162/313 [00:27<00:26,  5.78it/s] 52%|█████▏    | 163/313 [00:28<00:25,  5.77it/s] 52%|█████▏    | 164/313 [00:28<00:25,  5.77it/s] 53%|█████▎    | 165/313 [00:28<00:25,  5.77it/s] 53%|█████▎    | 166/313 [00:28<00:25,  5.77it/s] 53%|█████▎    | 167/313 [00:28<00:25,  5.77it/s] 54%|█████▎    | 168/313 [00:28<00:25,  5.78it/s] 54%|█████▍    | 169/313 [00:29<00:24,  5.77it/s] 54%|█████▍    | 170/313 [00:29<00:24,  5.78it/s] 55%|█████▍    | 171/313 [00:29<00:24,  5.76it/s] 55%|█████▍    | 172/313 [00:29<00:24,  5.77it/s] 55%|█████▌    | 173/313 [00:29<00:24,  5.77it/s] 56%|█████▌    | 174/313 [00:29<00:24,  5.77it/s] 56%|█████▌    | 175/313 [00:30<00:23,  5.77it/s] 56%|█████▌    | 176/313 [00:30<00:23,  5.78it/s] 57%|█████▋    | 177/313 [00:30<00:23,  5.77it/s] 57%|█████▋    | 178/313 [00:30<00:23,  5.78it/s] 57%|█████▋    | 179/313 [00:30<00:23,  5.78it/s] 58%|█████▊    | 180/313 [00:31<00:23,  5.77it/s] 58%|█████▊    | 181/313 [00:31<00:22,  5.76it/s] 58%|█████▊    | 182/313 [00:31<00:22,  5.76it/s] 58%|█████▊    | 183/313 [00:31<00:22,  5.76it/s] 59%|█████▉    | 184/313 [00:31<00:22,  5.76it/s] 59%|█████▉    | 185/313 [00:31<00:22,  5.76it/s] 59%|█████▉    | 186/313 [00:32<00:22,  5.77it/s] 60%|█████▉    | 187/313 [00:32<00:21,  5.76it/s] 60%|██████    | 188/313 [00:32<00:21,  5.76it/s] 60%|██████    | 189/313 [00:32<00:21,  5.77it/s] 61%|██████    | 190/313 [00:32<00:21,  5.77it/s] 61%|██████    | 191/313 [00:32<00:21,  5.77it/s] 61%|██████▏   | 192/313 [00:33<00:20,  5.78it/s] 62%|██████▏   | 193/313 [00:33<00:20,  5.78it/s] 62%|██████▏   | 194/313 [00:33<00:20,  5.77it/s] 62%|██████▏   | 195/313 [00:33<00:20,  5.77it/s] 63%|██████▎   | 196/313 [00:33<00:20,  5.77it/s] 63%|██████▎   | 197/313 [00:33<00:20,  5.77it/s] 63%|██████▎   | 198/313 [00:34<00:19,  5.78it/s] 64%|██████▎   | 199/313 [00:34<00:19,  5.77it/s] 64%|██████▍   | 200/313 [00:34<00:19,  5.78it/s] 64%|██████▍   | 201/313 [00:34<00:19,  5.78it/s] 65%|██████▍   | 202/313 [00:34<00:19,  5.79it/s] 65%|██████▍   | 203/313 [00:35<00:19,  5.78it/s] 65%|██████▌   | 204/313 [00:35<00:18,  5.78it/s] 65%|██████▌   | 205/313 [00:35<00:18,  5.78it/s] 66%|██████▌   | 206/313 [00:35<00:18,  5.78it/s] 66%|██████▌   | 207/313 [00:35<00:18,  5.78it/s] 66%|██████▋   | 208/313 [00:35<00:18,  5.78it/s] 67%|██████▋   | 209/313 [00:36<00:18,  5.77it/s] 67%|██████▋   | 210/313 [00:36<00:17,  5.78it/s] 67%|██████▋   | 211/313 [00:36<00:17,  5.77it/s] 68%|██████▊   | 212/313 [00:36<00:17,  5.77it/s] 68%|██████▊   | 213/313 [00:36<00:17,  5.77it/s] 68%|██████▊   | 214/313 [00:36<00:17,  5.77it/s] 69%|██████▊   | 215/313 [00:37<00:16,  5.78it/s] 69%|██████▉   | 216/313 [00:37<00:16,  5.77it/s] 69%|██████▉   | 217/313 [00:37<00:16,  5.77it/s] 70%|██████▉   | 218/313 [00:37<00:16,  5.78it/s] 70%|██████▉   | 219/313 [00:37<00:16,  5.77it/s] 70%|███████   | 220/313 [00:37<00:16,  5.78it/s] 71%|███████   | 221/313 [00:38<00:15,  5.77it/s] 71%|███████   | 222/313 [00:38<00:15,  5.78it/s] 71%|███████   | 223/313 [00:38<00:15,  5.78it/s] 72%|███████▏  | 224/313 [00:38<00:15,  5.78it/s] 72%|███████▏  | 225/313 [00:38<00:15,  5.78it/s] 72%|███████▏  | 226/313 [00:38<00:15,  5.78it/s] 73%|███████▎  | 227/313 [00:39<00:14,  5.77it/s] 73%|███████▎  | 228/313 [00:39<00:14,  5.78it/s] 73%|███████▎  | 229/313 [00:39<00:14,  5.78it/s] 73%|███████▎  | 230/313 [00:39<00:14,  5.78it/s] 74%|███████▍  | 231/313 [00:39<00:14,  5.78it/s] 74%|███████▍  | 232/313 [00:40<00:14,  5.78it/s] 74%|███████▍  | 233/313 [00:40<00:13,  5.78it/s] 75%|███████▍  | 234/313 [00:40<00:13,  5.78it/s] 75%|███████▌  | 235/313 [00:40<00:13,  5.78it/s] 75%|███████▌  | 236/313 [00:40<00:13,  5.78it/s] 76%|███████▌  | 237/313 [00:40<00:13,  5.78it/s] 76%|███████▌  | 238/313 [00:41<00:12,  5.77it/s] 76%|███████▋  | 239/313 [00:41<00:12,  5.77it/s] 77%|███████▋  | 240/313 [00:41<00:12,  5.78it/s] 77%|███████▋  | 241/313 [00:41<00:12,  5.78it/s] 77%|███████▋  | 242/313 [00:41<00:12,  5.77it/s] 78%|███████▊  | 243/313 [00:41<00:12,  5.77it/s] 78%|███████▊  | 244/313 [00:42<00:11,  5.78it/s] 78%|███████▊  | 245/313 [00:42<00:11,  5.78it/s] 79%|███████▊  | 246/313 [00:42<00:11,  5.77it/s] 79%|███████▉  | 247/313 [00:42<00:11,  5.78it/s] 79%|███████▉  | 248/313 [00:42<00:11,  5.78it/s] 80%|███████▉  | 249/313 [00:42<00:11,  5.78it/s] 80%|███████▉  | 250/313 [00:43<00:10,  5.78it/s] 80%|████████  | 251/313 [00:43<00:10,  5.78it/s] 81%|████████  | 252/313 [00:43<00:10,  5.78it/s] 81%|████████  | 253/313 [00:43<00:10,  5.77it/s] 81%|████████  | 254/313 [00:43<00:10,  5.77it/s] 81%|████████▏ | 255/313 [00:44<00:10,  5.78it/s] 82%|████████▏ | 256/313 [00:44<00:09,  5.78it/s] 82%|████████▏ | 257/313 [00:44<00:09,  5.77it/s] 82%|████████▏ | 258/313 [00:44<00:09,  5.77it/s] 83%|████████▎ | 259/313 [00:44<00:09,  5.77it/s] 83%|████████▎ | 260/313 [00:44<00:09,  5.77it/s] 83%|████████▎ | 261/313 [00:45<00:08,  5.78it/s] 84%|████████▎ | 262/313 [00:45<00:08,  5.77it/s] 84%|████████▍ | 263/313 [00:45<00:08,  5.77it/s] 84%|████████▍ | 264/313 [00:45<00:08,  5.78it/s] 85%|████████▍ | 265/313 [00:45<00:08,  5.78it/s] 85%|████████▍ | 266/313 [00:45<00:08,  5.78it/s] 85%|████████▌ | 267/313 [00:46<00:07,  5.77it/s] 86%|████████▌ | 268/313 [00:46<00:07,  5.77it/s] 86%|████████▌ | 269/313 [00:46<00:07,  5.77it/s] 86%|████████▋ | 270/313 [00:46<00:07,  5.77it/s] 87%|████████▋ | 271/313 [00:46<00:07,  5.78it/s] 87%|████████▋ | 272/313 [00:46<00:07,  5.77it/s] 87%|████████▋ | 273/313 [00:47<00:06,  5.78it/s] 88%|████████▊ | 274/313 [00:47<00:06,  5.78it/s] 88%|████████▊ | 275/313 [00:47<00:06,  5.78it/s] 88%|████████▊ | 276/313 [00:47<00:06,  5.77it/s] 88%|████████▊ | 277/313 [00:47<00:06,  5.78it/s] 89%|████████▉ | 278/313 [00:47<00:06,  5.77it/s] 89%|████████▉ | 279/313 [00:48<00:05,  5.77it/s] 89%|████████▉ | 280/313 [00:48<00:05,  5.77it/s] 90%|████████▉ | 281/313 [00:48<00:05,  5.77it/s] 90%|█████████ | 282/313 [00:48<00:05,  5.78it/s] 90%|█████████ | 283/313 [00:48<00:05,  5.78it/s] 91%|█████████ | 284/313 [00:49<00:05,  5.77it/s] 91%|█████████ | 285/313 [00:49<00:04,  5.77it/s] 91%|█████████▏| 286/313 [00:49<00:04,  5.78it/s] 92%|█████████▏| 287/313 [00:49<00:04,  5.77it/s] 92%|█████████▏| 288/313 [00:49<00:04,  5.77it/s] 92%|█████████▏| 289/313 [00:49<00:04,  5.77it/s] 93%|█████████▎| 290/313 [00:50<00:03,  5.77it/s] 93%|█████████▎| 291/313 [00:50<00:03,  5.75it/s] 93%|█████████▎| 292/313 [00:50<00:03,  5.75it/s] 94%|█████████▎| 293/313 [00:50<00:03,  5.75it/s] 94%|█████████▍| 294/313 [00:50<00:03,  5.76it/s] 94%|█████████▍| 295/313 [00:50<00:03,  5.77it/s] 95%|█████████▍| 296/313 [00:51<00:02,  5.76it/s] 95%|█████████▍| 297/313 [00:51<00:02,  5.77it/s] 95%|█████████▌| 298/313 [00:51<00:02,  5.78it/s] 96%|█████████▌| 299/313 [00:51<00:02,  5.77it/s] 96%|█████████▌| 300/313 [00:51<00:02,  5.78it/s] 96%|█████████▌| 301/313 [00:51<00:02,  5.77it/s] 96%|█████████▋| 302/313 [00:52<00:01,  5.76it/s] 97%|█████████▋| 303/313 [00:52<00:01,  5.77it/s] 97%|█████████▋| 304/313 [00:52<00:01,  5.77it/s] 97%|█████████▋| 305/313 [00:52<00:01,  5.76it/s] 98%|█████████▊| 306/313 [00:52<00:01,  5.77it/s] 98%|█████████▊| 307/313 [00:53<00:01,  5.78it/s] 98%|█████████▊| 308/313 [00:53<00:00,  5.77it/s] 99%|█████████▊| 309/313 [00:53<00:00,  5.78it/s] 99%|█████████▉| 310/313 [00:53<00:00,  5.77it/s] 99%|█████████▉| 311/313 [00:53<00:00,  5.78it/s]100%|█████████▉| 312/313 [00:53<00:00,  5.78it/s]100%|██████████| 313/313 [00:54<00:00,  5.06it/s]100%|██████████| 313/313 [00:54<00:00,  5.78it/s]
+2025-11-04 12:18:37,325 [INFO] __main__: Обучение завершено!
+2025-11-04 12:18:37,326 [INFO] __main__: Метрики: {'train': {'train_runtime': 1802.5154, 'train_samples_per_second': 1076.309, 'train_steps_per_second': 4.205, 'total_flos': 1.0019644338968986e+17, 'train_loss': 5.4477788527003845, 'epoch': 0.07837962657517979}, 'eval': {'eval_loss': 4.954087734222412, 'eval_runtime': 54.5119, 'eval_samples_per_second': 91.723, 'eval_steps_per_second': 5.742, 'epoch': 0.07837962657517979}}
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mbs16_ga4_FSDP_full_shard_v5[0m at: [34mhttps://wandb.ai/ksorzz/llm_hw2-aylesnov/runs/ghstkogd[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20251104_114737-ghstkogd/logs[0m
+[rank0]:[W1104 12:18:41.923784738 ProcessGroupNCCL.cpp:1294] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())

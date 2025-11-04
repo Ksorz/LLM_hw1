@@ -1,0 +1,1048 @@
+The following values were not passed to `accelerate launch` and had defaults used instead:
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--mixed_precision` was set to a value of `'no'`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+2025-11-04 12:29:36,010 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,010 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 12:29:36,010 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,014 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,014 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 12:29:36,014 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,044 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,044 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 12:29:36,044 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,208 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,208 [INFO] __main__: Запуск обучения в режиме: fsdp
+2025-11-04 12:29:36,208 [INFO] __main__: ============================================================
+2025-11-04 12:29:36,208 [INFO] __main__: World size: 4
+2025-11-04 12:29:36,208 [INFO] __main__: CUDA_VISIBLE_DEVICES: 0,1,2,3
+2025-11-04 12:29:36,208 [INFO] __main__: WANDB_PROJECT: llm_hw2-aylesnov
+2025-11-04 12:29:36,209 [INFO] __main__: Создание FSDP setup
+2025-11-04 12:29:36,209 [INFO] __main__:   sharding_strategy: full_shard
+2025-11-04 12:29:36,209 [INFO] __main__:   cpu_offload: False
+2025-11-04 12:29:36,209 [INFO] __main__:   activation_checkpointing: False
+2025-11-04 12:29:36,209 [INFO] __main__:   backward_prefetch: BACKWARD_POST
+2025-11-04 12:29:36,209 [INFO] __main__:   forward_prefetch: True
+2025-11-04 12:29:36,209 [INFO] __main__:   state_dict_type: FULL_STATE_DICT
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+Training samples:   1940063
+Validation samples: 5000
+2025-11-04 12:30:11,997 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+2025-11-04 12:30:12,236 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+2025-11-04 12:30:12,277 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 12:30:12,278 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 12:30:12,278 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 12:30:12,280 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=2,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=2,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=8,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7fc2304d8410>, <lib.callbacks.InspectCallback object at 0x7fc2301d6990>]}
+2025-11-04 12:30:12,280 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+2025-11-04 12:30:12,365 [INFO] lib.modeling: Модель: 960,881,664 параметров, dtype=torch.bfloat16, ~1.79 GB, на CPU (модель не перенесена на GPU)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 12:30:12,672 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 12:30:12,672 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 12:30:12,673 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=2,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=8,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f391dab01d0>, <lib.callbacks.InspectCallback object at 0x7f391cc2acc0>]}
+2025-11-04 12:30:12,673 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 12:30:12,728 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 12:30:12,728 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 12:30:12,729 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=2,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=1,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=8,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7fb63dbf3a40>, <lib.callbacks.InspectCallback object at 0x7fb63ed909b0>]}
+2025-11-04 12:30:12,729 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+When using FSDP full shard, instead of using `gradient_checkpointing` in TrainingArguments, please use `activation_checkpointing` in `fsdp_config`. The former introduces a redundant AllGather operation in backward pass. Reference: https://github.com/huggingface/transformers/issues/30404
+2025-11-04 12:30:12,755 [INFO] solution: FSDP:
+full_shard auto_wrap
+2025-11-04 12:30:12,755 [INFO] solution: FSDP config:
+{'fsdp_transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'fsdp_backward_prefetch': 'BACKWARD_POST', 'fsdp_forward_prefetch': True, 'fsdp_state_dict_type': 'FULL_STATE_DICT', 'fsdp_cpu_ram_efficient_loading': True, 'fsdp_use_orig_params': True, 'fsdp_sync_module_states': True, 'limit_all_gathers': True}
+2025-11-04 12:30:12,757 [INFO] lib.training: Trainer kwargs: {'model': Qwen3ForCausalLM(
+  (model): Qwen3Model(
+    (embed_tokens): Embedding(50257, 2048, padding_idx=0)
+    (layers): ModuleList(
+      (0-11): 12 x Qwen3DecoderLayer(
+        (self_attn): Qwen3Attention(
+          (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+          (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+          (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+          (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+        )
+        (mlp): Qwen3MLP(
+          (gate_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (up_proj): Linear(in_features=2048, out_features=8192, bias=False)
+          (down_proj): Linear(in_features=8192, out_features=2048, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+      )
+    )
+    (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+    (rotary_emb): Qwen3RotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=2048, out_features=50257, bias=False)
+), 'args': TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=2500,
+eval_strategy=IntervalStrategy.STEPS,
+eval_use_gather_object=False,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[<FSDPOption.FULL_SHARD: 'full_shard'>, <FSDPOption.AUTO_WRAP: 'auto_wrap'>],
+fsdp_config={'limit_all_gathers': True, 'transformer_layer_cls_to_wrap': ['Qwen3DecoderLayer'], 'backward_prefetch': 'BACKWARD_POST', 'forward_prefetch': True, 'state_dict_type': 'FULL_STATE_DICT', 'cpu_ram_efficient_loading': True, 'use_orig_params': True, 'sync_module_states': True, 'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=2,
+gradient_checkpointing=True,
+gradient_checkpointing_kwargs=None,
+greater_is_better=False,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=HubStrategy.EVERY_SAVE,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=True,
+local_rank=3,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/app/output_dir/logs,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=5,
+logging_strategy=IntervalStrategy.STEPS,
+lr_scheduler_kwargs={},
+lr_scheduler_type=SchedulerType.LINEAR,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=eval_loss,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=1,
+optim=OptimizerNames.ADAMW_TORCH,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/app/output_dir/gpt2-1b-russian,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=4,
+per_device_train_batch_size=8,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=/app/output_dir/gpt2-1b-russian,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=2500,
+save_strategy=SaveStrategy.STEPS,
+save_total_limit=2,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.01,
+), 'train_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 1940063
+}), 'eval_dataset': Dataset({
+    features: ['input_ids', 'attention_mask', 'labels'],
+    num_rows: 5000
+}), 'tokenizer': GPT2TokenizerFast(name_or_path='ai-forever/rugpt3small_based_on_gpt2', vocab_size=50257, model_max_length=2048, is_fast=True, padding_side='right', truncation_side='left', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'pad_token': '<pad>', 'mask_token': '<mask>'}, clean_up_tokenization_spaces=True, added_tokens_decoder={
+	0: AddedToken("<pad>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	1: AddedToken("<s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	2: AddedToken("</s>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	3: AddedToken("<unk>", rstrip=False, lstrip=False, single_word=False, normalized=True, special=True),
+	4: AddedToken("<mask>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+}
+), 'callbacks': [<lib.callbacks.TimeoutCallback object at 0x7f5e70ac0530>, <lib.callbacks.InspectCallback object at 0x7f5e70ab6ed0>]}
+2025-11-04 12:30:12,757 [INFO] lib.training: До Trainer: модель находится на устройстве: cpu
+/app/lib/training.py:109: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(**trainer_kwargs)
+2025-11-04 12:30:14,154 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 12:30:14,160 [INFO] lib.training: Старт обучения
+2025-11-04 12:30:14,310 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 12:30:14,321 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 12:30:14,324 [INFO] lib.training: Старт обучения
+2025-11-04 12:30:14,359 [INFO] lib.training: После Trainer: модель находится на устройстве: cpu
+2025-11-04 12:30:14,362 [INFO] lib.training: Старт обучения
+wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
+wandb: creating run
+wandb: Tracking run with wandb version 0.19.10
+wandb: Run data is saved locally in /app/hw2_parallel_pretrain/wandb/run-20251104_123015-bjw91zkb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run bs8_ga2_FSDP_full_shard_v6
+wandb: ⭐️ View project at https://wandb.ai/ksorzz/llm_hw2-aylesnov
+wandb: 🚀 View run at https://wandb.ai/ksorzz/llm_hw2-aylesnov/runs/bjw91zkb
+2025-11-04 12:30:16,638 [INFO] __main__: Setup создан успешно
+2025-11-04 12:30:16,639 [INFO] __main__: Конфигурация: {'output_dir': '/app/output_dir/gpt2-1b-russian', 'optim': 'adamw_torch', 'num_train_epochs': 1, 'per_device_train_batch_size': 8, 'save_steps': 2500, 'save_total_limit': 2, 'learning_rate': 5e-05, 'weight_decay': 0.01, 'logging_steps': 5, 'eval_steps': 2500, 'eval_strategy': 'steps', 'load_best_model_at_end': True, 'metric_for_best_model': 'eval_loss', 'gradient_checkpointing': True, 'gradient_accumulation_steps': 2, 'per_device_eval_batch_size': 4, 'dataloader_num_workers': 4, 'torch_compile': False, 'report_to': 'wandb', 'bf16': True}
+2025-11-04 12:30:16,639 [INFO] __main__: Старт обучения...
+2025-11-04 12:30:16,639 [INFO] lib.training: Старт обучения
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1731: UserWarning: Upcasted low precision parameters in Qwen3ForCausalLM because mixed precision turned on in FSDP. Affects: model.embed_tokens.weight, model.norm.weight, lm_head.weight.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1731: UserWarning: Upcasted low precision parameters in Qwen3DecoderLayer because mixed precision turned on in FSDP. Affects: self_attn.q_proj.weight, self_attn.k_proj.weight, self_attn.v_proj.weight, self_attn.o_proj.weight, self_attn.q_norm.weight, self_attn.k_norm.weight, mlp.gate_proj.weight, mlp.up_proj.weight, mlp.down_proj.weight, input_layernorm.weight, post_attention_layernorm.weight.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/accelerate/accelerator.py:1737: UserWarning: FSDP upcast of low precision parameters may affect the precision of model checkpoints.
+  warnings.warn(
+2025-11-04 12:30:18,335 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 12:30:18,335 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 12:30:18,335 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 12:30:18,335 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+2025-11-04 12:30:18,336 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 12:30:18,336 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 12:30:18,336 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 12:30:18,336 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+2025-11-04 12:30:18,337 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 12:30:18,337 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 12:30:18,337 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 12:30:18,337 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+wandb: WARNING The `run_name` is currently set to the same value as `TrainingArguments.output_dir`. If this was not intended, please specify a different run name by setting the `TrainingArguments.run_name` parameter.
+2025-11-04 12:30:18,344 [INFO] lib.callbacks: Distributed type: DistributedType.FSDP
+2025-11-04 12:30:18,344 [INFO] lib.callbacks: Model wrapper type: FullyShardedDataParallel (module: torch.distributed.fsdp.fully_sharded_data_parallel)
+2025-11-04 12:30:18,344 [INFO] lib.callbacks: Модель обёрнута в FSDP
+2025-11-04 12:30:18,345 [INFO] lib.callbacks: FSDP sharding strategy: ShardingStrategy.FULL_SHARD
+  0%|          | 0/30314 [00:00<?, ?it/s]`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+  0%|          | 1/30314 [00:02<21:07:51,  2.51s/it]  0%|          | 2/30314 [00:03<15:00:23,  1.78s/it]  0%|          | 3/30314 [00:05<13:02:03,  1.55s/it]  0%|          | 4/30314 [00:06<12:06:41,  1.44s/it]  0%|          | 5/30314 [00:07<11:39:00,  1.38s/it]                                                    {'loss': 10.6439, 'grad_norm': 6.458316326141357, 'learning_rate': 4.999340238833543e-05, 'epoch': 0.0}
+  0%|          | 5/30314 [00:07<11:39:00,  1.38s/it]  0%|          | 6/30314 [00:08<11:19:49,  1.35s/it]  0%|          | 7/30314 [00:10<11:07:05,  1.32s/it]  0%|          | 8/30314 [00:11<10:58:39,  1.30s/it]  0%|          | 9/30314 [00:12<10:53:12,  1.29s/it]  0%|          | 10/30314 [00:13<10:49:42,  1.29s/it]                                                     {'loss': 9.6597, 'grad_norm': 3.241887331008911, 'learning_rate': 4.9985155373754705e-05, 'epoch': 0.0}
+  0%|          | 10/30314 [00:13<10:49:42,  1.29s/it]  0%|          | 11/30314 [00:15<10:47:23,  1.28s/it]  0%|          | 12/30314 [00:16<10:45:42,  1.28s/it]  0%|          | 13/30314 [00:17<10:44:14,  1.28s/it]  0%|          | 14/30314 [00:19<10:43:24,  1.27s/it]  0%|          | 15/30314 [00:20<10:42:41,  1.27s/it]                                                     {'loss': 8.9178, 'grad_norm': 3.397484302520752, 'learning_rate': 4.997690835917398e-05, 'epoch': 0.0}
+  0%|          | 15/30314 [00:20<10:42:41,  1.27s/it]  0%|          | 16/30314 [00:21<10:42:09,  1.27s/it]  0%|          | 17/30314 [00:22<10:41:32,  1.27s/it]  0%|          | 18/30314 [00:24<10:41:26,  1.27s/it]  0%|          | 19/30314 [00:25<10:40:49,  1.27s/it]  0%|          | 20/30314 [00:26<10:40:42,  1.27s/it]                                                     {'loss': 8.5531, 'grad_norm': 1.613102912902832, 'learning_rate': 4.996866134459326e-05, 'epoch': 0.0}
+  0%|          | 20/30314 [00:26<10:40:42,  1.27s/it]  0%|          | 21/30314 [00:27<10:40:52,  1.27s/it]  0%|          | 22/30314 [00:29<10:40:35,  1.27s/it]  0%|          | 23/30314 [00:30<10:40:24,  1.27s/it]  0%|          | 24/30314 [00:31<10:40:21,  1.27s/it]  0%|          | 25/30314 [00:32<10:40:18,  1.27s/it]                                                     {'loss': 8.2779, 'grad_norm': 1.0446356534957886, 'learning_rate': 4.996041433001254e-05, 'epoch': 0.0}
+  0%|          | 25/30314 [00:32<10:40:18,  1.27s/it]  0%|          | 26/30314 [00:34<10:40:44,  1.27s/it]  0%|          | 27/30314 [00:35<10:40:27,  1.27s/it]  0%|          | 28/30314 [00:36<10:40:34,  1.27s/it]  0%|          | 29/30314 [00:38<10:40:13,  1.27s/it]  0%|          | 30/30314 [00:39<10:39:57,  1.27s/it]                                                     {'loss': 8.0094, 'grad_norm': 1.4306232929229736, 'learning_rate': 4.995216731543181e-05, 'epoch': 0.0}
+  0%|          | 30/30314 [00:39<10:39:57,  1.27s/it]  0%|          | 31/30314 [00:40<10:40:09,  1.27s/it]  0%|          | 32/30314 [00:41<10:40:13,  1.27s/it]  0%|          | 33/30314 [00:43<10:41:08,  1.27s/it]  0%|          | 34/30314 [00:44<10:40:49,  1.27s/it]  0%|          | 35/30314 [00:45<10:40:56,  1.27s/it]                                                     {'loss': 7.9125, 'grad_norm': 0.7213961482048035, 'learning_rate': 4.9943920300851096e-05, 'epoch': 0.0}
+  0%|          | 35/30314 [00:45<10:40:56,  1.27s/it]  0%|          | 36/30314 [00:46<10:41:11,  1.27s/it]  0%|          | 37/30314 [00:48<10:41:03,  1.27s/it]  0%|          | 38/30314 [00:49<10:40:34,  1.27s/it]  0%|          | 39/30314 [00:50<10:40:27,  1.27s/it]  0%|          | 40/30314 [00:52<10:40:26,  1.27s/it]                                                     {'loss': 7.7831, 'grad_norm': 0.9182899594306946, 'learning_rate': 4.993567328627037e-05, 'epoch': 0.0}
+  0%|          | 40/30314 [00:52<10:40:26,  1.27s/it]  0%|          | 41/30314 [00:53<10:40:48,  1.27s/it]  0%|          | 42/30314 [00:54<10:40:55,  1.27s/it]  0%|          | 43/30314 [00:55<10:40:45,  1.27s/it]  0%|          | 44/30314 [00:57<10:41:03,  1.27s/it]  0%|          | 45/30314 [00:58<10:41:28,  1.27s/it]                                                     {'loss': 7.7512, 'grad_norm': 1.0703787803649902, 'learning_rate': 4.992742627168966e-05, 'epoch': 0.0}
+  0%|          | 45/30314 [00:58<10:41:28,  1.27s/it]  0%|          | 46/30314 [00:59<10:41:20,  1.27s/it]  0%|          | 47/30314 [01:00<10:40:34,  1.27s/it]  0%|          | 48/30314 [01:02<10:40:15,  1.27s/it]  0%|          | 49/30314 [01:03<10:40:09,  1.27s/it]  0%|          | 50/30314 [01:04<10:40:01,  1.27s/it]                                                     {'loss': 7.5853, 'grad_norm': 1.080506443977356, 'learning_rate': 4.991917925710893e-05, 'epoch': 0.0}
+  0%|          | 50/30314 [01:04<10:40:01,  1.27s/it]  0%|          | 51/30314 [01:06<10:40:12,  1.27s/it]  0%|          | 52/30314 [01:07<10:40:11,  1.27s/it]  0%|          | 53/30314 [01:08<10:40:31,  1.27s/it]  0%|          | 54/30314 [01:09<10:40:36,  1.27s/it]  0%|          | 55/30314 [01:11<10:40:34,  1.27s/it]                                                     {'loss': 7.6394, 'grad_norm': 1.3484574556350708, 'learning_rate': 4.991093224252821e-05, 'epoch': 0.0}
+  0%|          | 55/30314 [01:11<10:40:34,  1.27s/it]  0%|          | 56/30314 [01:12<10:40:26,  1.27s/it]  0%|          | 57/30314 [01:13<10:39:57,  1.27s/it]  0%|          | 58/30314 [01:14<10:39:54,  1.27s/it]  0%|          | 59/30314 [01:16<10:39:56,  1.27s/it]  0%|          | 60/30314 [01:17<10:40:04,  1.27s/it]                                                     {'loss': 7.5607, 'grad_norm': 0.9114267230033875, 'learning_rate': 4.990268522794749e-05, 'epoch': 0.0}
+  0%|          | 60/30314 [01:17<10:40:04,  1.27s/it]  0%|          | 61/30314 [01:18<10:40:22,  1.27s/it]  0%|          | 62/30314 [01:19<10:40:41,  1.27s/it]  0%|          | 63/30314 [01:21<10:40:19,  1.27s/it]  0%|          | 64/30314 [01:22<10:40:02,  1.27s/it]  0%|          | 65/30314 [01:23<10:39:58,  1.27s/it]                                                     {'loss': 7.4573, 'grad_norm': 1.3313578367233276, 'learning_rate': 4.9894438213366764e-05, 'epoch': 0.0}
+  0%|          | 65/30314 [01:23<10:39:58,  1.27s/it]  0%|          | 66/30314 [01:25<10:39:53,  1.27s/it]  0%|          | 67/30314 [01:26<10:39:46,  1.27s/it]  0%|          | 68/30314 [01:27<10:39:52,  1.27s/it]  0%|          | 69/30314 [01:28<10:39:42,  1.27s/it]  0%|          | 70/30314 [01:30<10:39:31,  1.27s/it]                                                     {'loss': 7.3304, 'grad_norm': 1.0596277713775635, 'learning_rate': 4.988619119878604e-05, 'epoch': 0.0}
+  0%|          | 70/30314 [01:30<10:39:31,  1.27s/it]  0%|          | 71/30314 [01:31<10:40:04,  1.27s/it]  0%|          | 72/30314 [01:32<10:40:05,  1.27s/it]  0%|          | 73/30314 [01:33<10:40:07,  1.27s/it]  0%|          | 74/30314 [01:35<10:40:00,  1.27s/it]  0%|          | 75/30314 [01:36<10:40:01,  1.27s/it]                                                     {'loss': 7.3283, 'grad_norm': 1.3270317316055298, 'learning_rate': 4.9877944184205325e-05, 'epoch': 0.0}
+  0%|          | 75/30314 [01:36<10:40:01,  1.27s/it]  0%|          | 76/30314 [01:37<10:39:56,  1.27s/it]  0%|          | 77/30314 [01:39<10:40:01,  1.27s/it]  0%|          | 78/30314 [01:40<10:39:29,  1.27s/it]  0%|          | 79/30314 [01:41<10:39:22,  1.27s/it]  0%|          | 80/30314 [01:42<10:39:22,  1.27s/it]                                                     {'loss': 7.2447, 'grad_norm': 1.1802128553390503, 'learning_rate': 4.9869697169624595e-05, 'epoch': 0.0}
+  0%|          | 80/30314 [01:42<10:39:22,  1.27s/it]  0%|          | 81/30314 [01:44<10:39:41,  1.27s/it]  0%|          | 82/30314 [01:45<10:39:15,  1.27s/it]  0%|          | 83/30314 [01:46<10:39:16,  1.27s/it]  0%|          | 84/30314 [01:47<10:39:20,  1.27s/it]  0%|          | 85/30314 [01:49<10:39:25,  1.27s/it]                                                     {'loss': 7.2093, 'grad_norm': 1.2014983892440796, 'learning_rate': 4.986145015504388e-05, 'epoch': 0.0}
+  0%|          | 85/30314 [01:49<10:39:25,  1.27s/it]  0%|          | 86/30314 [01:50<10:40:06,  1.27s/it]  0%|          | 87/30314 [01:51<10:40:05,  1.27s/it]  0%|          | 88/30314 [01:52<10:40:25,  1.27s/it]  0%|          | 89/30314 [01:54<10:40:22,  1.27s/it]  0%|          | 90/30314 [01:55<10:40:08,  1.27s/it]                                                     {'loss': 7.2068, 'grad_norm': 1.0775504112243652, 'learning_rate': 4.9853203140463156e-05, 'epoch': 0.0}
+  0%|          | 90/30314 [01:55<10:40:08,  1.27s/it]  0%|          | 91/30314 [01:56<10:40:56,  1.27s/it]  0%|          | 92/30314 [01:58<10:40:42,  1.27s/it]  0%|          | 93/30314 [01:59<10:40:04,  1.27s/it]  0%|          | 94/30314 [02:00<10:39:49,  1.27s/it]  0%|          | 95/30314 [02:01<10:39:39,  1.27s/it]                                                     {'loss': 7.1733, 'grad_norm': 1.4725592136383057, 'learning_rate': 4.984495612588243e-05, 'epoch': 0.0}
+  0%|          | 95/30314 [02:01<10:39:39,  1.27s/it]  0%|          | 96/30314 [02:03<10:39:38,  1.27s/it]  0%|          | 97/30314 [02:04<10:39:25,  1.27s/it]  0%|          | 98/30314 [02:05<10:39:32,  1.27s/it]  0%|          | 99/30314 [02:06<10:39:24,  1.27s/it]  0%|          | 100/30314 [02:08<10:39:08,  1.27s/it]                                                      {'loss': 6.9652, 'grad_norm': 0.9999507069587708, 'learning_rate': 4.983670911130171e-05, 'epoch': 0.0}
+  0%|          | 100/30314 [02:08<10:39:08,  1.27s/it]  0%|          | 101/30314 [02:09<10:39:16,  1.27s/it]  0%|          | 102/30314 [02:10<10:38:37,  1.27s/it]  0%|          | 103/30314 [02:12<10:38:28,  1.27s/it]  0%|          | 104/30314 [02:13<10:38:31,  1.27s/it]  0%|          | 105/30314 [02:14<10:38:23,  1.27s/it]                                                      {'loss': 6.8336, 'grad_norm': 1.000173807144165, 'learning_rate': 4.982846209672099e-05, 'epoch': 0.0}
+  0%|          | 105/30314 [02:14<10:38:23,  1.27s/it]  0%|          | 106/30314 [02:15<10:38:25,  1.27s/it]  0%|          | 107/30314 [02:17<10:38:36,  1.27s/it]  0%|          | 108/30314 [02:18<10:38:31,  1.27s/it]  0%|          | 109/30314 [02:19<10:38:34,  1.27s/it]  0%|          | 110/30314 [02:20<10:38:17,  1.27s/it]                                                      {'loss': 6.8995, 'grad_norm': 1.0262740850448608, 'learning_rate': 4.982021508214027e-05, 'epoch': 0.0}
+  0%|          | 110/30314 [02:20<10:38:17,  1.27s/it]  0%|          | 111/30314 [02:22<10:38:55,  1.27s/it]  0%|          | 112/30314 [02:23<10:38:43,  1.27s/it]  0%|          | 113/30314 [02:24<10:38:22,  1.27s/it]  0%|          | 114/30314 [02:25<10:38:28,  1.27s/it]  0%|          | 115/30314 [02:27<10:38:24,  1.27s/it]                                                      {'loss': 6.7421, 'grad_norm': 1.2042407989501953, 'learning_rate': 4.981196806755955e-05, 'epoch': 0.0}
+  0%|          | 115/30314 [02:27<10:38:24,  1.27s/it]  0%|          | 116/30314 [02:28<10:38:44,  1.27s/it]  0%|          | 117/30314 [02:29<10:39:03,  1.27s/it]  0%|          | 118/30314 [02:31<10:38:59,  1.27s/it]  0%|          | 119/30314 [02:32<10:38:42,  1.27s/it]  0%|          | 120/30314 [02:33<10:38:30,  1.27s/it]                                                      {'loss': 6.7872, 'grad_norm': 1.0130268335342407, 'learning_rate': 4.9803721052978824e-05, 'epoch': 0.0}
+  0%|          | 120/30314 [02:33<10:38:30,  1.27s/it]  0%|          | 121/30314 [02:34<10:38:43,  1.27s/it]  0%|          | 122/30314 [02:36<10:38:22,  1.27s/it]  0%|          | 123/30314 [02:37<10:38:31,  1.27s/it]  0%|          | 124/30314 [02:38<10:38:19,  1.27s/it]  0%|          | 125/30314 [02:39<10:37:59,  1.27s/it]                                                      {'loss': 6.5963, 'grad_norm': 1.024614691734314, 'learning_rate': 4.979547403839811e-05, 'epoch': 0.0}
+  0%|          | 125/30314 [02:39<10:37:59,  1.27s/it]  0%|          | 126/30314 [02:41<10:37:48,  1.27s/it]  0%|          | 127/30314 [02:42<10:37:33,  1.27s/it]  0%|          | 128/30314 [02:43<10:37:41,  1.27s/it]  0%|          | 129/30314 [02:45<10:37:51,  1.27s/it]  0%|          | 130/30314 [02:46<10:37:33,  1.27s/it]                                                      {'loss': 6.6283, 'grad_norm': 1.0481328964233398, 'learning_rate': 4.978722702381738e-05, 'epoch': 0.0}
+  0%|          | 130/30314 [02:46<10:37:33,  1.27s/it]  0%|          | 131/30314 [02:47<10:38:10,  1.27s/it]  0%|          | 132/30314 [02:48<10:38:32,  1.27s/it]  0%|          | 133/30314 [02:50<10:38:29,  1.27s/it]  0%|          | 134/30314 [02:51<10:38:20,  1.27s/it]  0%|          | 135/30314 [02:52<10:37:46,  1.27s/it]                                                      {'loss': 6.5431, 'grad_norm': 1.0859501361846924, 'learning_rate': 4.977898000923666e-05, 'epoch': 0.0}
+  0%|          | 135/30314 [02:52<10:37:46,  1.27s/it]  0%|          | 136/30314 [02:53<10:37:52,  1.27s/it]  0%|          | 137/30314 [02:55<10:37:24,  1.27s/it]  0%|          | 138/30314 [02:56<10:38:03,  1.27s/it]  0%|          | 139/30314 [02:57<10:37:50,  1.27s/it]  0%|          | 140/30314 [02:58<10:37:32,  1.27s/it]                                                      {'loss': 6.5172, 'grad_norm': 0.9854033589363098, 'learning_rate': 4.977073299465594e-05, 'epoch': 0.0}
+  0%|          | 140/30314 [02:58<10:37:32,  1.27s/it]  0%|          | 141/30314 [03:00<10:37:37,  1.27s/it]  0%|          | 142/30314 [03:01<10:37:23,  1.27s/it]  0%|          | 143/30314 [03:02<10:37:37,  1.27s/it]  0%|          | 144/30314 [03:04<10:37:25,  1.27s/it]  0%|          | 145/30314 [03:05<10:37:24,  1.27s/it]                                                      {'loss': 6.5375, 'grad_norm': 0.9006024599075317, 'learning_rate': 4.9762485980075215e-05, 'epoch': 0.0}
+  0%|          | 145/30314 [03:05<10:37:24,  1.27s/it]  0%|          | 146/30314 [03:06<10:37:45,  1.27s/it]  0%|          | 147/30314 [03:07<10:37:51,  1.27s/it]  0%|          | 148/30314 [03:09<10:38:08,  1.27s/it]  0%|          | 149/30314 [03:10<10:37:50,  1.27s/it]  0%|          | 150/30314 [03:11<10:37:45,  1.27s/it]                                                      {'loss': 6.4429, 'grad_norm': 1.1057180166244507, 'learning_rate': 4.975423896549449e-05, 'epoch': 0.0}
+  0%|          | 150/30314 [03:11<10:37:45,  1.27s/it]  0%|          | 151/30314 [03:12<10:38:11,  1.27s/it]  1%|          | 152/30314 [03:14<10:37:51,  1.27s/it]  1%|          | 153/30314 [03:15<10:37:30,  1.27s/it]  1%|          | 154/30314 [03:16<10:37:31,  1.27s/it]  1%|          | 155/30314 [03:17<10:37:48,  1.27s/it]                                                      {'loss': 6.3709, 'grad_norm': 0.9321805834770203, 'learning_rate': 4.9745991950913776e-05, 'epoch': 0.01}
+  1%|          | 155/30314 [03:17<10:37:48,  1.27s/it]  1%|          | 156/30314 [03:19<10:38:06,  1.27s/it]  1%|          | 157/30314 [03:20<10:37:30,  1.27s/it]  1%|          | 158/30314 [03:21<10:37:40,  1.27s/it]  1%|          | 159/30314 [03:23<10:37:48,  1.27s/it]  1%|          | 160/30314 [03:24<10:37:34,  1.27s/it]                                                      {'loss': 6.4575, 'grad_norm': 1.0673446655273438, 'learning_rate': 4.9737744936333046e-05, 'epoch': 0.01}
+  1%|          | 160/30314 [03:24<10:37:34,  1.27s/it]  1%|          | 161/30314 [03:25<10:37:37,  1.27s/it]  1%|          | 162/30314 [03:26<10:37:29,  1.27s/it]  1%|          | 163/30314 [03:28<10:37:40,  1.27s/it]  1%|          | 164/30314 [03:29<10:37:24,  1.27s/it]  1%|          | 165/30314 [03:30<10:37:42,  1.27s/it]                                                      {'loss': 6.3733, 'grad_norm': 0.9898919463157654, 'learning_rate': 4.972949792175233e-05, 'epoch': 0.01}
+  1%|          | 165/30314 [03:30<10:37:42,  1.27s/it]  1%|          | 166/30314 [03:31<10:37:45,  1.27s/it]  1%|          | 167/30314 [03:33<10:37:28,  1.27s/it]  1%|          | 168/30314 [03:34<10:37:00,  1.27s/it]  1%|          | 169/30314 [03:35<10:36:59,  1.27s/it]  1%|          | 170/30314 [03:37<10:37:01,  1.27s/it]                                                      {'loss': 6.2806, 'grad_norm': 1.0633585453033447, 'learning_rate': 4.9721250907171607e-05, 'epoch': 0.01}
+  1%|          | 170/30314 [03:37<10:37:01,  1.27s/it]  1%|          | 171/30314 [03:38<10:37:21,  1.27s/it]  1%|          | 172/30314 [03:39<10:37:25,  1.27s/it]  1%|          | 173/30314 [03:40<10:37:19,  1.27s/it]  1%|          | 174/30314 [03:42<10:37:17,  1.27s/it]  1%|          | 175/30314 [03:43<10:37:18,  1.27s/it]                                                      {'loss': 6.4108, 'grad_norm': 1.1100636720657349, 'learning_rate': 4.971300389259089e-05, 'epoch': 0.01}
+  1%|          | 175/30314 [03:43<10:37:18,  1.27s/it]  1%|          | 176/30314 [03:44<10:37:38,  1.27s/it]  1%|          | 177/30314 [03:45<10:37:38,  1.27s/it]  1%|          | 178/30314 [03:47<10:37:08,  1.27s/it]  1%|          | 179/30314 [03:48<10:37:15,  1.27s/it]  1%|          | 180/30314 [03:49<10:36:52,  1.27s/it]                                                      {'loss': 6.2241, 'grad_norm': 1.210543155670166, 'learning_rate': 4.970475687801016e-05, 'epoch': 0.01}
+  1%|          | 180/30314 [03:49<10:36:52,  1.27s/it]  1%|          | 181/30314 [03:50<10:36:56,  1.27s/it]  1%|          | 182/30314 [03:52<10:37:08,  1.27s/it]  1%|          | 183/30314 [03:53<10:37:04,  1.27s/it]  1%|          | 184/30314 [03:54<10:37:00,  1.27s/it]  1%|          | 185/30314 [03:56<10:36:43,  1.27s/it]                                                      {'loss': 6.2679, 'grad_norm': 1.1122329235076904, 'learning_rate': 4.9696509863429444e-05, 'epoch': 0.01}
+  1%|          | 185/30314 [03:56<10:36:43,  1.27s/it]  1%|          | 186/30314 [03:57<10:37:41,  1.27s/it]  1%|          | 187/30314 [03:58<10:37:43,  1.27s/it]  1%|          | 188/30314 [03:59<10:37:07,  1.27s/it]  1%|          | 189/30314 [04:01<10:36:39,  1.27s/it]  1%|          | 190/30314 [04:02<10:36:21,  1.27s/it]                                                      {'loss': 6.104, 'grad_norm': 1.0624637603759766, 'learning_rate': 4.968826284884872e-05, 'epoch': 0.01}
+  1%|          | 190/30314 [04:02<10:36:21,  1.27s/it]  1%|          | 191/30314 [04:03<10:36:31,  1.27s/it]  1%|          | 192/30314 [04:04<10:36:30,  1.27s/it]  1%|          | 193/30314 [04:06<10:36:15,  1.27s/it]  1%|          | 194/30314 [04:07<10:36:29,  1.27s/it]  1%|          | 195/30314 [04:08<10:36:44,  1.27s/it]                                                      {'loss': 6.0919, 'grad_norm': 1.0433952808380127, 'learning_rate': 4.9680015834268e-05, 'epoch': 0.01}
+  1%|          | 195/30314 [04:08<10:36:44,  1.27s/it]  1%|          | 196/30314 [04:10<10:36:59,  1.27s/it]  1%|          | 197/30314 [04:11<10:36:46,  1.27s/it]  1%|          | 198/30314 [04:12<10:36:36,  1.27s/it]  1%|          | 199/30314 [04:13<10:36:33,  1.27s/it]  1%|          | 200/30314 [04:15<10:36:22,  1.27s/it]                                                      {'loss': 6.1392, 'grad_norm': 1.1030027866363525, 'learning_rate': 4.9671768819687275e-05, 'epoch': 0.01}
+  1%|          | 200/30314 [04:15<10:36:22,  1.27s/it]  1%|          | 201/30314 [04:16<10:36:48,  1.27s/it]  1%|          | 202/30314 [04:17<10:36:45,  1.27s/it]  1%|          | 203/30314 [04:18<10:36:44,  1.27s/it]  1%|          | 204/30314 [04:20<10:36:54,  1.27s/it]  1%|          | 205/30314 [04:21<10:36:54,  1.27s/it]                                                      {'loss': 6.0292, 'grad_norm': 1.1219254732131958, 'learning_rate': 4.966352180510656e-05, 'epoch': 0.01}
+  1%|          | 205/30314 [04:21<10:36:54,  1.27s/it]  1%|          | 206/30314 [04:22<10:36:49,  1.27s/it]  1%|          | 207/30314 [04:23<10:36:24,  1.27s/it]  1%|          | 208/30314 [04:25<10:36:03,  1.27s/it]  1%|          | 209/30314 [04:26<10:36:05,  1.27s/it]  1%|          | 210/30314 [04:27<10:35:53,  1.27s/it]                                                      {'loss': 6.0417, 'grad_norm': 1.305834412574768, 'learning_rate': 4.965527479052583e-05, 'epoch': 0.01}
+  1%|          | 210/30314 [04:27<10:35:53,  1.27s/it]  1%|          | 211/30314 [04:29<10:36:11,  1.27s/it]  1%|          | 212/30314 [04:30<10:36:13,  1.27s/it]  1%|          | 213/30314 [04:31<10:36:25,  1.27s/it]  1%|          | 214/30314 [04:32<10:36:27,  1.27s/it]  1%|          | 215/30314 [04:34<10:36:31,  1.27s/it]                                                      {'loss': 6.0578, 'grad_norm': 1.1608456373214722, 'learning_rate': 4.964702777594511e-05, 'epoch': 0.01}
+  1%|          | 215/30314 [04:34<10:36:31,  1.27s/it]  1%|          | 216/30314 [04:35<10:36:18,  1.27s/it]  1%|          | 217/30314 [04:36<10:36:17,  1.27s/it]  1%|          | 218/30314 [04:37<10:36:06,  1.27s/it]  1%|          | 219/30314 [04:39<10:36:05,  1.27s/it]  1%|          | 220/30314 [04:40<10:35:49,  1.27s/it]                                                      {'loss': 6.0192, 'grad_norm': 1.0645568370819092, 'learning_rate': 4.963878076136439e-05, 'epoch': 0.01}
+  1%|          | 220/30314 [04:40<10:35:49,  1.27s/it]  1%|          | 221/30314 [04:41<10:36:06,  1.27s/it]  1%|          | 222/30314 [04:42<10:36:17,  1.27s/it]  1%|          | 223/30314 [04:44<10:36:25,  1.27s/it]  1%|          | 224/30314 [04:45<10:36:06,  1.27s/it]  1%|          | 225/30314 [04:46<10:35:59,  1.27s/it]                                                      {'loss': 5.8987, 'grad_norm': 1.0774075984954834, 'learning_rate': 4.9630533746783666e-05, 'epoch': 0.01}
+  1%|          | 225/30314 [04:46<10:35:59,  1.27s/it]  1%|          | 226/30314 [04:48<10:36:20,  1.27s/it]  1%|          | 227/30314 [04:49<10:36:07,  1.27s/it]  1%|          | 228/30314 [04:50<10:36:02,  1.27s/it]  1%|          | 229/30314 [04:51<10:35:40,  1.27s/it]  1%|          | 230/30314 [04:53<10:35:43,  1.27s/it]                                                      {'loss': 6.0163, 'grad_norm': 1.0091707706451416, 'learning_rate': 4.962228673220294e-05, 'epoch': 0.01}
+  1%|          | 230/30314 [04:53<10:35:43,  1.27s/it]  1%|          | 231/30314 [04:54<10:36:05,  1.27s/it]  1%|          | 232/30314 [04:55<10:35:51,  1.27s/it]  1%|          | 233/30314 [04:56<10:36:22,  1.27s/it]  1%|          | 234/30314 [04:58<10:36:28,  1.27s/it]  1%|          | 235/30314 [04:59<10:36:14,  1.27s/it]                                                      {'loss': 6.0256, 'grad_norm': 1.074485421180725, 'learning_rate': 4.961403971762223e-05, 'epoch': 0.01}
+  1%|          | 235/30314 [04:59<10:36:14,  1.27s/it]  1%|          | 236/30314 [05:00<10:36:40,  1.27s/it]  1%|          | 237/30314 [05:02<10:36:32,  1.27s/it]  1%|          | 238/30314 [05:03<10:35:58,  1.27s/it]  1%|          | 239/30314 [05:04<10:35:51,  1.27s/it]  1%|          | 240/30314 [05:05<10:35:47,  1.27s/it]                                                      {'loss': 5.968, 'grad_norm': 1.2936793565750122, 'learning_rate': 4.9605792703041504e-05, 'epoch': 0.01}
+  1%|          | 240/30314 [05:05<10:35:47,  1.27s/it]  1%|          | 241/30314 [05:07<10:36:06,  1.27s/it]  1%|          | 242/30314 [05:08<10:35:52,  1.27s/it]  1%|          | 243/30314 [05:09<10:35:32,  1.27s/it]  1%|          | 244/30314 [05:10<10:35:40,  1.27s/it]  1%|          | 245/30314 [05:12<10:35:47,  1.27s/it]                                                      {'loss': 5.9052, 'grad_norm': 1.166038155555725, 'learning_rate': 4.959754568846078e-05, 'epoch': 0.01}
+  1%|          | 245/30314 [05:12<10:35:47,  1.27s/it]  1%|          | 246/30314 [05:13<10:36:01,  1.27s/it]  1%|          | 247/30314 [05:14<10:35:26,  1.27s/it]  1%|          | 248/30314 [05:15<10:35:02,  1.27s/it]  1%|          | 249/30314 [05:17<10:34:53,  1.27s/it]  1%|          | 250/30314 [05:18<10:35:08,  1.27s/it]                                                      {'loss': 5.7246, 'grad_norm': 0.9824703931808472, 'learning_rate': 4.958929867388006e-05, 'epoch': 0.01}
+  1%|          | 250/30314 [05:18<10:35:08,  1.27s/it]  1%|          | 251/30314 [05:19<10:35:17,  1.27s/it]  1%|          | 252/30314 [05:21<10:35:42,  1.27s/it]  1%|          | 253/30314 [05:22<10:35:51,  1.27s/it]  1%|          | 254/30314 [05:23<10:35:51,  1.27s/it]  1%|          | 255/30314 [05:24<10:36:07,  1.27s/it]                                                      {'loss': 5.8195, 'grad_norm': 1.219422459602356, 'learning_rate': 4.958105165929934e-05, 'epoch': 0.01}
+  1%|          | 255/30314 [05:24<10:36:07,  1.27s/it]  1%|          | 256/30314 [05:26<10:36:02,  1.27s/it]  1%|          | 257/30314 [05:27<10:35:49,  1.27s/it]  1%|          | 258/30314 [05:28<10:35:56,  1.27s/it]  1%|          | 259/30314 [05:29<10:35:30,  1.27s/it]  1%|          | 260/30314 [05:31<10:35:44,  1.27s/it]                                                      {'loss': 5.7078, 'grad_norm': 1.0520551204681396, 'learning_rate': 4.957280464471861e-05, 'epoch': 0.01}
+  1%|          | 260/30314 [05:31<10:35:44,  1.27s/it]  1%|          | 261/30314 [05:32<10:35:30,  1.27s/it]  1%|          | 262/30314 [05:33<10:35:37,  1.27s/it]  1%|          | 263/30314 [05:35<10:35:40,  1.27s/it]  1%|          | 264/30314 [05:36<10:35:24,  1.27s/it]  1%|          | 265/30314 [05:37<10:35:18,  1.27s/it]                                                      {'loss': 5.9407, 'grad_norm': 1.0961637496948242, 'learning_rate': 4.9564557630137895e-05, 'epoch': 0.01}
+  1%|          | 265/30314 [05:37<10:35:18,  1.27s/it]  1%|          | 266/30314 [05:38<10:35:31,  1.27s/it]  1%|          | 267/30314 [05:40<10:35:09,  1.27s/it]  1%|          | 268/30314 [05:41<10:35:01,  1.27s/it]  1%|          | 269/30314 [05:42<10:34:44,  1.27s/it]  1%|          | 270/30314 [05:43<10:34:56,  1.27s/it]                                                      {'loss': 5.7827, 'grad_norm': 1.1436833143234253, 'learning_rate': 4.955631061555717e-05, 'epoch': 0.01}
+  1%|          | 270/30314 [05:43<10:34:56,  1.27s/it]  1%|          | 271/30314 [05:45<10:35:15,  1.27s/it]  1%|          | 272/30314 [05:46<10:35:15,  1.27s/it]  1%|          | 273/30314 [05:47<10:35:13,  1.27s/it]  1%|          | 274/30314 [05:48<10:35:16,  1.27s/it]  1%|          | 275/30314 [05:50<10:35:31,  1.27s/it]                                                      {'loss': 5.7935, 'grad_norm': 1.3994472026824951, 'learning_rate': 4.954806360097645e-05, 'epoch': 0.01}
+  1%|          | 275/30314 [05:50<10:35:31,  1.27s/it]  1%|          | 276/30314 [05:51<10:35:36,  1.27s/it]  1%|          | 277/30314 [05:52<10:35:30,  1.27s/it]  1%|          | 278/30314 [05:54<10:35:20,  1.27s/it]  1%|          | 279/30314 [05:55<10:34:54,  1.27s/it]  1%|          | 280/30314 [05:56<10:35:16,  1.27s/it]                                                      {'loss': 5.7666, 'grad_norm': 1.082916259765625, 'learning_rate': 4.9539816586395726e-05, 'epoch': 0.01}
+  1%|          | 280/30314 [05:56<10:35:16,  1.27s/it]  1%|          | 281/30314 [05:57<10:35:33,  1.27s/it]  1%|          | 282/30314 [05:59<10:35:37,  1.27s/it]  1%|          | 283/30314 [06:00<10:35:20,  1.27s/it]  1%|          | 284/30314 [06:01<10:35:05,  1.27s/it]  1%|          | 285/30314 [06:02<10:35:04,  1.27s/it]                                                      {'loss': 5.6885, 'grad_norm': 1.1046674251556396, 'learning_rate': 4.953156957181501e-05, 'epoch': 0.01}
+  1%|          | 285/30314 [06:02<10:35:04,  1.27s/it]  1%|          | 286/30314 [06:04<10:35:34,  1.27s/it]  1%|          | 287/30314 [06:05<10:35:19,  1.27s/it]  1%|          | 288/30314 [06:06<10:35:05,  1.27s/it]  1%|          | 289/30314 [06:07<10:35:02,  1.27s/it]  1%|          | 290/30314 [06:09<10:35:19,  1.27s/it]                                                      {'loss': 5.6822, 'grad_norm': 1.0432751178741455, 'learning_rate': 4.9523322557234286e-05, 'epoch': 0.01}
+  1%|          | 290/30314 [06:09<10:35:19,  1.27s/it]  1%|          | 291/30314 [06:10<10:35:47,  1.27s/it]  1%|          | 292/30314 [06:11<10:34:54,  1.27s/it]  1%|          | 293/30314 [06:13<10:34:39,  1.27s/it]  1%|          | 294/30314 [06:14<10:34:37,  1.27s/it]  1%|          | 295/30314 [06:15<10:34:14,  1.27s/it]                                                      {'loss': 5.6365, 'grad_norm': 1.0410057306289673, 'learning_rate': 4.951507554265356e-05, 'epoch': 0.01}
+  1%|          | 295/30314 [06:15<10:34:14,  1.27s/it]  1%|          | 296/30314 [06:16<10:34:40,  1.27s/it]  1%|          | 297/30314 [06:18<10:34:37,  1.27s/it]  1%|          | 298/30314 [06:19<10:34:32,  1.27s/it]  1%|          | 299/30314 [06:20<10:34:27,  1.27s/it]  1%|          | 300/30314 [06:21<10:34:22,  1.27s/it]                                                      {'loss': 5.731, 'grad_norm': 0.9310414791107178, 'learning_rate': 4.950682852807284e-05, 'epoch': 0.01}
+  1%|          | 300/30314 [06:21<10:34:22,  1.27s/it]  1%|          | 301/30314 [06:23<10:34:57,  1.27s/it]  1%|          | 302/30314 [06:24<10:35:00,  1.27s/it]  1%|          | 303/30314 [06:25<10:34:39,  1.27s/it]  1%|          | 304/30314 [06:27<10:34:21,  1.27s/it]  1%|          | 305/30314 [06:28<10:34:43,  1.27s/it]                                                      {'loss': 5.6975, 'grad_norm': 1.0641359090805054, 'learning_rate': 4.9498581513492124e-05, 'epoch': 0.01}
+  1%|          | 305/30314 [06:28<10:34:43,  1.27s/it]  1%|          | 306/30314 [06:29<10:35:07,  1.27s/it]  1%|          | 307/30314 [06:30<10:34:49,  1.27s/it]  1%|          | 308/30314 [06:32<10:34:16,  1.27s/it]  1%|          | 309/30314 [06:33<10:34:14,  1.27s/it]  1%|          | 310/30314 [06:34<10:34:07,  1.27s/it]                                                      {'loss': 5.4778, 'grad_norm': 0.9945716857910156, 'learning_rate': 4.9490334498911394e-05, 'epoch': 0.01}
+  1%|          | 310/30314 [06:34<10:34:07,  1.27s/it]  1%|          | 311/30314 [06:35<10:34:11,  1.27s/it]  1%|          | 312/30314 [06:37<10:34:09,  1.27s/it]  1%|          | 313/30314 [06:38<10:34:09,  1.27s/it]  1%|          | 314/30314 [06:39<10:34:09,  1.27s/it]  1%|          | 315/30314 [06:40<10:34:01,  1.27s/it]                                                      {'loss': 5.6677, 'grad_norm': 1.1093130111694336, 'learning_rate': 4.948208748433068e-05, 'epoch': 0.01}
+  1%|          | 315/30314 [06:40<10:34:01,  1.27s/it]  1%|          | 316/30314 [06:42<10:34:38,  1.27s/it]  1%|          | 317/30314 [06:43<10:34:35,  1.27s/it]  1%|          | 318/30314 [06:44<10:34:30,  1.27s/it]  1%|          | 319/30314 [06:46<10:34:21,  1.27s/it]  1%|          | 320/30314 [06:47<10:34:20,  1.27s/it]                                                      {'loss': 5.6696, 'grad_norm': 1.1100331544876099, 'learning_rate': 4.9473840469749954e-05, 'epoch': 0.01}
+  1%|          | 320/30314 [06:47<10:34:20,  1.27s/it]  1%|          | 321/30314 [06:48<10:34:31,  1.27s/it]  1%|          | 322/30314 [06:49<10:34:17,  1.27s/it]  1%|          | 323/30314 [06:51<10:34:22,  1.27s/it]  1%|          | 324/30314 [06:52<10:34:31,  1.27s/it]  1%|          | 325/30314 [06:53<10:34:40,  1.27s/it]                                                      {'loss': 5.527, 'grad_norm': 1.3635979890823364, 'learning_rate': 4.946559345516923e-05, 'epoch': 0.01}
+  1%|          | 325/30314 [06:53<10:34:40,  1.27s/it]  1%|          | 326/30314 [06:54<10:34:56,  1.27s/it]  1%|          | 327/30314 [06:56<10:34:28,  1.27s/it]  1%|          | 328/30314 [06:57<10:34:39,  1.27s/it]  1%|          | 329/30314 [06:58<10:34:58,  1.27s/it]  1%|          | 330/30314 [07:00<10:34:38,  1.27s/it]                                                      {'loss': 5.5649, 'grad_norm': 1.1410698890686035, 'learning_rate': 4.945734644058851e-05, 'epoch': 0.01}
+  1%|          | 330/30314 [07:00<10:34:38,  1.27s/it]  1%|          | 331/30314 [07:01<10:34:44,  1.27s/it]  1%|          | 332/30314 [07:02<10:34:12,  1.27s/it]  1%|          | 333/30314 [07:03<10:34:14,  1.27s/it]  1%|          | 334/30314 [07:05<10:34:08,  1.27s/it]  1%|          | 335/30314 [07:06<10:33:53,  1.27s/it]                                                      {'loss': 5.4356, 'grad_norm': 1.1233996152877808, 'learning_rate': 4.944909942600779e-05, 'epoch': 0.01}
+  1%|          | 335/30314 [07:06<10:33:53,  1.27s/it]  1%|          | 336/30314 [07:07<10:33:54,  1.27s/it]  1%|          | 337/30314 [07:08<10:33:59,  1.27s/it]  1%|          | 338/30314 [07:10<10:33:48,  1.27s/it]  1%|          | 339/30314 [07:11<10:33:41,  1.27s/it]  1%|          | 340/30314 [07:12<10:33:30,  1.27s/it]                                                      {'loss': 5.4871, 'grad_norm': 1.05753755569458, 'learning_rate': 4.944085241142706e-05, 'epoch': 0.01}
+  1%|          | 340/30314 [07:12<10:33:30,  1.27s/it]  1%|          | 341/30314 [07:13<10:33:57,  1.27s/it]  1%|          | 342/30314 [07:15<10:34:07,  1.27s/it]  1%|          | 343/30314 [07:16<10:34:00,  1.27s/it]  1%|          | 344/30314 [07:17<10:33:33,  1.27s/it]  1%|          | 345/30314 [07:19<10:33:29,  1.27s/it]                                                      {'loss': 5.5265, 'grad_norm': 1.1593701839447021, 'learning_rate': 4.9432605396846346e-05, 'epoch': 0.01}
+  1%|          | 345/30314 [07:19<10:33:29,  1.27s/it]  1%|          | 346/30314 [07:20<10:33:42,  1.27s/it]  1%|          | 347/30314 [07:21<10:33:20,  1.27s/it]  1%|          | 348/30314 [07:22<10:33:18,  1.27s/it]  1%|          | 349/30314 [07:24<10:33:21,  1.27s/it]  1%|          | 350/30314 [07:25<10:33:14,  1.27s/it]                                                      {'loss': 5.5572, 'grad_norm': 1.0512769222259521, 'learning_rate': 4.942435838226562e-05, 'epoch': 0.01}
+  1%|          | 350/30314 [07:25<10:33:14,  1.27s/it]  1%|          | 351/30314 [07:26<10:33:45,  1.27s/it]  1%|          | 352/30314 [07:27<10:33:42,  1.27s/it]  1%|          | 353/30314 [07:29<10:33:36,  1.27s/it]  1%|          | 354/30314 [07:30<10:33:20,  1.27s/it]  1%|          | 355/30314 [07:31<10:33:16,  1.27s/it]                                                      {'loss': 5.5748, 'grad_norm': 0.9926838874816895, 'learning_rate': 4.9416111367684906e-05, 'epoch': 0.01}
+  1%|          | 355/30314 [07:31<10:33:16,  1.27s/it]  1%|          | 356/30314 [07:33<10:33:23,  1.27s/it]  1%|          | 357/30314 [07:34<10:33:06,  1.27s/it]  1%|          | 358/30314 [07:35<10:32:38,  1.27s/it]  1%|          | 359/30314 [07:36<10:32:29,  1.27s/it]  1%|          | 360/30314 [07:38<10:32:25,  1.27s/it]                                                      {'loss': 5.3856, 'grad_norm': 1.0660077333450317, 'learning_rate': 4.9407864353104176e-05, 'epoch': 0.01}
+  1%|          | 360/30314 [07:38<10:32:25,  1.27s/it]  1%|          | 361/30314 [07:39<10:32:51,  1.27s/it]  1%|          | 362/30314 [07:40<10:32:43,  1.27s/it]  1%|          | 363/30314 [07:41<10:32:43,  1.27s/it]  1%|          | 364/30314 [07:43<10:32:33,  1.27s/it]  1%|          | 365/30314 [07:44<10:32:21,  1.27s/it]                                                      {'loss': 5.432, 'grad_norm': 1.116496205329895, 'learning_rate': 4.939961733852346e-05, 'epoch': 0.01}
+  1%|          | 365/30314 [07:44<10:32:21,  1.27s/it]  1%|          | 366/30314 [07:45<10:32:54,  1.27s/it]  1%|          | 367/30314 [07:46<10:32:39,  1.27s/it]  1%|          | 368/30314 [07:48<10:32:27,  1.27s/it]  1%|          | 369/30314 [07:49<10:32:13,  1.27s/it]  1%|          | 370/30314 [07:50<10:32:25,  1.27s/it]                                                      {'loss': 5.37, 'grad_norm': 1.1212438344955444, 'learning_rate': 4.939137032394274e-05, 'epoch': 0.01}
+  1%|          | 370/30314 [07:50<10:32:25,  1.27s/it]  1%|          | 371/30314 [07:52<10:32:40,  1.27s/it]  1%|          | 372/30314 [07:53<10:32:41,  1.27s/it]  1%|          | 373/30314 [07:54<10:32:50,  1.27s/it]  1%|          | 374/30314 [07:55<10:33:08,  1.27s/it]  1%|          | 375/30314 [07:57<10:33:37,  1.27s/it]                                                      {'loss': 5.2839, 'grad_norm': 1.0623458623886108, 'learning_rate': 4.9383123309362014e-05, 'epoch': 0.01}
+  1%|          | 375/30314 [07:57<10:33:37,  1.27s/it]  1%|          | 376/30314 [07:58<10:33:38,  1.27s/it]  1%|          | 377/30314 [07:59<10:33:10,  1.27s/it]  1%|          | 378/30314 [08:00<10:33:03,  1.27s/it]  1%|▏         | 379/30314 [08:02<10:32:57,  1.27s/it]  1%|▏         | 380/30314 [08:03<10:32:48,  1.27s/it]                                                      {'loss': 5.3394, 'grad_norm': 1.130013346672058, 'learning_rate': 4.937487629478129e-05, 'epoch': 0.01}
+  1%|▏         | 380/30314 [08:03<10:32:48,  1.27s/it]  1%|▏         | 381/30314 [08:04<10:33:16,  1.27s/it]  1%|▏         | 382/30314 [08:05<10:33:11,  1.27s/it]  1%|▏         | 383/30314 [08:07<10:33:09,  1.27s/it]  1%|▏         | 384/30314 [08:08<10:33:18,  1.27s/it]  1%|▏         | 385/30314 [08:09<10:33:27,  1.27s/it]                                                      {'loss': 5.3645, 'grad_norm': 0.9941450953483582, 'learning_rate': 4.9366629280200574e-05, 'epoch': 0.01}
+  1%|▏         | 385/30314 [08:09<10:33:27,  1.27s/it]  1%|▏         | 386/30314 [08:11<10:33:13,  1.27s/it]  1%|▏         | 387/30314 [08:12<10:32:48,  1.27s/it]  1%|▏         | 388/30314 [08:13<10:32:37,  1.27s/it]  1%|▏         | 389/30314 [08:14<10:32:17,  1.27s/it]  1%|▏         | 390/30314 [08:16<10:32:01,  1.27s/it]                                                      {'loss': 5.3088, 'grad_norm': 1.1218013763427734, 'learning_rate': 4.9358382265619845e-05, 'epoch': 0.01}
+  1%|▏         | 390/30314 [08:16<10:32:01,  1.27s/it]  1%|▏         | 391/30314 [08:17<10:32:45,  1.27s/it]  1%|▏         | 392/30314 [08:18<10:33:04,  1.27s/it]  1%|▏         | 393/30314 [08:19<10:33:00,  1.27s/it]  1%|▏         | 394/30314 [08:21<10:32:54,  1.27s/it]  1%|▏         | 395/30314 [08:22<10:32:39,  1.27s/it]                                                      {'loss': 5.5087, 'grad_norm': 0.9336419105529785, 'learning_rate': 4.935013525103913e-05, 'epoch': 0.01}
+  1%|▏         | 395/30314 [08:22<10:32:39,  1.27s/it]  1%|▏         | 396/30314 [08:23<10:33:20,  1.27s/it]  1%|▏         | 397/30314 [08:25<10:33:11,  1.27s/it]  1%|▏         | 398/30314 [08:26<10:32:24,  1.27s/it]  1%|▏         | 399/30314 [08:27<10:32:18,  1.27s/it]  1%|▏         | 400/30314 [08:28<10:32:29,  1.27s/it]                                                      {'loss': 5.3581, 'grad_norm': 1.1124532222747803, 'learning_rate': 4.9341888236458405e-05, 'epoch': 0.01}
+  1%|▏         | 400/30314 [08:28<10:32:29,  1.27s/it]  1%|▏         | 401/30314 [08:30<10:32:56,  1.27s/it]  1%|▏         | 402/30314 [08:31<10:32:44,  1.27s/it]  1%|▏         | 403/30314 [08:32<10:32:28,  1.27s/it]  1%|▏         | 404/30314 [08:33<10:32:23,  1.27s/it]  1%|▏         | 405/30314 [08:35<10:32:52,  1.27s/it]                                                      {'loss': 5.4074, 'grad_norm': 1.0634063482284546, 'learning_rate': 4.933364122187768e-05, 'epoch': 0.01}
+  1%|▏         | 405/30314 [08:35<10:32:52,  1.27s/it]  1%|▏         | 406/30314 [08:36<10:33:08,  1.27s/it]  1%|▏         | 407/30314 [08:37<10:32:55,  1.27s/it]  1%|▏         | 408/30314 [08:38<10:32:30,  1.27s/it]  1%|▏         | 409/30314 [08:40<10:32:31,  1.27s/it]  1%|▏         | 410/30314 [08:41<10:32:06,  1.27s/it]                                                      {'loss': 5.3768, 'grad_norm': 1.115071177482605, 'learning_rate': 4.932539420729696e-05, 'epoch': 0.01}
+  1%|▏         | 410/30314 [08:41<10:32:06,  1.27s/it]  1%|▏         | 411/30314 [08:42<10:32:25,  1.27s/it]  1%|▏         | 412/30314 [08:44<10:32:45,  1.27s/it]  1%|▏         | 413/30314 [08:45<10:32:45,  1.27s/it]  1%|▏         | 414/30314 [08:46<10:32:15,  1.27s/it]  1%|▏         | 415/30314 [08:47<10:31:59,  1.27s/it]                                                      {'loss': 5.2254, 'grad_norm': 1.189546823501587, 'learning_rate': 4.931714719271624e-05, 'epoch': 0.01}
+  1%|▏         | 415/30314 [08:47<10:31:59,  1.27s/it]  1%|▏         | 416/30314 [08:49<10:32:04,  1.27s/it]  1%|▏         | 417/30314 [08:50<10:31:54,  1.27s/it]  1%|▏         | 418/30314 [08:51<10:32:05,  1.27s/it]  1%|▏         | 419/30314 [08:52<10:32:05,  1.27s/it]  1%|▏         | 420/30314 [08:54<10:32:01,  1.27s/it]                                                      {'loss': 5.1833, 'grad_norm': 1.0977352857589722, 'learning_rate': 4.930890017813552e-05, 'epoch': 0.01}
+  1%|▏         | 420/30314 [08:54<10:32:01,  1.27s/it]  1%|▏         | 421/30314 [08:55<10:32:29,  1.27s/it]  1%|▏         | 422/30314 [08:56<10:32:32,  1.27s/it]  1%|▏         | 423/30314 [08:58<10:32:42,  1.27s/it]  1%|▏         | 424/30314 [08:59<10:32:28,  1.27s/it]  1%|▏         | 425/30314 [09:00<10:32:36,  1.27s/it]                                                      {'loss': 5.2067, 'grad_norm': 1.2070547342300415, 'learning_rate': 4.9300653163554796e-05, 'epoch': 0.01}
+  1%|▏         | 425/30314 [09:00<10:32:36,  1.27s/it]  1%|▏         | 426/30314 [09:01<10:32:07,  1.27s/it]  1%|▏         | 427/30314 [09:03<10:32:07,  1.27s/it]  1%|▏         | 428/30314 [09:04<10:31:56,  1.27s/it]  1%|▏         | 429/30314 [09:05<10:31:49,  1.27s/it]  1%|▏         | 430/30314 [09:06<10:31:34,  1.27s/it]                                                      {'loss': 5.2589, 'grad_norm': 1.2811695337295532, 'learning_rate': 4.9292406148974073e-05, 'epoch': 0.01}
+  1%|▏         | 430/30314 [09:06<10:31:34,  1.27s/it]  1%|▏         | 431/30314 [09:08<10:32:04,  1.27s/it]  1%|▏         | 432/30314 [09:09<10:32:12,  1.27s/it]  1%|▏         | 433/30314 [09:10<10:32:19,  1.27s/it]  1%|▏         | 434/30314 [09:11<10:32:03,  1.27s/it]  1%|▏         | 435/30314 [09:13<10:31:57,  1.27s/it]                                                      {'loss': 5.1503, 'grad_norm': 1.206850528717041, 'learning_rate': 4.928415913439336e-05, 'epoch': 0.01}
+  1%|▏         | 435/30314 [09:13<10:31:57,  1.27s/it]  1%|▏         | 436/30314 [09:14<10:32:18,  1.27s/it]  1%|▏         | 437/30314 [09:15<10:32:05,  1.27s/it]  1%|▏         | 438/30314 [09:17<10:31:56,  1.27s/it]  1%|▏         | 439/30314 [09:18<10:31:40,  1.27s/it]  1%|▏         | 440/30314 [09:19<10:31:30,  1.27s/it]                                                      {'loss': 5.1833, 'grad_norm': 1.0330220460891724, 'learning_rate': 4.927591211981263e-05, 'epoch': 0.01}
+  1%|▏         | 440/30314 [09:19<10:31:30,  1.27s/it]  1%|▏         | 441/30314 [09:20<10:31:35,  1.27s/it]  1%|▏         | 442/30314 [09:22<10:31:18,  1.27s/it]  1%|▏         | 443/30314 [09:23<10:31:27,  1.27s/it]  1%|▏         | 444/30314 [09:24<10:31:19,  1.27s/it]  1%|▏         | 445/30314 [09:25<10:31:13,  1.27s/it]                                                      {'loss': 5.2784, 'grad_norm': 1.130678653717041, 'learning_rate': 4.926766510523191e-05, 'epoch': 0.01}
+  1%|▏         | 445/30314 [09:25<10:31:13,  1.27s/it]  1%|▏         | 446/30314 [09:27<10:31:44,  1.27s/it]  1%|▏         | 447/30314 [09:28<10:31:35,  1.27s/it]  1%|▏         | 448/30314 [09:29<10:30:55,  1.27s/it]  1%|▏         | 449/30314 [09:30<10:31:01,  1.27s/it]  1%|▏         | 450/30314 [09:32<10:31:09,  1.27s/it]                                                      {'loss': 5.19, 'grad_norm': 0.9795604348182678, 'learning_rate': 4.925941809065119e-05, 'epoch': 0.01}
+  1%|▏         | 450/30314 [09:32<10:31:09,  1.27s/it]  1%|▏         | 451/30314 [09:33<10:31:06,  1.27s/it]  1%|▏         | 452/30314 [09:34<10:31:22,  1.27s/it]  1%|▏         | 453/30314 [09:36<10:30:52,  1.27s/it]  1%|▏         | 454/30314 [09:37<10:31:33,  1.27s/it]  2%|▏         | 455/30314 [09:38<10:31:00,  1.27s/it]                                                      {'loss': 5.0255, 'grad_norm': 1.0229912996292114, 'learning_rate': 4.9251171076070465e-05, 'epoch': 0.02}
+  2%|▏         | 455/30314 [09:38<10:31:00,  1.27s/it]  2%|▏         | 456/30314 [09:39<10:31:43,  1.27s/it]  2%|▏         | 457/30314 [09:41<10:31:31,  1.27s/it]  2%|▏         | 458/30314 [09:42<10:31:28,  1.27s/it]  2%|▏         | 459/30314 [09:43<10:31:18,  1.27s/it]  2%|▏         | 460/30314 [09:44<10:31:10,  1.27s/it]                                                      {'loss': 5.1247, 'grad_norm': 1.0619897842407227, 'learning_rate': 4.924292406148974e-05, 'epoch': 0.02}
+  2%|▏         | 460/30314 [09:44<10:31:10,  1.27s/it]  2%|▏         | 461/30314 [09:46<10:31:12,  1.27s/it]  2%|▏         | 462/30314 [09:47<10:31:16,  1.27s/it]  2%|▏         | 463/30314 [09:48<10:31:19,  1.27s/it]  2%|▏         | 464/30314 [09:50<10:31:20,  1.27s/it]  2%|▏         | 465/30314 [09:51<10:31:07,  1.27s/it]                                                      {'loss': 5.2352, 'grad_norm': 1.1626255512237549, 'learning_rate': 4.9234677046909025e-05, 'epoch': 0.02}
+  2%|▏         | 465/30314 [09:51<10:31:07,  1.27s/it]  2%|▏         | 466/30314 [09:52<10:31:37,  1.27s/it]  2%|▏         | 467/30314 [09:53<10:31:17,  1.27s/it]  2%|▏         | 468/30314 [09:55<10:31:04,  1.27s/it]  2%|▏         | 469/30314 [09:56<10:31:15,  1.27s/it]  2%|▏         | 470/30314 [09:57<10:31:15,  1.27s/it]                                                      {'loss': 5.1637, 'grad_norm': 1.1207691431045532, 'learning_rate': 4.9226430032328295e-05, 'epoch': 0.02}
+  2%|▏         | 470/30314 [09:57<10:31:15,  1.27s/it]  2%|▏         | 471/30314 [09:58<10:31:37,  1.27s/it]  2%|▏         | 472/30314 [10:00<10:31:36,  1.27s/it]  2%|▏         | 473/30314 [10:01<10:31:24,  1.27s/it]  2%|▏         | 474/30314 [10:02<10:31:26,  1.27s/it]  2%|▏         | 475/30314 [10:03<10:31:11,  1.27s/it]                                                      {'loss': 5.0408, 'grad_norm': 1.1325979232788086, 'learning_rate': 4.921818301774758e-05, 'epoch': 0.02}
+  2%|▏         | 475/30314 [10:03<10:31:11,  1.27s/it]  2%|▏         | 476/30314 [10:05<10:31:32,  1.27s/it]  2%|▏         | 477/30314 [10:06<10:31:10,  1.27s/it]  2%|▏         | 478/30314 [10:07<10:31:02,  1.27s/it]  2%|▏         | 479/30314 [10:09<10:30:45,  1.27s/it]  2%|▏         | 480/30314 [10:10<10:31:02,  1.27s/it]                                                      {'loss': 5.2434, 'grad_norm': 1.0844296216964722, 'learning_rate': 4.9209936003166856e-05, 'epoch': 0.02}
+  2%|▏         | 480/30314 [10:10<10:31:02,  1.27s/it]  2%|▏         | 481/30314 [10:11<10:31:08,  1.27s/it]  2%|▏         | 482/30314 [10:12<10:31:13,  1.27s/it]  2%|▏         | 483/30314 [10:14<10:31:12,  1.27s/it]  2%|▏         | 484/30314 [10:15<10:30:56,  1.27s/it]  2%|▏         | 485/30314 [10:16<10:30:50,  1.27s/it]                                                      {'loss': 5.2151, 'grad_norm': 0.9366000890731812, 'learning_rate': 4.920168898858614e-05, 'epoch': 0.02}
+  2%|▏         | 485/30314 [10:16<10:30:50,  1.27s/it]  2%|▏         | 486/30314 [10:17<10:31:26,  1.27s/it]  2%|▏         | 487/30314 [10:19<10:31:08,  1.27s/it]  2%|▏         | 488/30314 [10:20<10:31:04,  1.27s/it]  2%|▏         | 489/30314 [10:21<10:30:41,  1.27s/it]  2%|▏         | 490/30314 [10:23<10:30:39,  1.27s/it]                                                      {'loss': 5.0015, 'grad_norm': 0.9347882270812988, 'learning_rate': 4.919344197400541e-05, 'epoch': 0.02}
+  2%|▏         | 490/30314 [10:23<10:30:39,  1.27s/it]  2%|▏         | 491/30314 [10:24<10:31:06,  1.27s/it]  2%|▏         | 492/30314 [10:25<10:30:42,  1.27s/it]  2%|▏         | 493/30314 [10:26<10:30:45,  1.27s/it]  2%|▏         | 494/30314 [10:28<10:30:55,  1.27s/it]  2%|▏         | 495/30314 [10:29<10:30:40,  1.27s/it]                                                      {'loss': 5.1398, 'grad_norm': 1.0198497772216797, 'learning_rate': 4.9185194959424694e-05, 'epoch': 0.02}
+  2%|▏         | 495/30314 [10:29<10:30:40,  1.27s/it]  2%|▏         | 496/30314 [10:30<10:31:10,  1.27s/it]  2%|▏         | 497/30314 [10:31<10:30:54,  1.27s/it]  2%|▏         | 498/30314 [10:33<10:30:44,  1.27s/it]  2%|▏         | 499/30314 [10:34<10:30:23,  1.27s/it]  2%|▏         | 500/30314 [10:35<10:30:21,  1.27s/it]                                                      {'loss': 4.9876, 'grad_norm': 1.030051350593567, 'learning_rate': 4.917694794484397e-05, 'epoch': 0.02}
+  2%|▏         | 500/30314 [10:35<10:30:21,  1.27s/it]  2%|▏         | 501/30314 [10:36<10:30:15,  1.27s/it]  2%|▏         | 502/30314 [10:38<10:30:37,  1.27s/it]  2%|▏         | 503/30314 [10:39<10:30:18,  1.27s/it]  2%|▏         | 504/30314 [10:40<10:30:19,  1.27s/it]  2%|▏         | 505/30314 [10:42<10:30:05,  1.27s/it]                                                      {'loss': 5.0163, 'grad_norm': 1.0358672142028809, 'learning_rate': 4.916870093026325e-05, 'epoch': 0.02}
+  2%|▏         | 505/30314 [10:42<10:30:05,  1.27s/it]  2%|▏         | 506/30314 [10:43<10:31:01,  1.27s/it]  2%|▏         | 507/30314 [10:44<10:30:47,  1.27s/it]  2%|▏         | 508/30314 [10:45<10:30:40,  1.27s/it]  2%|▏         | 509/30314 [10:47<10:30:14,  1.27s/it]  2%|▏         | 510/30314 [10:48<10:30:25,  1.27s/it]                                                      {'loss': 4.9584, 'grad_norm': 1.1211410760879517, 'learning_rate': 4.9160453915682524e-05, 'epoch': 0.02}
+  2%|▏         | 510/30314 [10:48<10:30:25,  1.27s/it]  2%|▏         | 511/30314 [10:49<10:30:33,  1.27s/it]  2%|▏         | 512/30314 [10:50<10:30:30,  1.27s/it]  2%|▏         | 513/30314 [10:52<10:30:06,  1.27s/it]  2%|▏         | 514/30314 [10:53<10:30:01,  1.27s/it]  2%|▏         | 515/30314 [10:54<10:29:47,  1.27s/it]                                                      {'loss': 5.0705, 'grad_norm': 0.9659106135368347, 'learning_rate': 4.915220690110181e-05, 'epoch': 0.02}
+  2%|▏         | 515/30314 [10:54<10:29:47,  1.27s/it]  2%|▏         | 516/30314 [10:56<10:30:25,  1.27s/it]  2%|▏         | 517/30314 [10:57<10:30:36,  1.27s/it]  2%|▏         | 518/30314 [10:58<10:30:44,  1.27s/it]  2%|▏         | 519/30314 [10:59<10:30:36,  1.27s/it]  2%|▏         | 520/30314 [11:01<10:30:16,  1.27s/it]                                                      {'loss': 5.0808, 'grad_norm': 1.0819895267486572, 'learning_rate': 4.914395988652108e-05, 'epoch': 0.02}
+  2%|▏         | 520/30314 [11:01<10:30:16,  1.27s/it]  2%|▏         | 521/30314 [11:02<10:30:17,  1.27s/it]  2%|▏         | 522/30314 [11:03<10:29:57,  1.27s/it]  2%|▏         | 523/30314 [11:04<10:30:20,  1.27s/it]  2%|▏         | 524/30314 [11:06<10:30:20,  1.27s/it]  2%|▏         | 525/30314 [11:07<10:30:18,  1.27s/it]                                                      {'loss': 4.9975, 'grad_norm': 1.2211557626724243, 'learning_rate': 4.913571287194036e-05, 'epoch': 0.02}
+  2%|▏         | 525/30314 [11:07<10:30:18,  1.27s/it]  2%|▏         | 526/30314 [11:08<10:30:37,  1.27s/it]  2%|▏         | 527/30314 [11:09<10:30:16,  1.27s/it]  2%|▏         | 528/30314 [11:11<10:29:56,  1.27s/it]  2%|▏         | 529/30314 [11:12<10:29:19,  1.27s/it]  2%|▏         | 530/30314 [11:13<10:29:17,  1.27s/it]                                                      {'loss': 5.0697, 'grad_norm': 1.0313388109207153, 'learning_rate': 4.912746585735964e-05, 'epoch': 0.02}
+  2%|▏         | 530/30314 [11:13<10:29:17,  1.27s/it]  2%|▏         | 531/30314 [11:15<10:29:26,  1.27s/it]  2%|▏         | 532/30314 [11:16<10:29:41,  1.27s/it]  2%|▏         | 533/30314 [11:17<10:29:40,  1.27s/it]  2%|▏         | 534/30314 [11:18<10:29:57,  1.27s/it]  2%|▏         | 535/30314 [11:20<10:29:38,  1.27s/it]                                                      {'loss': 5.0811, 'grad_norm': 1.0634551048278809, 'learning_rate': 4.911921884277892e-05, 'epoch': 0.02}
+  2%|▏         | 535/30314 [11:20<10:29:38,  1.27s/it]  2%|▏         | 536/30314 [11:21<10:29:51,  1.27s/it]  2%|▏         | 537/30314 [11:22<10:29:24,  1.27s/it]  2%|▏         | 538/30314 [11:23<10:29:10,  1.27s/it]  2%|▏         | 539/30314 [11:25<10:29:04,  1.27s/it]  2%|▏         | 540/30314 [11:26<10:28:49,  1.27s/it]                                                      {'loss': 4.9435, 'grad_norm': 1.0722153186798096, 'learning_rate': 4.911097182819819e-05, 'epoch': 0.02}
+  2%|▏         | 540/30314 [11:26<10:28:49,  1.27s/it]  2%|▏         | 541/30314 [11:27<10:29:24,  1.27s/it]  2%|▏         | 542/30314 [11:29<10:29:24,  1.27s/it]  2%|▏         | 543/30314 [11:30<10:29:25,  1.27s/it]  2%|▏         | 544/30314 [11:31<10:29:25,  1.27s/it]  2%|▏         | 545/30314 [11:32<10:29:20,  1.27s/it]                                                      {'loss': 4.8574, 'grad_norm': 1.1871531009674072, 'learning_rate': 4.9102724813617476e-05, 'epoch': 0.02}
+  2%|▏         | 545/30314 [11:32<10:29:20,  1.27s/it]  2%|▏         | 546/30314 [11:34<10:29:27,  1.27s/it]  2%|▏         | 547/30314 [11:35<10:29:07,  1.27s/it]  2%|▏         | 548/30314 [11:36<10:28:45,  1.27s/it]  2%|▏         | 549/30314 [11:37<10:28:34,  1.27s/it]  2%|▏         | 550/30314 [11:39<10:28:43,  1.27s/it]                                                      {'loss': 5.0217, 'grad_norm': 1.0644242763519287, 'learning_rate': 4.909447779903675e-05, 'epoch': 0.02}
+  2%|▏         | 550/30314 [11:39<10:28:43,  1.27s/it]  2%|▏         | 551/30314 [11:40<10:29:25,  1.27s/it]  2%|▏         | 552/30314 [11:41<10:29:13,  1.27s/it]  2%|▏         | 553/30314 [11:42<10:29:12,  1.27s/it]  2%|▏         | 554/30314 [11:44<10:29:33,  1.27s/it]  2%|▏         | 555/30314 [11:45<10:29:44,  1.27s/it]                                                      {'loss': 4.9754, 'grad_norm': 1.0883758068084717, 'learning_rate': 4.908623078445603e-05, 'epoch': 0.02}
+  2%|▏         | 555/30314 [11:45<10:29:44,  1.27s/it]  2%|▏         | 556/30314 [11:46<10:29:54,  1.27s/it]  2%|▏         | 557/30314 [11:48<10:29:30,  1.27s/it]  2%|▏         | 558/30314 [11:49<10:29:08,  1.27s/it]  2%|▏         | 559/30314 [11:50<10:29:13,  1.27s/it]  2%|▏         | 560/30314 [11:51<10:29:10,  1.27s/it]                                                      {'loss': 4.9584, 'grad_norm': 1.017386555671692, 'learning_rate': 4.907798376987531e-05, 'epoch': 0.02}
+  2%|▏         | 560/30314 [11:51<10:29:10,  1.27s/it]  2%|▏         | 561/30314 [11:53<10:29:24,  1.27s/it]  2%|▏         | 562/30314 [11:54<10:29:20,  1.27s/it]  2%|▏         | 563/30314 [11:55<10:29:13,  1.27s/it]  2%|▏         | 564/30314 [11:56<10:29:36,  1.27s/it]  2%|▏         | 565/30314 [11:58<10:29:03,  1.27s/it]                                                      {'loss': 4.8289, 'grad_norm': 1.0164598226547241, 'learning_rate': 4.906973675529459e-05, 'epoch': 0.02}
+  2%|▏         | 565/30314 [11:58<10:29:03,  1.27s/it]  2%|▏         | 566/30314 [11:59<10:29:09,  1.27s/it]  2%|▏         | 567/30314 [12:00<10:28:47,  1.27s/it]  2%|▏         | 568/30314 [12:01<10:28:21,  1.27s/it]  2%|▏         | 569/30314 [12:03<10:28:28,  1.27s/it]  2%|▏         | 570/30314 [12:04<10:28:15,  1.27s/it]                                                      {'loss': 4.7949, 'grad_norm': 1.037180781364441, 'learning_rate': 4.906148974071386e-05, 'epoch': 0.02}
+  2%|▏         | 570/30314 [12:04<10:28:15,  1.27s/it]  2%|▏         | 571/30314 [12:05<10:28:31,  1.27s/it]  2%|▏         | 572/30314 [12:07<10:28:55,  1.27s/it]  2%|▏         | 573/30314 [12:08<10:28:30,  1.27s/it]  2%|▏         | 574/30314 [12:09<10:28:25,  1.27s/it]  2%|▏         | 575/30314 [12:10<10:28:14,  1.27s/it]                                                      {'loss': 4.9251, 'grad_norm': 0.9872786998748779, 'learning_rate': 4.9053242726133144e-05, 'epoch': 0.02}
+  2%|▏         | 575/30314 [12:10<10:28:14,  1.27s/it]  2%|▏         | 576/30314 [12:12<10:28:33,  1.27s/it]  2%|▏         | 577/30314 [12:13<10:28:50,  1.27s/it]  2%|▏         | 578/30314 [12:14<10:29:00,  1.27s/it]  2%|▏         | 579/30314 [12:15<10:28:39,  1.27s/it]  2%|▏         | 580/30314 [12:17<10:28:31,  1.27s/it]                                                      {'loss': 4.832, 'grad_norm': 1.034256935119629, 'learning_rate': 4.904499571155242e-05, 'epoch': 0.02}
+  2%|▏         | 580/30314 [12:17<10:28:31,  1.27s/it]  2%|▏         | 581/30314 [12:18<10:28:59,  1.27s/it]  2%|▏         | 582/30314 [12:19<10:28:51,  1.27s/it]  2%|▏         | 583/30314 [12:21<10:28:25,  1.27s/it]  2%|▏         | 584/30314 [12:22<10:28:31,  1.27s/it]  2%|▏         | 585/30314 [12:23<10:28:22,  1.27s/it]                                                      {'loss': 5.0472, 'grad_norm': 1.031738519668579, 'learning_rate': 4.90367486969717e-05, 'epoch': 0.02}
+  2%|▏         | 585/30314 [12:23<10:28:22,  1.27s/it]  2%|▏         | 586/30314 [12:24<10:28:33,  1.27s/it]  2%|▏         | 587/30314 [12:26<10:28:24,  1.27s/it]  2%|▏         | 588/30314 [12:27<10:27:56,  1.27s/it]  2%|▏         | 589/30314 [12:28<10:27:49,  1.27s/it]  2%|▏         | 590/30314 [12:29<10:27:51,  1.27s/it]                                                      {'loss': 4.9462, 'grad_norm': 0.9541729688644409, 'learning_rate': 4.9028501682390975e-05, 'epoch': 0.02}
+  2%|▏         | 590/30314 [12:29<10:27:51,  1.27s/it]  2%|▏         | 591/30314 [12:31<10:28:10,  1.27s/it]  2%|▏         | 592/30314 [12:32<10:28:02,  1.27s/it]  2%|▏         | 593/30314 [12:33<10:28:08,  1.27s/it]  2%|▏         | 594/30314 [12:34<10:27:57,  1.27s/it]  2%|▏         | 595/30314 [12:36<10:28:16,  1.27s/it]                                                      {'loss': 4.8957, 'grad_norm': 1.0629583597183228, 'learning_rate': 4.902025466781026e-05, 'epoch': 0.02}
+  2%|▏         | 595/30314 [12:36<10:28:16,  1.27s/it]  2%|▏         | 596/30314 [12:37<10:28:22,  1.27s/it]  2%|▏         | 597/30314 [12:38<10:27:53,  1.27s/it]  2%|▏         | 598/30314 [12:40<10:27:42,  1.27s/it]  2%|▏         | 599/30314 [12:41<10:27:17,  1.27s/it]  2%|▏         | 600/30314 [12:42<10:27:32,  1.27s/it]                                                      {'loss': 4.8604, 'grad_norm': 1.1984162330627441, 'learning_rate': 4.9012007653229536e-05, 'epoch': 0.02}
+  2%|▏         | 600/30314 [12:42<10:27:32,  1.27s/it]  2%|▏         | 601/30314 [12:43<10:28:11,  1.27s/it]  2%|▏         | 602/30314 [12:45<10:28:25,  1.27s/it]  2%|▏         | 603/30314 [12:46<10:27:52,  1.27s/it]  2%|▏         | 604/30314 [12:47<10:28:14,  1.27s/it]  2%|▏         | 605/30314 [12:48<10:27:55,  1.27s/it]                                                      {'loss': 4.9408, 'grad_norm': 0.9985387325286865, 'learning_rate': 4.900376063864881e-05, 'epoch': 0.02}
+  2%|▏         | 605/30314 [12:48<10:27:55,  1.27s/it]  2%|▏         | 606/30314 [12:50<10:27:58,  1.27s/it]  2%|▏         | 607/30314 [12:51<10:27:45,  1.27s/it]  2%|▏         | 608/30314 [12:52<10:27:22,  1.27s/it]  2%|▏         | 609/30314 [12:53<10:27:27,  1.27s/it]  2%|▏         | 610/30314 [12:55<10:27:26,  1.27s/it]                                                      {'loss': 4.8649, 'grad_norm': 1.060473084449768, 'learning_rate': 4.899551362406809e-05, 'epoch': 0.02}
+  2%|▏         | 610/30314 [12:55<10:27:26,  1.27s/it]  2%|▏         | 611/30314 [12:56<10:28:10,  1.27s/it]  2%|▏         | 612/30314 [12:57<10:28:15,  1.27s/it]  2%|▏         | 613/30314 [12:59<10:28:05,  1.27s/it]  2%|▏         | 614/30314 [13:00<10:27:48,  1.27s/it]  2%|▏         | 615/30314 [13:01<10:27:47,  1.27s/it]                                                      {'loss': 4.8935, 'grad_norm': 1.024479627609253, 'learning_rate': 4.898726660948737e-05, 'epoch': 0.02}
+  2%|▏         | 615/30314 [13:01<10:27:47,  1.27s/it]  2%|▏         | 616/30314 [13:02<10:27:57,  1.27s/it]  2%|▏         | 617/30314 [13:04<10:27:45,  1.27s/it]  2%|▏         | 618/30314 [13:05<10:27:43,  1.27s/it]  2%|▏         | 619/30314 [13:06<10:27:40,  1.27s/it]  2%|▏         | 620/30314 [13:07<10:27:43,  1.27s/it]                                                      {'loss': 4.8884, 'grad_norm': 1.0384938716888428, 'learning_rate': 4.897901959490664e-05, 'epoch': 0.02}
+  2%|▏         | 620/30314 [13:07<10:27:43,  1.27s/it]  2%|▏         | 621/30314 [13:09<10:28:17,  1.27s/it]  2%|▏         | 622/30314 [13:10<10:27:55,  1.27s/it]  2%|▏         | 623/30314 [13:11<10:27:35,  1.27s/it]  2%|▏         | 624/30314 [13:13<10:27:30,  1.27s/it]  2%|▏         | 625/30314 [13:14<10:27:21,  1.27s/it]                                                      {'loss': 4.8993, 'grad_norm': 1.106911063194275, 'learning_rate': 4.897077258032593e-05, 'epoch': 0.02}
+  2%|▏         | 625/30314 [13:14<10:27:21,  1.27s/it]  2%|▏         | 626/30314 [13:15<10:27:48,  1.27s/it]  2%|▏         | 627/30314 [13:16<10:27:25,  1.27s/it]  2%|▏         | 628/30314 [13:18<10:27:50,  1.27s/it]  2%|▏         | 629/30314 [13:19<10:27:48,  1.27s/it]  2%|▏         | 630/30314 [13:20<10:27:44,  1.27s/it]                                                      {'loss': 4.8509, 'grad_norm': 1.1830105781555176, 'learning_rate': 4.8962525565745204e-05, 'epoch': 0.02}
+  2%|▏         | 630/30314 [13:20<10:27:44,  1.27s/it]  2%|▏         | 631/30314 [13:21<10:28:15,  1.27s/it]  2%|▏         | 632/30314 [13:23<10:28:00,  1.27s/it]  2%|▏         | 633/30314 [13:24<10:27:48,  1.27s/it]  2%|▏         | 634/30314 [13:25<10:27:40,  1.27s/it]  2%|▏         | 635/30314 [13:26<10:27:28,  1.27s/it]                                                      {'loss': 4.84, 'grad_norm': 0.9832803010940552, 'learning_rate': 4.895427855116448e-05, 'epoch': 0.02}
+  2%|▏         | 635/30314 [13:26<10:27:28,  1.27s/it]  2%|▏         | 636/30314 [13:28<10:28:06,  1.27s/it]  2%|▏         | 637/30314 [13:29<10:27:26,  1.27s/it]  2%|▏         | 638/30314 [13:30<10:27:10,  1.27s/it]  2%|▏         | 639/30314 [13:32<10:27:03,  1.27s/it]  2%|▏         | 640/30314 [13:33<10:27:15,  1.27s/it]                                                      {'loss': 4.7636, 'grad_norm': 1.0051518678665161, 'learning_rate': 4.894603153658376e-05, 'epoch': 0.02}
+  2%|▏         | 640/30314 [13:33<10:27:15,  1.27s/it]  2%|▏         | 641/30314 [13:34<10:27:54,  1.27s/it]  2%|▏         | 642/30314 [13:35<10:27:46,  1.27s/it]  2%|▏         | 643/30314 [13:37<10:27:34,  1.27s/it]  2%|▏         | 644/30314 [13:38<10:27:36,  1.27s/it]  2%|▏         | 645/30314 [13:39<10:27:27,  1.27s/it]                                                      {'loss': 4.7189, 'grad_norm': 1.0752488374710083, 'learning_rate': 4.893778452200304e-05, 'epoch': 0.02}
+  2%|▏         | 645/30314 [13:39<10:27:27,  1.27s/it]  2%|▏         | 646/30314 [13:40<10:27:49,  1.27s/it]  2%|▏         | 647/30314 [13:42<10:27:16,  1.27s/it]  2%|▏         | 648/30314 [13:43<10:27:37,  1.27s/it]  2%|▏         | 649/30314 [13:44<10:27:44,  1.27s/it]  2%|▏         | 650/30314 [13:46<10:27:20,  1.27s/it]                                                      {'loss': 4.7917, 'grad_norm': 1.0492606163024902, 'learning_rate': 4.892953750742231e-05, 'epoch': 0.02}
+  2%|▏         | 650/30314 [13:46<10:27:20,  1.27s/it]  2%|▏         | 651/30314 [13:47<10:27:12,  1.27s/it]  2%|▏         | 652/30314 [13:48<10:27:23,  1.27s/it]  2%|▏         | 653/30314 [13:49<10:27:23,  1.27s/it]  2%|▏         | 654/30314 [13:51<10:27:04,  1.27s/it]  2%|▏         | 655/30314 [13:52<10:26:59,  1.27s/it]                                                      {'loss': 4.8164, 'grad_norm': 0.9654434323310852, 'learning_rate': 4.8921290492841595e-05, 'epoch': 0.02}
+  2%|▏         | 655/30314 [13:52<10:26:59,  1.27s/it]  2%|▏         | 656/30314 [13:53<10:27:26,  1.27s/it]  2%|▏         | 657/30314 [13:54<10:27:14,  1.27s/it]  2%|▏         | 658/30314 [13:56<10:27:30,  1.27s/it]  2%|▏         | 659/30314 [13:57<10:27:36,  1.27s/it]  2%|▏         | 660/30314 [13:58<10:27:38,  1.27s/it]                                                      {'loss': 4.8404, 'grad_norm': 1.0700021982192993, 'learning_rate': 4.891304347826087e-05, 'epoch': 0.02}
+  2%|▏         | 660/30314 [13:58<10:27:38,  1.27s/it]  2%|▏         | 661/30314 [13:59<10:27:47,  1.27s/it]  2%|▏         | 662/30314 [14:01<10:28:07,  1.27s/it]  2%|▏         | 663/30314 [14:02<10:27:38,  1.27s/it]  2%|▏         | 664/30314 [14:03<10:27:20,  1.27s/it]  2%|▏         | 665/30314 [14:05<10:27:10,  1.27s/it]                                                      {'loss': 4.8679, 'grad_norm': 0.9594531059265137, 'learning_rate': 4.8904796463680156e-05, 'epoch': 0.02}
+  2%|▏         | 665/30314 [14:05<10:27:10,  1.27s/it]  2%|▏         | 666/30314 [14:06<10:26:47,  1.27s/it]  2%|▏         | 667/30314 [14:07<10:26:42,  1.27s/it]  2%|▏         | 668/30314 [14:08<10:26:27,  1.27s/it]  2%|▏         | 669/30314 [14:10<10:26:14,  1.27s/it]  2%|▏         | 670/30314 [14:11<10:26:00,  1.27s/it]                                                      {'loss': 4.5351, 'grad_norm': 1.1030610799789429, 'learning_rate': 4.8896549449099426e-05, 'epoch': 0.02}
+  2%|▏         | 670/30314 [14:11<10:26:00,  1.27s/it]  2%|▏         | 671/30314 [14:12<10:26:21,  1.27s/it]  2%|▏         | 672/30314 [14:13<10:26:25,  1.27s/it]  2%|▏         | 673/30314 [14:15<10:26:38,  1.27s/it]  2%|▏         | 674/30314 [14:16<10:26:54,  1.27s/it]  2%|▏         | 675/30314 [14:17<10:26:48,  1.27s/it]                                                      {'loss': 4.798, 'grad_norm': 1.0137369632720947, 'learning_rate': 4.888830243451871e-05, 'epoch': 0.02}
+  2%|▏         | 675/30314 [14:17<10:26:48,  1.27s/it]  2%|▏         | 676/30314 [14:19<10:27:03,  1.27s/it]  2%|▏         | 677/30314 [14:20<10:26:55,  1.27s/it]  2%|▏         | 678/30314 [14:21<10:26:20,  1.27s/it]  2%|▏         | 679/30314 [14:22<10:25:49,  1.27s/it]  2%|▏         | 680/30314 [14:24<10:25:55,  1.27s/it]                                                      {'loss': 4.6434, 'grad_norm': 1.0488154888153076, 'learning_rate': 4.8880055419937986e-05, 'epoch': 0.02}
+  2%|▏         | 680/30314 [14:24<10:25:55,  1.27s/it]  2%|▏         | 681/30314 [14:25<10:26:20,  1.27s/it]  2%|▏         | 682/30314 [14:26<10:26:16,  1.27s/it]  2%|▏         | 683/30314 [14:27<10:26:18,  1.27s/it]  2%|▏         | 684/30314 [14:29<10:26:12,  1.27s/it]  2%|▏         | 685/30314 [14:30<10:25:58,  1.27s/it]                                                      {'loss': 4.6943, 'grad_norm': 0.9942074418067932, 'learning_rate': 4.887180840535726e-05, 'epoch': 0.02}
+  2%|▏         | 685/30314 [14:30<10:25:58,  1.27s/it]  2%|▏         | 686/30314 [14:31<10:25:57,  1.27s/it]  2%|▏         | 687/30314 [14:32<10:25:40,  1.27s/it]  2%|▏         | 688/30314 [14:34<10:25:50,  1.27s/it]  2%|▏         | 689/30314 [14:35<10:25:54,  1.27s/it]  2%|▏         | 690/30314 [14:36<10:25:58,  1.27s/it]                                                      {'loss': 4.6346, 'grad_norm': 1.1520899534225464, 'learning_rate': 4.886356139077654e-05, 'epoch': 0.02}
+  2%|▏         | 690/30314 [14:36<10:25:58,  1.27s/it]  2%|▏         | 691/30314 [14:38<10:26:16,  1.27s/it]  2%|▏         | 692/30314 [14:39<10:26:40,  1.27s/it]  2%|▏         | 693/30314 [14:40<10:26:08,  1.27s/it]  2%|▏         | 694/30314 [14:41<10:26:26,  1.27s/it]  2%|▏         | 695/30314 [14:43<10:26:30,  1.27s/it]                                                      {'loss': 4.6831, 'grad_norm': 1.017580270767212, 'learning_rate': 4.8855314376195824e-05, 'epoch': 0.02}
+  2%|▏         | 695/30314 [14:43<10:26:30,  1.27s/it]  2%|▏         | 696/30314 [14:44<10:27:03,  1.27s/it]  2%|▏         | 697/30314 [14:45<10:26:33,  1.27s/it]  2%|▏         | 698/30314 [14:46<10:25:59,  1.27s/it]  2%|▏         | 699/30314 [14:48<10:25:57,  1.27s/it]  2%|▏         | 700/30314 [14:49<10:25:55,  1.27s/it]                                                      {'loss': 4.7278, 'grad_norm': 1.203478455543518, 'learning_rate': 4.8847067361615094e-05, 'epoch': 0.02}
+  2%|▏         | 700/30314 [14:49<10:25:55,  1.27s/it]  2%|▏         | 701/30314 [14:50<10:26:05,  1.27s/it]  2%|▏         | 702/30314 [14:51<10:26:17,  1.27s/it]  2%|▏         | 703/30314 [14:53<10:25:55,  1.27s/it]  2%|▏         | 704/30314 [14:54<10:26:06,  1.27s/it]  2%|▏         | 705/30314 [14:55<10:25:58,  1.27s/it]                                                      {'loss': 4.7419, 'grad_norm': 0.9255306720733643, 'learning_rate': 4.883882034703438e-05, 'epoch': 0.02}
+  2%|▏         | 705/30314 [14:55<10:25:58,  1.27s/it]  2%|▏         | 706/30314 [14:57<10:26:24,  1.27s/it]  2%|▏         | 707/30314 [14:58<10:26:04,  1.27s/it]  2%|▏         | 708/30314 [14:59<10:25:49,  1.27s/it]  2%|▏         | 709/30314 [15:00<10:25:51,  1.27s/it]  2%|▏         | 710/30314 [15:02<10:25:15,  1.27s/it]                                                      {'loss': 4.6987, 'grad_norm': 1.1593281030654907, 'learning_rate': 4.8830573332453655e-05, 'epoch': 0.02}
+  2%|▏         | 710/30314 [15:02<10:25:15,  1.27s/it]  2%|▏         | 711/30314 [15:03<10:25:25,  1.27s/it]  2%|▏         | 712/30314 [15:04<10:25:20,  1.27s/it]  2%|▏         | 713/30314 [15:05<10:25:15,  1.27s/it]  2%|▏         | 714/30314 [15:07<10:25:14,  1.27s/it]  2%|▏         | 715/30314 [15:08<10:25:14,  1.27s/it]                                                      {'loss': 4.6424, 'grad_norm': 0.988456130027771, 'learning_rate': 4.882232631787294e-05, 'epoch': 0.02}
+  2%|▏         | 715/30314 [15:08<10:25:14,  1.27s/it]  2%|▏         | 716/30314 [15:09<10:25:37,  1.27s/it]  2%|▏         | 717/30314 [15:11<10:25:59,  1.27s/it]  2%|▏         | 718/30314 [15:12<10:26:02,  1.27s/it]  2%|▏         | 719/30314 [15:13<10:25:52,  1.27s/it]  2%|▏         | 720/30314 [15:14<10:25:44,  1.27s/it]                                                      {'loss': 4.7238, 'grad_norm': 0.9725451469421387, 'learning_rate': 4.881407930329221e-05, 'epoch': 0.02}
+  2%|▏         | 720/30314 [15:14<10:25:44,  1.27s/it]  2%|▏         | 721/30314 [15:16<10:25:47,  1.27s/it]  2%|▏         | 722/30314 [15:17<10:25:30,  1.27s/it]  2%|▏         | 723/30314 [15:18<10:25:39,  1.27s/it]  2%|▏         | 724/30314 [15:19<10:25:35,  1.27s/it]  2%|▏         | 725/30314 [15:21<10:25:32,  1.27s/it]                                                      {'loss': 4.6607, 'grad_norm': 1.221150517463684, 'learning_rate': 4.880583228871149e-05, 'epoch': 0.02}
+  2%|▏         | 725/30314 [15:21<10:25:32,  1.27s/it]  2%|▏         | 726/30314 [15:22<10:25:31,  1.27s/it]  2%|▏         | 727/30314 [15:23<10:25:35,  1.27s/it]  2%|▏         | 728/30314 [15:24<10:25:08,  1.27s/it]  2%|▏         | 729/30314 [15:26<10:24:46,  1.27s/it]  2%|▏         | 730/30314 [15:27<10:24:34,  1.27s/it]                                                      {'loss': 4.7109, 'grad_norm': 1.083613395690918, 'learning_rate': 4.879758527413077e-05, 'epoch': 0.02}
+  2%|▏         | 730/30314 [15:27<10:24:34,  1.27s/it]  2%|▏         | 731/30314 [15:28<10:25:19,  1.27s/it]  2%|▏         | 732/30314 [15:30<10:25:16,  1.27s/it]  2%|▏         | 733/30314 [15:31<10:25:26,  1.27s/it]  2%|▏         | 734/30314 [15:32<10:25:44,  1.27s/it]  2%|▏         | 735/30314 [15:33<10:25:34,  1.27s/it]                                                      {'loss': 4.6122, 'grad_norm': 0.976732611656189, 'learning_rate': 4.8789338259550046e-05, 'epoch': 0.02}
+  2%|▏         | 735/30314 [15:33<10:25:34,  1.27s/it]  2%|▏         | 736/30314 [15:35<10:25:49,  1.27s/it]  2%|▏         | 737/30314 [15:36<10:25:56,  1.27s/it]  2%|▏         | 738/30314 [15:37<10:25:52,  1.27s/it]  2%|▏         | 739/30314 [15:38<10:25:21,  1.27s/it]  2%|▏         | 740/30314 [15:40<10:25:34,  1.27s/it]                                                      {'loss': 4.7665, 'grad_norm': 0.9422478675842285, 'learning_rate': 4.878109124496932e-05, 'epoch': 0.02}
+  2%|▏         | 740/30314 [15:40<10:25:34,  1.27s/it]  2%|▏         | 741/30314 [15:41<10:25:53,  1.27s/it]  2%|▏         | 742/30314 [15:42<10:25:34,  1.27s/it]  2%|▏         | 743/30314 [15:43<10:25:38,  1.27s/it]  2%|▏         | 744/30314 [15:45<10:25:30,  1.27s/it]  2%|▏         | 745/30314 [15:46<10:25:16,  1.27s/it]                                                      {'loss': 4.7043, 'grad_norm': 1.03690505027771, 'learning_rate': 4.8772844230388607e-05, 'epoch': 0.02}
+  2%|▏         | 745/30314 [15:46<10:25:16,  1.27s/it]  2%|▏         | 746/30314 [15:47<10:25:42,  1.27s/it]  2%|▏         | 747/30314 [15:49<10:25:42,  1.27s/it]  2%|▏         | 748/30314 [15:50<10:25:28,  1.27s/it]  2%|▏         | 749/30314 [15:51<10:25:28,  1.27s/it]  2%|▏         | 750/30314 [15:52<10:25:18,  1.27s/it]                                                      {'loss': 4.6982, 'grad_norm': 1.0370216369628906, 'learning_rate': 4.876459721580788e-05, 'epoch': 0.02}
+  2%|▏         | 750/30314 [15:52<10:25:18,  1.27s/it]  2%|▏         | 751/30314 [15:54<10:25:39,  1.27s/it]  2%|▏         | 752/30314 [15:55<10:25:02,  1.27s/it]  2%|▏         | 753/30314 [15:56<10:25:26,  1.27s/it]  2%|▏         | 754/30314 [15:57<10:25:33,  1.27s/it]  2%|▏         | 755/30314 [15:59<10:25:08,  1.27s/it]                                                      {'loss': 4.6221, 'grad_norm': 1.1299493312835693, 'learning_rate': 4.875635020122716e-05, 'epoch': 0.02}
+  2%|▏         | 755/30314 [15:59<10:25:08,  1.27s/it]  2%|▏         | 756/30314 [16:00<10:25:03,  1.27s/it]  2%|▏         | 757/30314 [16:01<10:24:20,  1.27s/it]  3%|▎         | 758/30314 [16:03<10:24:05,  1.27s/it]  3%|▎         | 759/30314 [16:04<10:24:13,  1.27s/it]  3%|▎         | 760/30314 [16:05<10:24:12,  1.27s/it]                                                      {'loss': 4.5755, 'grad_norm': 0.9984933733940125, 'learning_rate': 4.874810318664644e-05, 'epoch': 0.03}
+  3%|▎         | 760/30314 [16:05<10:24:12,  1.27s/it]  3%|▎         | 761/30314 [16:06<10:24:39,  1.27s/it]  3%|▎         | 762/30314 [16:08<10:24:36,  1.27s/it]  3%|▎         | 763/30314 [16:09<10:24:26,  1.27s/it]  3%|▎         | 764/30314 [16:10<10:24:26,  1.27s/it]  3%|▎         | 765/30314 [16:11<10:24:21,  1.27s/it]                                                      {'loss': 4.5012, 'grad_norm': 1.0652681589126587, 'learning_rate': 4.8739856172065714e-05, 'epoch': 0.03}
+  3%|▎         | 765/30314 [16:11<10:24:21,  1.27s/it]  3%|▎         | 766/30314 [16:13<10:25:23,  1.27s/it]  3%|▎         | 767/30314 [16:14<10:25:09,  1.27s/it]  3%|▎         | 768/30314 [16:15<10:24:48,  1.27s/it]  3%|▎         | 769/30314 [16:16<10:24:42,  1.27s/it]  3%|▎         | 770/30314 [16:18<10:24:20,  1.27s/it]                                                      {'loss': 4.6641, 'grad_norm': 1.0079700946807861, 'learning_rate': 4.873160915748499e-05, 'epoch': 0.03}
+  3%|▎         | 770/30314 [16:18<10:24:20,  1.27s/it]  3%|▎         | 771/30314 [16:19<10:24:55,  1.27s/it]  3%|▎         | 772/30314 [16:20<10:24:26,  1.27s/it]  3%|▎         | 773/30314 [16:22<10:24:06,  1.27s/it]  3%|▎         | 774/30314 [16:23<10:24:45,  1.27s/it]  3%|▎         | 775/30314 [16:24<10:24:49,  1.27s/it]                                                      {'loss': 4.6276, 'grad_norm': 1.1033085584640503, 'learning_rate': 4.8723362142904275e-05, 'epoch': 0.03}
+  3%|▎         | 775/30314 [16:24<10:24:49,  1.27s/it]  3%|▎         | 776/30314 [16:25<10:24:45,  1.27s/it]  3%|▎         | 777/30314 [16:27<10:24:27,  1.27s/it]  3%|▎         | 778/30314 [16:28<10:24:56,  1.27s/it]  3%|▎         | 779/30314 [16:29<10:24:46,  1.27s/it]  3%|▎         | 780/30314 [16:30<10:24:38,  1.27s/it]                                                      {'loss': 4.4563, 'grad_norm': 0.960887610912323, 'learning_rate': 4.871511512832355e-05, 'epoch': 0.03}
+  3%|▎         | 780/30314 [16:30<10:24:38,  1.27s/it]  3%|▎         | 781/30314 [16:32<10:24:44,  1.27s/it]  3%|▎         | 782/30314 [16:33<10:24:48,  1.27s/it]  3%|▎         | 783/30314 [16:34<10:24:45,  1.27s/it]  3%|▎         | 784/30314 [16:36<10:24:45,  1.27s/it]  3%|▎         | 785/30314 [16:37<10:25:04,  1.27s/it]                                                      {'loss': 4.5591, 'grad_norm': 1.2716799974441528, 'learning_rate': 4.870686811374283e-05, 'epoch': 0.03}
+  3%|▎         | 785/30314 [16:37<10:25:04,  1.27s/it]  3%|▎         | 786/30314 [16:38<10:25:10,  1.27s/it]  3%|▎         | 787/30314 [16:39<10:24:22,  1.27s/it]  3%|▎         | 788/30314 [16:41<10:24:19,  1.27s/it]  3%|▎         | 789/30314 [16:42<10:24:19,  1.27s/it]  3%|▎         | 790/30314 [16:43<10:24:09,  1.27s/it]                                                      {'loss': 4.5017, 'grad_norm': 1.022857904434204, 'learning_rate': 4.8698621099162105e-05, 'epoch': 0.03}
+  3%|▎         | 790/30314 [16:43<10:24:09,  1.27s/it]  3%|▎         | 791/30314 [16:44<10:24:28,  1.27s/it]  3%|▎         | 792/30314 [16:46<10:24:09,  1.27s/it]  3%|▎         | 793/30314 [16:47<10:24:03,  1.27s/it]  3%|▎         | 794/30314 [16:48<10:23:45,  1.27s/it]  3%|▎         | 795/30314 [16:49<10:23:46,  1.27s/it]                                                      {'loss': 4.5172, 'grad_norm': 0.9953296184539795, 'learning_rate': 4.869037408458139e-05, 'epoch': 0.03}
+  3%|▎         | 795/30314 [16:49<10:23:46,  1.27s/it]  3%|▎         | 796/30314 [16:51<10:24:07,  1.27s/it]  3%|▎         | 797/30314 [16:52<10:24:09,  1.27s/it]  3%|▎         | 798/30314 [16:53<10:24:34,  1.27s/it]  3%|▎         | 799/30314 [16:55<10:24:45,  1.27s/it]  3%|▎         | 800/30314 [16:56<10:24:33,  1.27s/it]                                                      {'loss': 4.6833, 'grad_norm': 1.1139194965362549, 'learning_rate': 4.868212707000066e-05, 'epoch': 0.03}
+  3%|▎         | 800/30314 [16:56<10:24:33,  1.27s/it]  3%|▎         | 801/30314 [16:57<10:24:43,  1.27s/it]  3%|▎         | 802/30314 [16:58<10:24:26,  1.27s/it]  3%|▎         | 803/30314 [17:00<10:24:24,  1.27s/it]  3%|▎         | 804/30314 [17:01<10:24:01,  1.27s/it]  3%|▎         | 805/30314 [17:02<10:23:32,  1.27s/it]                                                      {'loss': 4.5968, 'grad_norm': 1.0685745477676392, 'learning_rate': 4.867388005541994e-05, 'epoch': 0.03}
+  3%|▎         | 805/30314 [17:02<10:23:32,  1.27s/it]  3%|▎         | 806/30314 [17:03<10:23:47,  1.27s/it]  3%|▎         | 807/30314 [17:05<10:23:42,  1.27s/it]  3%|▎         | 808/30314 [17:06<10:23:35,  1.27s/it]  3%|▎         | 809/30314 [17:07<10:23:33,  1.27s/it]  3%|▎         | 810/30314 [17:08<10:23:32,  1.27s/it]                                                      {'loss': 4.5718, 'grad_norm': 1.057360053062439, 'learning_rate': 4.866563304083922e-05, 'epoch': 0.03}
+  3%|▎         | 810/30314 [17:08<10:23:32,  1.27s/it]  3%|▎         | 811/30314 [17:10<10:24:13,  1.27s/it]  3%|▎         | 812/30314 [17:11<10:23:57,  1.27s/it]  3%|▎         | 813/30314 [17:12<10:23:57,  1.27s/it]  3%|▎         | 814/30314 [17:14<10:23:37,  1.27s/it]  3%|▎         | 815/30314 [17:15<10:23:46,  1.27s/it]                                                      {'loss': 4.6714, 'grad_norm': 0.9759106040000916, 'learning_rate': 4.86573860262585e-05, 'epoch': 0.03}
+  3%|▎         | 815/30314 [17:15<10:23:46,  1.27s/it]  3%|▎         | 816/30314 [17:16<10:23:49,  1.27s/it]  3%|▎         | 817/30314 [17:17<10:23:59,  1.27s/it]  3%|▎         | 818/30314 [17:19<10:24:04,  1.27s/it]  3%|▎         | 819/30314 [17:20<10:24:03,  1.27s/it]  3%|▎         | 820/30314 [17:21<10:23:22,  1.27s/it]                                                      {'loss': 4.531, 'grad_norm': 1.0061135292053223, 'learning_rate': 4.8649139011677774e-05, 'epoch': 0.03}
+  3%|▎         | 820/30314 [17:21<10:23:22,  1.27s/it]  3%|▎         | 821/30314 [17:22<10:24:02,  1.27s/it]  3%|▎         | 822/30314 [17:24<10:24:00,  1.27s/it]  3%|▎         | 823/30314 [17:25<10:23:46,  1.27s/it]  3%|▎         | 824/30314 [17:26<10:23:24,  1.27s/it]  3%|▎         | 825/30314 [17:28<10:23:21,  1.27s/it]                                                      {'loss': 4.5428, 'grad_norm': 1.0109604597091675, 'learning_rate': 4.864089199709706e-05, 'epoch': 0.03}
+  3%|▎         | 825/30314 [17:28<10:23:21,  1.27s/it]  3%|▎         | 826/30314 [17:29<10:23:42,  1.27s/it]  3%|▎         | 827/30314 [17:30<10:23:37,  1.27s/it]  3%|▎         | 828/30314 [17:31<10:23:31,  1.27s/it]  3%|▎         | 829/30314 [17:33<10:23:11,  1.27s/it]  3%|▎         | 830/30314 [17:34<10:23:04,  1.27s/it]                                                      {'loss': 4.5035, 'grad_norm': 0.9984024167060852, 'learning_rate': 4.863264498251633e-05, 'epoch': 0.03}
+  3%|▎         | 830/30314 [17:34<10:23:04,  1.27s/it]  3%|▎         | 831/30314 [17:35<10:23:38,  1.27s/it]  3%|▎         | 832/30314 [17:36<10:23:18,  1.27s/it]  3%|▎         | 833/30314 [17:38<10:22:53,  1.27s/it]  3%|▎         | 834/30314 [17:39<10:23:00,  1.27s/it]  3%|▎         | 835/30314 [17:40<10:22:44,  1.27s/it]                                                      {'loss': 4.582, 'grad_norm': 1.0092178583145142, 'learning_rate': 4.862439796793561e-05, 'epoch': 0.03}
+  3%|▎         | 835/30314 [17:40<10:22:44,  1.27s/it]  3%|▎         | 836/30314 [17:41<10:23:12,  1.27s/it]  3%|▎         | 837/30314 [17:43<10:23:12,  1.27s/it]  3%|▎         | 838/30314 [17:44<10:23:06,  1.27s/it]  3%|▎         | 839/30314 [17:45<10:22:32,  1.27s/it]  3%|▎         | 840/30314 [17:47<10:22:27,  1.27s/it]                                                      {'loss': 4.6759, 'grad_norm': 1.090242862701416, 'learning_rate': 4.861615095335489e-05, 'epoch': 0.03}
+  3%|▎         | 840/30314 [17:47<10:22:27,  1.27s/it]  3%|▎         | 841/30314 [17:48<10:22:59,  1.27s/it]  3%|▎         | 842/30314 [17:49<10:22:57,  1.27s/it]  3%|▎         | 843/30314 [17:50<10:22:55,  1.27s/it]  3%|▎         | 844/30314 [17:52<10:22:41,  1.27s/it]  3%|▎         | 845/30314 [17:53<10:22:36,  1.27s/it]                                                      {'loss': 4.3746, 'grad_norm': 1.008749008178711, 'learning_rate': 4.860790393877417e-05, 'epoch': 0.03}
+  3%|▎         | 845/30314 [17:53<10:22:36,  1.27s/it]  3%|▎         | 846/30314 [17:54<10:22:51,  1.27s/it]  3%|▎         | 847/30314 [17:55<10:22:46,  1.27s/it]  3%|▎         | 848/30314 [17:57<10:23:00,  1.27s/it]  3%|▎         | 849/30314 [17:58<10:23:08,  1.27s/it]  3%|▎         | 850/30314 [17:59<10:22:54,  1.27s/it]                                                      {'loss': 4.4086, 'grad_norm': 1.0129457712173462, 'learning_rate': 4.859965692419344e-05, 'epoch': 0.03}
+  3%|▎         | 850/30314 [17:59<10:22:54,  1.27s/it]  3%|▎         | 851/30314 [18:01<10:22:49,  1.27s/it]  3%|▎         | 852/30314 [18:02<10:22:42,  1.27s/it]  3%|▎         | 853/30314 [18:03<10:22:45,  1.27s/it]  3%|▎         | 854/30314 [18:04<10:22:59,  1.27s/it]  3%|▎         | 855/30314 [18:06<10:22:29,  1.27s/it]                                                      {'loss': 4.4739, 'grad_norm': 1.0595976114273071, 'learning_rate': 4.8591409909612726e-05, 'epoch': 0.03}
+  3%|▎         | 855/30314 [18:06<10:22:29,  1.27s/it]  3%|▎         | 856/30314 [18:07<10:22:22,  1.27s/it]  3%|▎         | 857/30314 [18:08<10:22:28,  1.27s/it]  3%|▎         | 858/30314 [18:09<10:22:46,  1.27s/it]  3%|▎         | 859/30314 [18:11<10:22:49,  1.27s/it]  3%|▎         | 860/30314 [18:12<10:22:33,  1.27s/it]                                                      {'loss': 4.4552, 'grad_norm': 1.0144603252410889, 'learning_rate': 4.8583162895032e-05, 'epoch': 0.03}
+  3%|▎         | 860/30314 [18:12<10:22:33,  1.27s/it]  3%|▎         | 861/30314 [18:13<10:22:20,  1.27s/it]  3%|▎         | 862/30314 [18:14<10:22:08,  1.27s/it]  3%|▎         | 863/30314 [18:16<10:21:46,  1.27s/it]  3%|▎         | 864/30314 [18:17<10:22:06,  1.27s/it]  3%|▎         | 865/30314 [18:18<10:22:15,  1.27s/it]                                                      {'loss': 4.4355, 'grad_norm': 1.0905755758285522, 'learning_rate': 4.857491588045128e-05, 'epoch': 0.03}
+  3%|▎         | 865/30314 [18:18<10:22:15,  1.27s/it]  3%|▎         | 866/30314 [18:20<10:22:36,  1.27s/it]  3%|▎         | 867/30314 [18:21<10:22:33,  1.27s/it]  3%|▎         | 868/30314 [18:22<10:22:45,  1.27s/it]  3%|▎         | 869/30314 [18:23<10:22:36,  1.27s/it]  3%|▎         | 870/30314 [18:25<10:22:17,  1.27s/it]                                                      {'loss': 4.4323, 'grad_norm': 0.9876592755317688, 'learning_rate': 4.8566668865870556e-05, 'epoch': 0.03}
+  3%|▎         | 870/30314 [18:25<10:22:17,  1.27s/it]  3%|▎         | 871/30314 [18:26<10:22:41,  1.27s/it]  3%|▎         | 872/30314 [18:27<10:22:50,  1.27s/it]  3%|▎         | 873/30314 [18:28<10:22:33,  1.27s/it]  3%|▎         | 874/30314 [18:30<10:22:59,  1.27s/it]  3%|▎         | 875/30314 [18:31<10:22:42,  1.27s/it]                                                      {'loss': 4.4869, 'grad_norm': 0.9501920342445374, 'learning_rate': 4.855842185128984e-05, 'epoch': 0.03}
+  3%|▎         | 875/30314 [18:31<10:22:42,  1.27s/it]  3%|▎         | 876/30314 [18:32<10:22:39,  1.27s/it]  3%|▎         | 877/30314 [18:33<10:22:33,  1.27s/it]  3%|▎         | 878/30314 [18:35<10:22:01,  1.27s/it]  3%|▎         | 879/30314 [18:36<10:22:25,  1.27s/it]  3%|▎         | 880/30314 [18:37<10:22:01,  1.27s/it]                                                      {'loss': 4.4951, 'grad_norm': 1.0182583332061768, 'learning_rate': 4.855017483670911e-05, 'epoch': 0.03}
+  3%|▎         | 880/30314 [18:37<10:22:01,  1.27s/it]  3%|▎         | 881/30314 [18:39<10:22:32,  1.27s/it]  3%|▎         | 882/30314 [18:40<10:22:33,  1.27s/it]  3%|▎         | 883/30314 [18:41<10:22:40,  1.27s/it]  3%|▎         | 884/30314 [18:42<10:23:07,  1.27s/it]  3%|▎         | 885/30314 [18:44<10:23:25,  1.27s/it]                                                      {'loss': 4.4575, 'grad_norm': 1.0192668437957764, 'learning_rate': 4.8541927822128394e-05, 'epoch': 0.03}
+  3%|▎         | 885/30314 [18:44<10:23:25,  1.27s/it]  3%|▎         | 886/30314 [18:45<10:23:12,  1.27s/it]  3%|▎         | 887/30314 [18:46<10:22:58,  1.27s/it]  3%|▎         | 888/30314 [18:47<10:22:42,  1.27s/it]  3%|▎         | 889/30314 [18:49<10:22:25,  1.27s/it]  3%|▎         | 890/30314 [18:50<10:21:51,  1.27s/it]                                                      {'loss': 4.4477, 'grad_norm': 0.958482563495636, 'learning_rate': 4.853368080754767e-05, 'epoch': 0.03}
+  3%|▎         | 890/30314 [18:50<10:21:51,  1.27s/it]  3%|▎         | 891/30314 [18:51<10:22:22,  1.27s/it]  3%|▎         | 892/30314 [18:53<10:22:19,  1.27s/it]  3%|▎         | 893/30314 [18:54<10:22:15,  1.27s/it]  3%|▎         | 894/30314 [18:55<10:21:53,  1.27s/it]  3%|▎         | 895/30314 [18:57<11:08:51,  1.36s/it]                                                      {'loss': 4.4368, 'grad_norm': 0.9202280044555664, 'learning_rate': 4.852543379296695e-05, 'epoch': 0.03}
+  3%|▎         | 895/30314 [18:57<11:08:51,  1.36s/it]  3%|▎         | 896/30314 [18:58<10:55:05,  1.34s/it]  3%|▎         | 897/30314 [18:59<10:44:51,  1.32s/it]  3%|▎         | 898/30314 [19:00<10:37:53,  1.30s/it]  3%|▎         | 899/30314 [19:02<10:32:43,  1.29s/it]  3%|▎         | 900/30314 [19:03<10:29:47,  1.28s/it]                                                      {'loss': 4.4925, 'grad_norm': 0.9236849546432495, 'learning_rate': 4.8517186778386225e-05, 'epoch': 0.03}
+  3%|▎         | 900/30314 [19:03<10:29:47,  1.28s/it]  3%|▎         | 901/30314 [19:04<10:28:02,  1.28s/it]  3%|▎         | 902/30314 [19:06<10:26:04,  1.28s/it]  3%|▎         | 903/30314 [19:07<10:24:57,  1.27s/it]  3%|▎         | 904/30314 [19:08<10:24:14,  1.27s/it]  3%|▎         | 905/30314 [19:09<10:23:52,  1.27s/it]                                                      {'loss': 4.5062, 'grad_norm': 0.9441831707954407, 'learning_rate': 4.850893976380551e-05, 'epoch': 0.03}
+  3%|▎         | 905/30314 [19:09<10:23:52,  1.27s/it]  3%|▎         | 906/30314 [19:11<10:23:18,  1.27s/it]  3%|▎         | 907/30314 [19:12<10:22:25,  1.27s/it]  3%|▎         | 908/30314 [19:13<10:22:11,  1.27s/it]  3%|▎         | 909/30314 [19:14<10:21:49,  1.27s/it]  3%|▎         | 910/30314 [19:16<10:22:03,  1.27s/it]                                                      {'loss': 4.4049, 'grad_norm': 0.9588618278503418, 'learning_rate': 4.8500692749224785e-05, 'epoch': 0.03}
+  3%|▎         | 910/30314 [19:16<10:22:03,  1.27s/it]  3%|▎         | 911/30314 [19:17<10:22:35,  1.27s/it]  3%|▎         | 912/30314 [19:18<10:22:42,  1.27s/it]  3%|▎         | 913/30314 [19:20<10:23:06,  1.27s/it]  3%|▎         | 914/30314 [19:21<10:23:09,  1.27s/it]  3%|▎         | 915/30314 [19:22<10:22:50,  1.27s/it]                                                      {'loss': 4.4572, 'grad_norm': 1.0182689428329468, 'learning_rate': 4.849244573464406e-05, 'epoch': 0.03}
+  3%|▎         | 915/30314 [19:22<10:22:50,  1.27s/it]  3%|▎         | 916/30314 [19:23<10:22:52,  1.27s/it]  3%|▎         | 917/30314 [19:25<10:22:22,  1.27s/it]  3%|▎         | 918/30314 [19:26<10:21:55,  1.27s/it]  3%|▎         | 919/30314 [19:27<10:21:57,  1.27s/it]  3%|▎         | 920/30314 [19:28<10:21:41,  1.27s/it]                                                      {'loss': 4.3787, 'grad_norm': 1.1122883558273315, 'learning_rate': 4.848419872006334e-05, 'epoch': 0.03}
+  3%|▎         | 920/30314 [19:28<10:21:41,  1.27s/it]  3%|▎         | 921/30314 [19:30<10:22:02,  1.27s/it]  3%|▎         | 922/30314 [19:31<10:21:42,  1.27s/it]  3%|▎         | 923/30314 [19:32<10:21:37,  1.27s/it]  3%|▎         | 924/30314 [19:33<10:21:28,  1.27s/it]  3%|▎         | 925/30314 [19:35<10:21:15,  1.27s/it]                                                      {'loss': 4.4293, 'grad_norm': 1.1027203798294067, 'learning_rate': 4.847595170548262e-05, 'epoch': 0.03}
+  3%|▎         | 925/30314 [19:35<10:21:15,  1.27s/it]  3%|▎         | 926/30314 [19:36<10:21:23,  1.27s/it]  3%|▎         | 927/30314 [19:37<10:21:27,  1.27s/it]  3%|▎         | 928/30314 [19:39<10:21:25,  1.27s/it]  3%|▎         | 929/30314 [19:40<10:21:29,  1.27s/it]  3%|▎         | 930/30314 [19:41<10:21:17,  1.27s/it]                                                      {'loss': 4.4707, 'grad_norm': 0.992185115814209, 'learning_rate': 4.846770469090189e-05, 'epoch': 0.03}
+  3%|▎         | 930/30314 [19:41<10:21:17,  1.27s/it]  3%|▎         | 931/30314 [19:42<10:21:51,  1.27s/it]  3%|▎         | 932/30314 [19:44<10:21:54,  1.27s/it]  3%|▎         | 933/30314 [19:45<10:21:43,  1.27s/it]  3%|▎         | 934/30314 [19:46<10:21:47,  1.27s/it]  3%|▎         | 935/30314 [19:47<10:21:42,  1.27s/it]                                                      {'loss': 4.3268, 'grad_norm': 1.0204057693481445, 'learning_rate': 4.8459457676321176e-05, 'epoch': 0.03}
+  3%|▎         | 935/30314 [19:47<10:21:42,  1.27s/it]  3%|▎         | 936/30314 [19:49<10:21:54,  1.27s/it]  3%|▎         | 937/30314 [19:50<10:21:45,  1.27s/it]  3%|▎         | 938/30314 [19:52<11:16:47,  1.38s/it]  3%|▎         | 939/30314 [19:53<11:00:14,  1.35s/it]  3%|▎         | 940/30314 [19:54<10:48:15,  1.32s/it]                                                      {'loss': 4.3366, 'grad_norm': 1.0231059789657593, 'learning_rate': 4.845121066174045e-05, 'epoch': 0.03}
+  3%|▎         | 940/30314 [19:54<10:48:15,  1.32s/it]  3%|▎         | 941/30314 [19:55<10:40:33,  1.31s/it]  3%|▎         | 942/30314 [19:57<10:34:51,  1.30s/it]  3%|▎         | 943/30314 [19:58<10:30:49,  1.29s/it]  3%|▎         | 944/30314 [19:59<10:27:57,  1.28s/it]  3%|▎         | 945/30314 [20:01<12:00:40,  1.47s/it]                                                      {'loss': 4.4489, 'grad_norm': 1.0466947555541992, 'learning_rate': 4.844296364715973e-05, 'epoch': 0.03}
+  3%|▎         | 945/30314 [20:01<12:00:40,  1.47s/it]  3%|▎         | 946/30314 [20:02<11:31:13,  1.41s/it]  3%|▎         | 947/30314 [20:04<11:10:10,  1.37s/it]  3%|▎         | 948/30314 [20:05<10:55:17,  1.34s/it]  3%|▎         | 949/30314 [20:06<10:44:59,  1.32s/it]  3%|▎         | 950/30314 [20:07<10:37:39,  1.30s/it]                                                      {'loss': 4.3576, 'grad_norm': 1.0842663049697876, 'learning_rate': 4.843471663257901e-05, 'epoch': 0.03}
+  3%|▎         | 950/30314 [20:07<10:37:39,  1.30s/it]  3%|▎         | 951/30314 [20:09<10:32:51,  1.29s/it]  3%|▎         | 952/30314 [20:10<10:29:09,  1.29s/it]  3%|▎         | 953/30314 [20:11<10:26:31,  1.28s/it]  3%|▎         | 954/30314 [20:13<10:24:50,  1.28s/it]  3%|▎         | 955/30314 [20:14<10:23:42,  1.27s/it]                                                      {'loss': 4.4632, 'grad_norm': 1.0090522766113281, 'learning_rate': 4.842646961799829e-05, 'epoch': 0.03}
+  3%|▎         | 955/30314 [20:14<10:23:42,  1.27s/it]  3%|▎         | 956/30314 [20:15<10:22:54,  1.27s/it]  3%|▎         | 957/30314 [20:16<10:22:01,  1.27s/it]  3%|▎         | 958/30314 [20:18<10:21:43,  1.27s/it]  3%|▎         | 959/30314 [20:19<10:21:26,  1.27s/it]  3%|▎         | 960/30314 [20:20<10:20:52,  1.27s/it]                                                      {'loss': 4.4366, 'grad_norm': 1.0284156799316406, 'learning_rate': 4.841822260341757e-05, 'epoch': 0.03}
+  3%|▎         | 960/30314 [20:20<10:20:52,  1.27s/it]  3%|▎         | 961/30314 [20:21<10:21:21,  1.27s/it]  3%|▎         | 962/30314 [20:23<10:21:14,  1.27s/it]  3%|▎         | 963/30314 [20:24<10:21:13,  1.27s/it]  3%|▎         | 964/30314 [20:25<10:20:51,  1.27s/it]  3%|▎         | 965/30314 [20:27<10:20:46,  1.27s/it]                                                      {'loss': 4.279, 'grad_norm': 1.0130407810211182, 'learning_rate': 4.8409975588836845e-05, 'epoch': 0.03}
+  3%|▎         | 965/30314 [20:27<10:20:46,  1.27s/it]  3%|▎         | 966/30314 [20:28<10:20:52,  1.27s/it]  3%|▎         | 967/30314 [20:29<10:20:43,  1.27s/it]  3%|▎         | 968/30314 [20:30<10:20:37,  1.27s/it]  3%|▎         | 969/30314 [20:32<10:20:30,  1.27s/it]  3%|▎         | 970/30314 [20:33<10:20:44,  1.27s/it]                                                      {'loss': 4.4433, 'grad_norm': 0.9178645014762878, 'learning_rate': 4.840172857425612e-05, 'epoch': 0.03}
+  3%|▎         | 970/30314 [20:33<10:20:44,  1.27s/it]  3%|▎         | 971/30314 [20:34<10:21:36,  1.27s/it]  3%|▎         | 972/30314 [20:35<10:21:11,  1.27s/it]  3%|▎         | 973/30314 [20:37<10:21:05,  1.27s/it]  3%|▎         | 974/30314 [20:38<10:21:00,  1.27s/it]  3%|▎         | 975/30314 [20:39<10:20:55,  1.27s/it]                                                      {'loss': 4.386, 'grad_norm': 0.9880272150039673, 'learning_rate': 4.8393481559675405e-05, 'epoch': 0.03}
+  3%|▎         | 975/30314 [20:39<10:20:55,  1.27s/it]  3%|▎         | 976/30314 [20:40<10:21:05,  1.27s/it]  3%|▎         | 977/30314 [20:42<10:20:45,  1.27s/it]  3%|▎         | 978/30314 [20:43<10:20:51,  1.27s/it]  3%|▎         | 979/30314 [20:44<10:21:17,  1.27s/it]  3%|▎         | 980/30314 [20:46<10:21:10,  1.27s/it]                                                      {'loss': 4.3131, 'grad_norm': 1.046189546585083, 'learning_rate': 4.8385234545094675e-05, 'epoch': 0.03}
+  3%|▎         | 980/30314 [20:46<10:21:10,  1.27s/it]  3%|▎         | 981/30314 [20:47<10:21:16,  1.27s/it]  3%|▎         | 982/30314 [20:48<10:21:08,  1.27s/it]  3%|▎         | 983/30314 [20:49<10:21:08,  1.27s/it]  3%|▎         | 984/30314 [20:51<10:20:51,  1.27s/it]  3%|▎         | 985/30314 [20:52<10:20:58,  1.27s/it]                                                      {'loss': 4.377, 'grad_norm': 0.9994511604309082, 'learning_rate': 4.837698753051396e-05, 'epoch': 0.03}
+  3%|▎         | 985/30314 [20:52<10:20:58,  1.27s/it]  3%|▎         | 986/30314 [20:53<10:21:08,  1.27s/it]  3%|▎         | 987/30314 [20:54<10:20:41,  1.27s/it]  3%|▎         | 988/30314 [20:56<10:20:28,  1.27s/it]  3%|▎         | 989/30314 [20:57<10:20:37,  1.27s/it]  3%|▎         | 990/30314 [20:58<10:20:58,  1.27s/it]                                                      {'loss': 4.439, 'grad_norm': 1.0610724687576294, 'learning_rate': 4.8368740515933236e-05, 'epoch': 0.03}
+  3%|▎         | 990/30314 [20:58<10:20:58,  1.27s/it]  3%|▎         | 991/30314 [21:00<10:21:15,  1.27s/it]  3%|▎         | 992/30314 [21:01<10:21:03,  1.27s/it]  3%|▎         | 993/30314 [21:02<10:21:07,  1.27s/it]  3%|▎         | 994/30314 [21:03<10:21:11,  1.27s/it]  3%|▎         | 995/30314 [21:05<10:20:33,  1.27s/it]                                                      {'loss': 4.2449, 'grad_norm': 1.0273733139038086, 'learning_rate': 4.836049350135251e-05, 'epoch': 0.03}
+  3%|▎         | 995/30314 [21:05<10:20:33,  1.27s/it]  3%|▎         | 996/30314 [21:06<10:20:49,  1.27s/it]  3%|▎         | 997/30314 [21:07<10:20:29,  1.27s/it]  3%|▎         | 998/30314 [21:08<10:20:45,  1.27s/it]  3%|▎         | 999/30314 [21:10<10:20:17,  1.27s/it]  3%|▎         | 1000/30314 [21:11<10:20:24,  1.27s/it]                                                       {'loss': 4.4121, 'grad_norm': 0.9814417958259583, 'learning_rate': 4.835224648677179e-05, 'epoch': 0.03}
+  3%|▎         | 1000/30314 [21:11<10:20:24,  1.27s/it]  3%|▎         | 1001/30314 [21:12<10:20:50,  1.27s/it]  3%|▎         | 1002/30314 [21:14<10:20:44,  1.27s/it]  3%|▎         | 1003/30314 [21:15<10:20:24,  1.27s/it]  3%|▎         | 1004/30314 [21:16<10:20:20,  1.27s/it]  3%|▎         | 1005/30314 [21:17<10:19:59,  1.27s/it]                                                       {'loss': 4.2695, 'grad_norm': 1.0173139572143555, 'learning_rate': 4.8343999472191073e-05, 'epoch': 0.03}
+  3%|▎         | 1005/30314 [21:17<10:19:59,  1.27s/it]  3%|▎         | 1006/30314 [21:19<10:20:56,  1.27s/it]  3%|▎         | 1007/30314 [21:20<10:20:57,  1.27s/it]  3%|▎         | 1008/30314 [21:21<10:20:44,  1.27s/it]  3%|▎         | 1009/30314 [21:22<10:20:40,  1.27s/it]  3%|▎         | 1010/30314 [21:24<10:20:14,  1.27s/it]                                                       {'loss': 4.47, 'grad_norm': 1.0232692956924438, 'learning_rate': 4.8335752457610344e-05, 'epoch': 0.03}
+  3%|▎         | 1010/30314 [21:24<10:20:14,  1.27s/it]  3%|▎         | 1011/30314 [21:25<10:20:06,  1.27s/it]  3%|▎         | 1012/30314 [21:26<10:19:59,  1.27s/it]  3%|▎         | 1013/30314 [21:27<10:19:48,  1.27s/it]  3%|▎         | 1014/30314 [21:29<10:20:07,  1.27s/it]  3%|▎         | 1015/30314 [21:30<10:20:19,  1.27s/it]                                                       {'loss': 4.3753, 'grad_norm': 1.0316380262374878, 'learning_rate': 4.832750544302963e-05, 'epoch': 0.03}
+  3%|▎         | 1015/30314 [21:30<10:20:19,  1.27s/it]  3%|▎         | 1016/30314 [21:31<10:20:23,  1.27s/it]  3%|▎         | 1017/30314 [21:33<10:20:24,  1.27s/it]  3%|▎         | 1018/30314 [21:34<10:20:37,  1.27s/it]  3%|▎         | 1019/30314 [21:35<10:20:16,  1.27s/it]  3%|▎         | 1020/30314 [21:36<10:19:49,  1.27s/it]                                                       {'loss': 4.3413, 'grad_norm': 1.0596213340759277, 'learning_rate': 4.8319258428448904e-05, 'epoch': 0.03}
+  3%|▎         | 1020/30314 [21:36<10:19:49,  1.27s/it]  3%|▎         | 1021/30314 [21:38<10:19:54,  1.27s/it]  3%|▎         | 1022/30314 [21:39<10:19:59,  1.27s/it]  3%|▎         | 1023/30314 [21:40<10:19:59,  1.27s/it]  3%|▎         | 1024/30314 [21:41<10:20:07,  1.27s/it]  3%|▎         | 1025/30314 [21:43<10:19:40,  1.27s/it]                                                       {'loss': 4.2446, 'grad_norm': 1.044251799583435, 'learning_rate': 4.831101141386819e-05, 'epoch': 0.03}
+  3%|▎         | 1025/30314 [21:43<10:19:40,  1.27s/it]  3%|▎         | 1026/30314 [21:44<10:19:59,  1.27s/it]  3%|▎         | 1027/30314 [21:45<10:19:35,  1.27s/it]  3%|▎         | 1028/30314 [21:47<10:19:28,  1.27s/it]  3%|▎         | 1029/30314 [21:48<10:19:02,  1.27s/it]  3%|▎         | 1030/30314 [21:49<10:19:08,  1.27s/it]                                                       {'loss': 4.3326, 'grad_norm': 0.9934329986572266, 'learning_rate': 4.830276439928746e-05, 'epoch': 0.03}
+  3%|▎         | 1030/30314 [21:49<10:19:08,  1.27s/it]  3%|▎         | 1031/30314 [21:50<10:19:02,  1.27s/it]  3%|▎         | 1032/30314 [21:52<10:19:36,  1.27s/it]  3%|▎         | 1033/30314 [21:53<10:19:26,  1.27s/it]  3%|▎         | 1034/30314 [21:54<10:19:47,  1.27s/it]  3%|▎         | 1035/30314 [21:55<10:19:33,  1.27s/it]                                                       {'loss': 4.2593, 'grad_norm': 0.996052622795105, 'learning_rate': 4.829451738470674e-05, 'epoch': 0.03}
+  3%|▎         | 1035/30314 [21:55<10:19:33,  1.27s/it]  3%|▎         | 1036/30314 [21:57<10:20:08,  1.27s/it]  3%|▎         | 1037/30314 [21:58<10:20:20,  1.27s/it]  3%|▎         | 1038/30314 [21:59<10:20:08,  1.27s/it]  3%|▎         | 1039/30314 [22:01<10:19:40,  1.27s/it]  3%|▎         | 1040/30314 [22:02<10:19:22,  1.27s/it]                                                       {'loss': 4.3987, 'grad_norm': 1.0439754724502563, 'learning_rate': 4.828627037012602e-05, 'epoch': 0.03}
+  3%|▎         | 1040/30314 [22:02<10:19:22,  1.27s/it]  3%|▎         | 1041/30314 [22:03<10:19:48,  1.27s/it]  3%|▎         | 1042/30314 [22:04<10:19:50,  1.27s/it]  3%|▎         | 1043/30314 [22:06<10:19:29,  1.27s/it]  3%|▎         | 1044/30314 [22:07<10:19:16,  1.27s/it]  3%|▎         | 1045/30314 [22:08<10:19:29,  1.27s/it]                                                       {'loss': 4.2861, 'grad_norm': 1.1781795024871826, 'learning_rate': 4.8278023355545295e-05, 'epoch': 0.03}
+  3%|▎         | 1045/30314 [22:08<10:19:29,  1.27s/it]  3%|▎         | 1046/30314 [22:09<10:19:12,  1.27s/it]  3%|▎         | 1047/30314 [22:11<10:18:54,  1.27s/it]  3%|▎         | 1048/30314 [22:12<10:18:54,  1.27s/it]  3%|▎         | 1049/30314 [22:13<10:19:17,  1.27s/it]  3%|▎         | 1050/30314 [22:14<10:19:11,  1.27s/it]                                                       {'loss': 4.281, 'grad_norm': 0.9952004551887512, 'learning_rate': 4.826977634096457e-05, 'epoch': 0.03}
+  3%|▎         | 1050/30314 [22:14<10:19:11,  1.27s/it]  3%|▎         | 1051/30314 [22:16<10:19:27,  1.27s/it]  3%|▎         | 1052/30314 [22:17<10:19:41,  1.27s/it]  3%|▎         | 1053/30314 [22:18<10:19:38,  1.27s/it]  3%|▎         | 1054/30314 [22:20<10:19:37,  1.27s/it]  3%|▎         | 1055/30314 [22:21<10:19:20,  1.27s/it]                                                       {'loss': 4.247, 'grad_norm': 0.9913967251777649, 'learning_rate': 4.8261529326383856e-05, 'epoch': 0.03}
+  3%|▎         | 1055/30314 [22:21<10:19:20,  1.27s/it]  3%|▎         | 1056/30314 [22:22<10:19:17,  1.27s/it]  3%|▎         | 1057/30314 [22:23<10:19:14,  1.27s/it]  3%|▎         | 1058/30314 [22:25<10:18:56,  1.27s/it]  3%|▎         | 1059/30314 [22:26<10:19:01,  1.27s/it]  3%|▎         | 1060/30314 [22:27<10:18:49,  1.27s/it]                                                       {'loss': 4.2212, 'grad_norm': 1.012749433517456, 'learning_rate': 4.8253282311803126e-05, 'epoch': 0.03}
+  3%|▎         | 1060/30314 [22:27<10:18:49,  1.27s/it]  4%|▎         | 1061/30314 [22:28<10:19:15,  1.27s/it]  4%|▎         | 1062/30314 [22:30<10:19:21,  1.27s/it]  4%|▎         | 1063/30314 [22:31<10:19:22,  1.27s/it]  4%|▎         | 1064/30314 [22:32<10:18:54,  1.27s/it]  4%|▎         | 1065/30314 [22:34<10:18:57,  1.27s/it]                                                       {'loss': 4.2476, 'grad_norm': 1.0260835886001587, 'learning_rate': 4.824503529722241e-05, 'epoch': 0.04}
+  4%|▎         | 1065/30314 [22:34<10:18:57,  1.27s/it]  4%|▎         | 1066/30314 [22:35<10:18:54,  1.27s/it]  4%|▎         | 1067/30314 [22:36<10:18:37,  1.27s/it]  4%|▎         | 1068/30314 [22:37<10:18:54,  1.27s/it]  4%|▎         | 1069/30314 [22:39<10:18:57,  1.27s/it]  4%|▎         | 1070/30314 [22:40<10:18:58,  1.27s/it]                                                       {'loss': 4.2785, 'grad_norm': 1.0642647743225098, 'learning_rate': 4.823678828264169e-05, 'epoch': 0.04}
+  4%|▎         | 1070/30314 [22:40<10:18:58,  1.27s/it]  4%|▎         | 1071/30314 [22:41<10:18:55,  1.27s/it]  4%|▎         | 1072/30314 [22:42<10:18:38,  1.27s/it]  4%|▎         | 1073/30314 [22:44<10:18:53,  1.27s/it]  4%|▎         | 1074/30314 [22:45<10:18:41,  1.27s/it]  4%|▎         | 1075/30314 [22:46<10:18:02,  1.27s/it]                                                       {'loss': 4.2654, 'grad_norm': 1.0623470544815063, 'learning_rate': 4.8228541268060964e-05, 'epoch': 0.04}
+  4%|▎         | 1075/30314 [22:46<10:18:02,  1.27s/it]  4%|▎         | 1076/30314 [22:47<10:18:23,  1.27s/it]  4%|▎         | 1077/30314 [22:49<10:18:02,  1.27s/it]  4%|▎         | 1078/30314 [22:50<10:17:53,  1.27s/it]  4%|▎         | 1079/30314 [22:51<10:17:58,  1.27s/it]  4%|▎         | 1080/30314 [22:53<10:17:50,  1.27s/it]                                                       {'loss': 4.2378, 'grad_norm': 0.9749417304992676, 'learning_rate': 4.822029425348024e-05, 'epoch': 0.04}
+  4%|▎         | 1080/30314 [22:53<10:17:50,  1.27s/it]  4%|▎         | 1081/30314 [22:54<10:18:29,  1.27s/it]  4%|▎         | 1082/30314 [22:55<10:18:05,  1.27s/it]  4%|▎         | 1083/30314 [22:56<10:18:18,  1.27s/it]  4%|▎         | 1084/30314 [22:58<10:18:19,  1.27s/it]  4%|▎         | 1085/30314 [22:59<10:18:15,  1.27s/it]                                                       {'loss': 4.215, 'grad_norm': 1.0023754835128784, 'learning_rate': 4.8212047238899524e-05, 'epoch': 0.04}
+  4%|▎         | 1085/30314 [22:59<10:18:15,  1.27s/it]  4%|▎         | 1086/30314 [23:00<10:18:17,  1.27s/it]  4%|▎         | 1087/30314 [23:01<10:18:16,  1.27s/it]  4%|▎         | 1088/30314 [23:03<10:17:44,  1.27s/it]  4%|▎         | 1089/30314 [23:04<10:17:20,  1.27s/it]  4%|▎         | 1090/30314 [23:05<10:16:49,  1.27s/it]                                                       {'loss': 4.2633, 'grad_norm': 1.045582890510559, 'learning_rate': 4.82038002243188e-05, 'epoch': 0.04}
+  4%|▎         | 1090/30314 [23:05<10:16:49,  1.27s/it]  4%|▎         | 1091/30314 [23:07<10:17:27,  1.27s/it]  4%|▎         | 1092/30314 [23:08<10:17:22,  1.27s/it]  4%|▎         | 1093/30314 [23:09<10:17:28,  1.27s/it]  4%|▎         | 1094/30314 [23:10<10:17:55,  1.27s/it]  4%|▎         | 1095/30314 [23:12<10:17:53,  1.27s/it]                                                       {'loss': 4.1673, 'grad_norm': 1.0083266496658325, 'learning_rate': 4.819555320973808e-05, 'epoch': 0.04}
+  4%|▎         | 1095/30314 [23:12<10:17:53,  1.27s/it]  4%|▎         | 1096/30314 [23:13<10:18:22,  1.27s/it]  4%|▎         | 1097/30314 [23:14<10:18:05,  1.27s/it]  4%|▎         | 1098/30314 [23:15<10:17:31,  1.27s/it]  4%|▎         | 1099/30314 [23:17<10:17:38,  1.27s/it]  4%|▎         | 1100/30314 [23:18<10:17:30,  1.27s/it]                                                       {'loss': 4.3186, 'grad_norm': 1.0117809772491455, 'learning_rate': 4.8187306195157355e-05, 'epoch': 0.04}
+  4%|▎         | 1100/30314 [23:18<10:17:30,  1.27s/it]  4%|▎         | 1101/30314 [23:19<10:17:53,  1.27s/it]  4%|▎         | 1102/30314 [23:20<10:17:51,  1.27s/it]  4%|▎         | 1103/30314 [23:22<10:17:32,  1.27s/it]  4%|▎         | 1104/30314 [23:23<10:17:26,  1.27s/it]  4%|▎         | 1105/30314 [23:24<10:17:33,  1.27s/it]                                                       {'loss': 4.3198, 'grad_norm': 1.0302633047103882, 'learning_rate': 4.817905918057664e-05, 'epoch': 0.04}
+  4%|▎         | 1105/30314 [23:24<10:17:33,  1.27s/it]  4%|▎         | 1106/30314 [23:26<10:17:42,  1.27s/it]  4%|▎         | 1107/30314 [23:27<10:17:23,  1.27s/it]  4%|▎         | 1108/30314 [23:28<10:17:24,  1.27s/it]  4%|▎         | 1109/30314 [23:29<10:17:19,  1.27s/it]  4%|▎         | 1110/30314 [23:31<10:17:09,  1.27s/it]                                                       {'loss': 4.0915, 'grad_norm': 0.961218535900116, 'learning_rate': 4.817081216599591e-05, 'epoch': 0.04}
+  4%|▎         | 1110/30314 [23:31<10:17:09,  1.27s/it]  4%|▎         | 1111/30314 [23:32<10:17:25,  1.27s/it]  4%|▎         | 1112/30314 [23:33<10:17:48,  1.27s/it]  4%|▎         | 1113/30314 [23:34<10:17:36,  1.27s/it]  4%|▎         | 1114/30314 [23:36<10:17:29,  1.27s/it]  4%|▎         | 1115/30314 [23:37<10:17:15,  1.27s/it]                                                       {'loss': 4.2802, 'grad_norm': 0.9849963188171387, 'learning_rate': 4.816256515141519e-05, 'epoch': 0.04}
+  4%|▎         | 1115/30314 [23:37<10:17:15,  1.27s/it]  4%|▎         | 1116/30314 [23:38<10:17:15,  1.27s/it]  4%|▎         | 1117/30314 [23:40<10:17:08,  1.27s/it]  4%|▎         | 1118/30314 [23:41<10:17:04,  1.27s/it]  4%|▎         | 1119/30314 [23:42<10:16:54,  1.27s/it]  4%|▎         | 1120/30314 [23:43<10:16:52,  1.27s/it]                                                       {'loss': 4.238, 'grad_norm': 1.0318959951400757, 'learning_rate': 4.815431813683447e-05, 'epoch': 0.04}
+  4%|▎         | 1120/30314 [23:43<10:16:52,  1.27s/it]  4%|▎         | 1121/30314 [23:45<10:17:01,  1.27s/it]  4%|▎         | 1122/30314 [23:46<10:17:26,  1.27s/it]  4%|▎         | 1123/30314 [23:47<10:17:13,  1.27s/it]  4%|▎         | 1124/30314 [23:48<10:17:12,  1.27s/it]  4%|▎         | 1125/30314 [23:50<10:17:03,  1.27s/it]                                                       {'loss': 4.3173, 'grad_norm': 0.9770708680152893, 'learning_rate': 4.8146071122253746e-05, 'epoch': 0.04}
+  4%|▎         | 1125/30314 [23:50<10:17:03,  1.27s/it]  4%|▎         | 1126/30314 [23:51<10:17:27,  1.27s/it]  4%|▎         | 1127/30314 [23:52<10:16:59,  1.27s/it]  4%|▎         | 1128/30314 [23:53<10:17:15,  1.27s/it]  4%|▎         | 1129/30314 [23:55<10:17:16,  1.27s/it]  4%|▎         | 1130/30314 [23:56<10:17:13,  1.27s/it]                                                       {'loss': 4.2537, 'grad_norm': 1.0362355709075928, 'learning_rate': 4.813782410767302e-05, 'epoch': 0.04}
+  4%|▎         | 1130/30314 [23:56<10:17:13,  1.27s/it]  4%|▎         | 1131/30314 [23:57<10:17:26,  1.27s/it]  4%|▎         | 1132/30314 [23:59<10:17:26,  1.27s/it]  4%|▎         | 1133/30314 [24:00<10:17:17,  1.27s/it]  4%|▎         | 1134/30314 [24:01<10:17:02,  1.27s/it]  4%|▎         | 1135/30314 [24:02<10:16:51,  1.27s/it]                                                       {'loss': 4.2429, 'grad_norm': 1.0495834350585938, 'learning_rate': 4.812957709309231e-05, 'epoch': 0.04}
+  4%|▎         | 1135/30314 [24:02<10:16:51,  1.27s/it]  4%|▎         | 1136/30314 [24:04<10:17:05,  1.27s/it]  4%|▍         | 1137/30314 [24:05<10:16:46,  1.27s/it]  4%|▍         | 1138/30314 [24:06<10:16:54,  1.27s/it]  4%|▍         | 1139/30314 [24:07<10:16:37,  1.27s/it]  4%|▍         | 1140/30314 [24:09<10:16:37,  1.27s/it]                                                       {'loss': 4.203, 'grad_norm': 0.9644210338592529, 'learning_rate': 4.812133007851158e-05, 'epoch': 0.04}
+  4%|▍         | 1140/30314 [24:09<10:16:37,  1.27s/it]  4%|▍         | 1141/30314 [24:10<10:17:10,  1.27s/it]  4%|▍         | 1142/30314 [24:11<10:16:58,  1.27s/it]  4%|▍         | 1143/30314 [24:12<10:17:06,  1.27s/it]  4%|▍         | 1144/30314 [24:14<10:17:02,  1.27s/it]  4%|▍         | 1145/30314 [24:15<10:16:40,  1.27s/it]                                                       {'loss': 4.254, 'grad_norm': 0.9238255023956299, 'learning_rate': 4.811308306393086e-05, 'epoch': 0.04}
+  4%|▍         | 1145/30314 [24:15<10:16:40,  1.27s/it]  4%|▍         | 1146/30314 [24:16<10:16:35,  1.27s/it]  4%|▍         | 1147/30314 [24:18<10:16:20,  1.27s/it]  4%|▍         | 1148/30314 [24:19<10:16:47,  1.27s/it]  4%|▍         | 1149/30314 [24:20<10:16:38,  1.27s/it]  4%|▍         | 1150/30314 [24:21<10:16:19,  1.27s/it]                                                       {'loss': 4.1461, 'grad_norm': 0.9433541893959045, 'learning_rate': 4.810483604935014e-05, 'epoch': 0.04}
+  4%|▍         | 1150/30314 [24:21<10:16:19,  1.27s/it]  4%|▍         | 1151/30314 [24:23<10:16:41,  1.27s/it]  4%|▍         | 1152/30314 [24:24<10:16:24,  1.27s/it]  4%|▍         | 1153/30314 [24:25<10:16:07,  1.27s/it]  4%|▍         | 1154/30314 [24:26<10:16:01,  1.27s/it]  4%|▍         | 1155/30314 [24:28<10:15:48,  1.27s/it]                                                       {'loss': 4.2294, 'grad_norm': 1.0887831449508667, 'learning_rate': 4.809658903476942e-05, 'epoch': 0.04}
+  4%|▍         | 1155/30314 [24:28<10:15:48,  1.27s/it]  4%|▍         | 1156/30314 [24:29<10:16:17,  1.27s/it]  4%|▍         | 1157/30314 [24:30<10:16:00,  1.27s/it]  4%|▍         | 1158/30314 [24:32<10:15:49,  1.27s/it]  4%|▍         | 1159/30314 [24:33<10:15:43,  1.27s/it]  4%|▍         | 1160/30314 [24:34<10:15:57,  1.27s/it]                                                       {'loss': 4.2306, 'grad_norm': 0.9505829215049744, 'learning_rate': 4.808834202018869e-05, 'epoch': 0.04}
+  4%|▍         | 1160/30314 [24:34<10:15:57,  1.27s/it]  4%|▍         | 1161/30314 [24:35<10:16:24,  1.27s/it]  4%|▍         | 1162/30314 [24:37<10:15:59,  1.27s/it]  4%|▍         | 1163/30314 [24:38<10:16:18,  1.27s/it]  4%|▍         | 1164/30314 [24:39<10:16:15,  1.27s/it]  4%|▍         | 1165/30314 [24:40<10:16:34,  1.27s/it]                                                       {'loss': 4.2903, 'grad_norm': 0.9844001531600952, 'learning_rate': 4.8080095005607975e-05, 'epoch': 0.04}
+  4%|▍         | 1165/30314 [24:40<10:16:34,  1.27s/it]  4%|▍         | 1166/30314 [24:42<10:16:26,  1.27s/it]  4%|▍         | 1167/30314 [24:43<10:16:31,  1.27s/it]  4%|▍         | 1168/30314 [24:44<10:16:56,  1.27s/it]  4%|▍         | 1169/30314 [24:45<10:16:31,  1.27s/it]  4%|▍         | 1170/30314 [24:47<10:16:20,  1.27s/it]                                                       {'loss': 4.1157, 'grad_norm': 0.9803200364112854, 'learning_rate': 4.807184799102725e-05, 'epoch': 0.04}
+  4%|▍         | 1170/30314 [24:47<10:16:20,  1.27s/it]  4%|▍         | 1171/30314 [24:48<10:16:56,  1.27s/it]  4%|▍         | 1172/30314 [24:49<10:16:51,  1.27s/it]  4%|▍         | 1173/30314 [24:51<10:16:21,  1.27s/it]  4%|▍         | 1174/30314 [24:52<10:16:27,  1.27s/it]  4%|▍         | 1175/30314 [24:53<10:16:17,  1.27s/it]                                                       {'loss': 4.1647, 'grad_norm': 0.9831609725952148, 'learning_rate': 4.806360097644653e-05, 'epoch': 0.04}
+  4%|▍         | 1175/30314 [24:53<10:16:17,  1.27s/it]  4%|▍         | 1176/30314 [24:54<10:16:30,  1.27s/it]  4%|▍         | 1177/30314 [24:56<10:16:26,  1.27s/it]  4%|▍         | 1178/30314 [24:57<10:16:30,  1.27s/it]  4%|▍         | 1179/30314 [24:58<10:16:42,  1.27s/it]  4%|▍         | 1180/30314 [24:59<10:16:20,  1.27s/it]                                                       {'loss': 4.1896, 'grad_norm': 1.0182881355285645, 'learning_rate': 4.8055353961865806e-05, 'epoch': 0.04}
+  4%|▍         | 1180/30314 [24:59<10:16:20,  1.27s/it]  4%|▍         | 1181/30314 [25:01<10:16:35,  1.27s/it]  4%|▍         | 1182/30314 [25:02<10:16:39,  1.27s/it]  4%|▍         | 1183/30314 [25:03<10:17:01,  1.27s/it]  4%|▍         | 1184/30314 [25:05<10:16:57,  1.27s/it]  4%|▍         | 1185/30314 [25:06<10:16:42,  1.27s/it]                                                       {'loss': 4.2416, 'grad_norm': 1.0777803659439087, 'learning_rate': 4.804710694728509e-05, 'epoch': 0.04}
+  4%|▍         | 1185/30314 [25:06<10:16:42,  1.27s/it]  4%|▍         | 1186/30314 [25:07<10:16:32,  1.27s/it]  4%|▍         | 1187/30314 [25:08<10:16:08,  1.27s/it]  4%|▍         | 1188/30314 [25:10<10:16:13,  1.27s/it]  4%|▍         | 1189/30314 [25:11<10:15:56,  1.27s/it]  4%|▍         | 1190/30314 [25:12<10:15:56,  1.27s/it]                                                       {'loss': 4.083, 'grad_norm': 1.0364645719528198, 'learning_rate': 4.803885993270436e-05, 'epoch': 0.04}
+  4%|▍         | 1190/30314 [25:12<10:15:56,  1.27s/it]  4%|▍         | 1191/30314 [25:13<10:16:20,  1.27s/it]  4%|▍         | 1192/30314 [25:15<10:16:11,  1.27s/it]  4%|▍         | 1193/30314 [25:16<10:15:56,  1.27s/it]  4%|▍         | 1194/30314 [25:17<10:15:39,  1.27s/it]  4%|▍         | 1195/30314 [25:18<10:15:42,  1.27s/it]                                                       {'loss': 4.1216, 'grad_norm': 0.932995080947876, 'learning_rate': 4.803061291812364e-05, 'epoch': 0.04}
+  4%|▍         | 1195/30314 [25:18<10:15:42,  1.27s/it]  4%|▍         | 1196/30314 [25:20<10:15:34,  1.27s/it]  4%|▍         | 1197/30314 [25:21<10:15:26,  1.27s/it]  4%|▍         | 1198/30314 [25:22<10:15:29,  1.27s/it]  4%|▍         | 1199/30314 [25:24<10:15:35,  1.27s/it]  4%|▍         | 1200/30314 [25:25<10:15:30,  1.27s/it]                                                       {'loss': 4.1678, 'grad_norm': 0.9841821193695068, 'learning_rate': 4.802236590354292e-05, 'epoch': 0.04}
+  4%|▍         | 1200/30314 [25:25<10:15:30,  1.27s/it]  4%|▍         | 1201/30314 [25:26<10:16:25,  1.27s/it]  4%|▍         | 1202/30314 [25:27<10:16:15,  1.27s/it]  4%|▍         | 1203/30314 [25:29<10:16:01,  1.27s/it]  4%|▍         | 1204/30314 [25:30<10:16:07,  1.27s/it]  4%|▍         | 1205/30314 [25:31<10:15:54,  1.27s/it]                                                       {'loss': 4.1778, 'grad_norm': 0.9776709079742432, 'learning_rate': 4.8014118888962204e-05, 'epoch': 0.04}
+  4%|▍         | 1205/30314 [25:31<10:15:54,  1.27s/it]  4%|▍         | 1206/30314 [25:32<10:15:45,  1.27s/it]  4%|▍         | 1207/30314 [25:34<10:15:59,  1.27s/it]  4%|▍         | 1208/30314 [25:35<10:15:51,  1.27s/it]  4%|▍         | 1209/30314 [25:36<10:15:48,  1.27s/it]  4%|▍         | 1210/30314 [25:38<10:15:49,  1.27s/it]                                                       {'loss': 4.3079, 'grad_norm': 0.9603378176689148, 'learning_rate': 4.8005871874381474e-05, 'epoch': 0.04}
+  4%|▍         | 1210/30314 [25:38<10:15:49,  1.27s/it]  4%|▍         | 1211/30314 [25:39<10:16:00,  1.27s/it]  4%|▍         | 1212/30314 [25:40<10:15:34,  1.27s/it]  4%|▍         | 1213/30314 [25:41<10:15:13,  1.27s/it]  4%|▍         | 1214/30314 [25:43<10:14:57,  1.27s/it]  4%|▍         | 1215/30314 [25:44<10:15:09,  1.27s/it]                                                       {'loss': 4.1282, 'grad_norm': 1.1504641771316528, 'learning_rate': 4.799762485980076e-05, 'epoch': 0.04}
+  4%|▍         | 1215/30314 [25:44<10:15:09,  1.27s/it]  4%|▍         | 1216/30314 [25:45<10:15:30,  1.27s/it]  4%|▍         | 1217/30314 [25:46<10:15:12,  1.27s/it]  4%|▍         | 1218/30314 [25:48<10:15:34,  1.27s/it]  4%|▍         | 1219/30314 [25:49<10:15:16,  1.27s/it]  4%|▍         | 1220/30314 [25:50<10:15:12,  1.27s/it]                                                       {'loss': 4.1377, 'grad_norm': 1.0177407264709473, 'learning_rate': 4.7989377845220035e-05, 'epoch': 0.04}
+  4%|▍         | 1220/30314 [25:50<10:15:12,  1.27s/it]  4%|▍         | 1221/30314 [25:51<10:16:12,  1.27s/it]  4%|▍         | 1222/30314 [25:53<10:15:34,  1.27s/it]  4%|▍         | 1223/30314 [25:54<10:15:37,  1.27s/it]  4%|▍         | 1224/30314 [25:55<10:15:22,  1.27s/it]  4%|▍         | 1225/30314 [25:57<10:15:36,  1.27s/it]                                                       {'loss': 4.0886, 'grad_norm': 1.0328336954116821, 'learning_rate': 4.798113083063931e-05, 'epoch': 0.04}
+  4%|▍         | 1225/30314 [25:57<10:15:36,  1.27s/it]  4%|▍         | 1226/30314 [25:58<10:15:45,  1.27s/it]  4%|▍         | 1227/30314 [25:59<10:15:24,  1.27s/it]  4%|▍         | 1228/30314 [26:00<10:14:45,  1.27s/it]  4%|▍         | 1229/30314 [26:02<10:14:29,  1.27s/it]  4%|▍         | 1230/30314 [26:03<10:14:41,  1.27s/it]                                                       {'loss': 4.1472, 'grad_norm': 0.9734464287757874, 'learning_rate': 4.797288381605859e-05, 'epoch': 0.04}
+  4%|▍         | 1230/30314 [26:03<10:14:41,  1.27s/it]  4%|▍         | 1231/30314 [26:04<10:15:00,  1.27s/it]  4%|▍         | 1232/30314 [26:05<10:14:59,  1.27s/it]  4%|▍         | 1233/30314 [26:07<10:14:53,  1.27s/it]  4%|▍         | 1234/30314 [26:08<10:14:58,  1.27s/it]  4%|▍         | 1235/30314 [26:09<10:15:23,  1.27s/it]                                                       {'loss': 4.1254, 'grad_norm': 1.1423653364181519, 'learning_rate': 4.796463680147787e-05, 'epoch': 0.04}
+  4%|▍         | 1235/30314 [26:09<10:15:23,  1.27s/it]  4%|▍         | 1236/30314 [26:11<10:15:44,  1.27s/it]  4%|▍         | 1237/30314 [26:12<10:15:28,  1.27s/it]  4%|▍         | 1238/30314 [26:13<10:14:59,  1.27s/it]  4%|▍         | 1239/30314 [26:14<10:15:01,  1.27s/it]  4%|▍         | 1240/30314 [26:16<10:14:45,  1.27s/it]                                                       {'loss': 4.2664, 'grad_norm': 0.9187659025192261, 'learning_rate': 4.795638978689714e-05, 'epoch': 0.04}
+  4%|▍         | 1240/30314 [26:16<10:14:45,  1.27s/it]  4%|▍         | 1241/30314 [26:17<10:14:50,  1.27s/it]  4%|▍         | 1242/30314 [26:18<10:15:16,  1.27s/it]  4%|▍         | 1243/30314 [26:19<10:15:09,  1.27s/it]  4%|▍         | 1244/30314 [26:21<10:14:57,  1.27s/it]  4%|▍         | 1245/30314 [26:22<10:15:04,  1.27s/it]                                                       {'loss': 4.2017, 'grad_norm': 0.9289751052856445, 'learning_rate': 4.7948142772316426e-05, 'epoch': 0.04}
+  4%|▍         | 1245/30314 [26:22<10:15:04,  1.27s/it]  4%|▍         | 1246/30314 [26:23<10:14:56,  1.27s/it]  4%|▍         | 1247/30314 [26:24<10:15:01,  1.27s/it]  4%|▍         | 1248/30314 [26:26<10:14:31,  1.27s/it]  4%|▍         | 1249/30314 [26:27<10:14:15,  1.27s/it]  4%|▍         | 1250/30314 [26:28<10:14:27,  1.27s/it]                                                       {'loss': 4.133, 'grad_norm': 0.9975016117095947, 'learning_rate': 4.79398957577357e-05, 'epoch': 0.04}
+  4%|▍         | 1250/30314 [26:28<10:14:27,  1.27s/it]  4%|▍         | 1251/30314 [26:30<10:14:45,  1.27s/it]  4%|▍         | 1252/30314 [26:31<10:14:20,  1.27s/it]  4%|▍         | 1253/30314 [26:32<10:14:08,  1.27s/it]  4%|▍         | 1254/30314 [26:33<10:14:06,  1.27s/it]  4%|▍         | 1255/30314 [26:35<10:14:07,  1.27s/it]                                                       {'loss': 4.1422, 'grad_norm': 1.0357083082199097, 'learning_rate': 4.793164874315498e-05, 'epoch': 0.04}
+  4%|▍         | 1255/30314 [26:35<10:14:07,  1.27s/it]  4%|▍         | 1256/30314 [26:36<10:14:31,  1.27s/it]  4%|▍         | 1257/30314 [26:37<10:14:28,  1.27s/it]  4%|▍         | 1258/30314 [26:38<10:14:26,  1.27s/it]  4%|▍         | 1259/30314 [26:40<10:14:27,  1.27s/it]  4%|▍         | 1260/30314 [26:41<10:14:00,  1.27s/it]                                                       {'loss': 4.1062, 'grad_norm': 1.0937340259552002, 'learning_rate': 4.7923401728574257e-05, 'epoch': 0.04}
+  4%|▍         | 1260/30314 [26:41<10:14:00,  1.27s/it]  4%|▍         | 1261/30314 [26:42<10:14:31,  1.27s/it]  4%|▍         | 1262/30314 [26:44<10:14:53,  1.27s/it]  4%|▍         | 1263/30314 [26:45<10:15:09,  1.27s/it]  4%|▍         | 1264/30314 [26:46<10:14:54,  1.27s/it]  4%|▍         | 1265/30314 [26:47<10:14:44,  1.27s/it]                                                       {'loss': 4.1162, 'grad_norm': 1.023891806602478, 'learning_rate': 4.791515471399354e-05, 'epoch': 0.04}
+  4%|▍         | 1265/30314 [26:47<10:14:44,  1.27s/it]  4%|▍         | 1266/30314 [26:49<10:14:59,  1.27s/it]  4%|▍         | 1267/30314 [26:50<10:14:51,  1.27s/it]  4%|▍         | 1268/30314 [26:51<10:14:34,  1.27s/it]

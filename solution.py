@@ -18,20 +18,22 @@ from lib import (
     build_custom_scheduler_v2,
     build_deepspeed_config,
     build_fsdp_config,
-    build_run_name,
     build_tokenizer,
     build_training_config,
     build_training_arguments,
     create_model,
     create_trainer,
-    initialize_wandb,
     load_tokenized_dataset,
     prepare_tokenized_dataset,
     run_training,
     split_dataset,
 )
 from lib.optim import build_optimizer
-from lib.utils import seed_everything
+from lib.utils.wandb_utils import (
+    seed_everything,
+    initialize_wandb,
+    build_run_name,
+)
 
 
 LOGGER = logging.getLogger(__name__)

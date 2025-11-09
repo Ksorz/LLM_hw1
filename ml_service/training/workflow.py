@@ -117,11 +117,14 @@ def build_training_artifacts(
     dataset = load_prepared_dataset(data_dir)
     train_ds, eval_ds = split_prepared_dataset(dataset, validation_size=validation_size)
 
+    # info logging model_config before model creation
+    LOGGER.info("🧩 Model config before model creation: %s", model_config)
+    
     model = create_model(tokenizer, model_config=model_config, bf16=config["bf16"])
     if fsdp_kwargs and fsdp_kwargs.get("activation_checkpointing", False):
         config["gradient_checkpointing"] = False
     else:
-        config["gradient_checkpointing"] = True
+        config["gradient_checkpointing"] = False
     if config.get("gradient_checkpointing"):
         model.gradient_checkpointing_enable()
 
@@ -155,6 +158,9 @@ def build_training_artifacts(
         LOGGER.info("FSDP:\n%s", fsdp_string)
     if fsdp_config is not None:
         LOGGER.info("FSDP config:\n%s", fsdp_config)
+
+    # info logging final config before training
+    LOGGER.info("🧩 Final training config before trainer creation: %s", config)
 
     trainer = create_trainer(
         model=model,

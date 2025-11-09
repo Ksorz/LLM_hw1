@@ -44,6 +44,6 @@ class BatchTextResponse(BaseModel):
 
 
 class MetadataResponse(BaseModel):
-    commit: Optional[str]
-    date: Optional[str]
-    experiment: Optional[str]
+    commit: Optional[str] = None
+    date: Optional[str] = None
+    experiment: Optional[str] = None

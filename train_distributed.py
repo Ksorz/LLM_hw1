@@ -231,12 +231,9 @@ def main():
         logger.info(f"WANDB_PROJECT: {os.getenv('WANDB_PROJECT', 'не установлена')}")
     
     # Импорт после настройки окружения
-    from solution import (
-        build_baseline_setup,
-        build_deepspeed_setup,
-        build_fsdp_setup,
-        run_training_session,
-    )
+    from solution import build_trainer_setup
+    from lib.training import run_training
+    from transformers import Trainer
     
     # Общие параметры конфигурации
     config_overrides = {
@@ -258,14 +255,13 @@ def main():
         if rank == 0:
             logger.info("Создание baseline setup (single GPU)")
         
-        setup = build_baseline_setup(
+        setup = build_trainer_setup(
             config_overrides=config_overrides,
             run_name_suffix=args.run_name or "baseline",
             initialize_wandb_run=not args.no_wandb and rank == 0,
             data_dir=args.data_dir,
             timeout_seconds=args.timeout,
         )
-        # setup = build_baseline_setup(run_name_suffix="baseline_fc1")
 
     
     elif args.mode == "deepspeed":
@@ -287,11 +283,11 @@ def main():
             "stage3_param_persistence_threshold": args.stage3_param_persistence_threshold,
         }
         
-        setup = build_deepspeed_setup(
-            stage=args.deepspeed_stage,
-            config_overrides=config_overrides,
+        setup = build_trainer_setup(
+            deepspeed_stage=args.deepspeed_stage,
             deepspeed_config_kwargs=deepspeed_kwargs,
-            run_name_suffix=args.run_name or f"ds_stage{args.deepspeed_stage}",
+            config_overrides=config_overrides,
+            run_name_suffix=args.run_name or f"DeepSpeed_{args.deepspeed_stage}",
             initialize_wandb_run=not args.no_wandb and rank == 0,
             data_dir=args.data_dir,
             timeout_seconds=args.timeout,
@@ -319,7 +315,7 @@ def main():
             "state_dict_type": args.fsdp_state_dict_type,
         }
         
-        setup = build_fsdp_setup(
+        setup = build_trainer_setup(
             fsdp_kwargs=fsdp_kwargs,
             config_overrides=config_overrides,
             run_name_suffix=args.run_name or "fsdp",
@@ -336,8 +332,12 @@ def main():
     if rank == 0:
         logger.info("Старт обучения...")
     
-    metrics = run_training_session(
-        setup, 
+    trainer = setup["trainer"]
+    if not isinstance(trainer, Trainer):
+        raise TypeError(f"Expected Trainer, got {type(trainer)}")
+    
+    metrics = run_training(
+        trainer, 
         final_evaluation=True,
         generate_text=not args.no_generation,
         generation_prompt=args.generation_prompt,

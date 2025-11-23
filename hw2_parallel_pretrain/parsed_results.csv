@@ -1,0 +1,19 @@
+filename,mode,run_name,wandb_url,cuda_visible_devices,world_size,per_device_train_batch_size,gradient_accumulation_steps,effective_batch_size,deepspeed_stage,fsdp_string,num_steps_detected,median_it_per_s,median_s_per_it,median_samples_per_s,total_samples_seen,train_runtime,train_steps_per_second,train_samples_per_second,eval_loss,peak_gpu_mem_gb_detected,path,bf16,fp16
+1_GPU_v2.log,baseline,bs32_ga4_1_GPU_v2,https://wandb.ai/ksorzz/llm_hw2-aylesnov,"0
+2025",1,,1,,,,416,26.36,0.03793626707132018,,,1800.4886,8.418,1077.52,3.939300060272217,1.79,/app/data/logs/1_GPU_v2.log,,
+Baseline_1_GPU.log,baseline,bs16_ga4_Baseline_1_GPU,https://wandb.ai/ksorzz/llm_hw2-aylesnov,"1
+2025",1,,1,,,,444,25.99,0.038476337052712584,,,1800.4817,16.837,1077.524,3.7759594917297363,1.79,/app/data/logs/Baseline_1_GPU.log,,
+DeepSpeed_1.log,deepspeed,bs16_ga4_DeepSpeed_1,https://wandb.ai/ksorzz/llm_hw2-aylesnov,"2,3
+2025",2,,1,,1.0,,208,26.21,0.03815337657382678,,,1801.2283,8.415,1077.078,4.827373504638672,1.79,/app/data/logs/DeepSpeed_1.log,,
+DeepSpeed_2.log,deepspeed,bs16_ga4_DeepSpeed_2,https://wandb.ai/ksorzz/llm_hw2-aylesnov,"0,1
+2025",2,,1,,2.0,,208,26.39,0.037893141341417205,,,1801.851,8.412,1076.706,6.077337265014648,1.79,/app/data/logs/DeepSpeed_2.log,,
+DeepSpeed_3.log,deepspeed,,https://wandb.ai/ksorzz/llm_hw2-aylesnov,"2,3
+2025",2,,1,,3.0,,312,17.05,0.05865102639296187,,,1801.2486,8.415,1077.066,,1.79,/app/data/logs/DeepSpeed_3.log,,
+FSDP_full_shard.log,fsdp,"/app/output_dir/gpt2-1b-russian,",https://wandb.ai/ksorzz/llm_hw2-aylesnov,"0,1
+2025",2,16.0,4,128.0,,full_shard auto_wrap,624,5.94,0.16835016835016833,760.32,79872.0,1802.2373,8.41,1076.475,,1.79,/app/data/logs/FSDP_full_shard.log,True,False
+FSDP_full_shard_v2.log,fsdp,"/app/output_dir/gpt2-1b-russian,",https://wandb.ai/ksorzz/llm_hw2-aylesnov,"2,3
+2025",2,16.0,2,64.0,,full_shard auto_wrap,624,5.95,0.1680672268907563,380.8,39936.0,1800.4499,16.837,1077.543,,1.79,/app/data/logs/FSDP_full_shard_v2.log,True,False
+FSDP_full_shard_v3.log,fsdp,"/app/output_dir/gpt2-1b-russian,",https://wandb.ai/ksorzz/llm_hw2-aylesnov,"0,1
+2025",2,8.0,4,64.0,,full_shard auto_wrap,624,5.94,0.16835016835016833,380.16,39936.0,1801.5717,16.826,1076.872,5.252961158752441,1.79,/app/data/logs/FSDP_full_shard_v3.log,True,False
+FSDP_full_shard_v4.log,fsdp,"/app/output_dir/gpt2-1b-russian,",https://wandb.ai/ksorzz/llm_hw2-aylesnov,"2,3
+2025",2,128.0,1,256.0,,full_shard auto_wrap offload,625,2.04,0.49019607843137253,522.24,160000.0,1804.7246,4.2,1074.991,6.852046966552734,1.79,/app/data/logs/FSDP_full_shard_v4.log,True,False

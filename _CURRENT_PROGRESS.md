@@ -227,7 +227,7 @@ API работает с реальной моделью. Обучение раб
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **Makefile команды**: `make help`
-- **Инструкции**: [HOW_TO_USE.md](HOW_TO_USE.md)
+- **Инструкции**: [HOW_TO_USE](_HOW_TO_USE.md)
 
 ---
 

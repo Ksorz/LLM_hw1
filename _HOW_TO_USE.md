@@ -2,253 +2,127 @@
 
 ## Быстрый старт
 
-### 1. Запуск сервиса с необученной моделью (baseline)
+### 1. Запуск полного стека (Рекомендуется) 🏗️_0
+
+Самый простой способ увидеть результат "Усложнения 0" — запустить всё через Docker Compose.
 
 ```bash
+make up-full
+```
+
+Эта команда поднимет 5 контейнеров:
+1. **Frontend (Streamlit)**: http://localhost:8501 — Чат с моделью.
+2. **API (FastAPI)**: http://localhost:8000/docs — Swagger UI.
+3. **Grafana**: http://localhost:3000 — Дашборды (login: `admin`/`admin`).
+4. **Prometheus**: http://localhost:9090 — Метрики.
+5. **PostgreSQL**: База данных (порт 5432).
+
+### 2. Запуск только API (Локально)
+
+Если вы хотите запустить API без Docker (например, для отладки):
+
+```bash
+# Установите новые зависимости
+pip install sqlalchemy psycopg2-binary prometheus-fastapi-instrumentator
+
+# Запуск (требуется локальный Postgres или изменение DATABASE_URL)
 make serve
 ```
 
-Или напрямую:
+---
 
-```bash
-python serve.py
-```
+## Интерфейсы
 
-Сервис запустится на `http://0.0.0.0:8000`
+### 🖥️ Frontend (Чат)
+Откройте http://localhost:8501.
+Здесь можно общаться с моделью в режиме диалога. История сообщений сохраняется в рамках сессии браузера.
 
-### 2. Проверка работы API
+### 🔌 API Endpoints
+- **POST /forward**: Генерация текста (логируется в БД).
+- **POST /forward_batch**: Батчевая генерация.
+- **GET /metadata**: Информация о модели.
+- **GET /metrics**: Метрики для Prometheus (🆕).
 
-Откройте Swagger UI: http://localhost:8000/docs
+### 📊 Мониторинг
+- **Grafana** (http://localhost:3000): Визуализация метрик. Вы можете добавить Prometheus как Data Source (`http://prometheus:9090`) и создать дашборд.
+- **Prometheus** (http://localhost:9090): Сырые метрики. Попробуйте запросить `http_requests_total`.
 
-Или используйте curl:
-
-```bash
-# POST /forward - генерация текста
-curl -X POST "http://localhost:8000/forward" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "В начале было слово"}'
-
-# POST /forward_batch - батчевая генерация
-curl -X POST "http://localhost:8000/forward_batch" \
-  -H "Content-Type: application/json" \
-  -d '{"texts": ["Привет", "Как дела"]}'
-
-# GET /metadata - метаданные модели
-curl "http://localhost:8000/metadata"
-```
+### 🗄️ База данных
+Все запросы к API логируются в таблицу `request_logs` в PostgreSQL.
+Поля: `timestamp`, `input_text`, `output_text`, `processing_time_ms`, `model_name`.
 
 ---
 
-## End-to-End: Обучение → Сохранение → Загрузка → API
+## End-to-End: Обучение → API
 
-### Шаг 1: Обучение модели
+### Шаг 1: Обучение модели (как раньше)
 
 ```bash
-# Baseline (single GPU)
-CUDA_VISIBLE_DEVICES=0 python train_distributed.py \
-  --mode baseline \
-  --bf16 \
-  --batch-size 16 \
-  --grad-accum 4 \
-  --run-name my_experiment \
-  --max-steps 1000
-
-# DeepSpeed (multi-GPU)
-CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-  --num_processes 2 \
-  --main_process_port 29500 \
-  train_distributed.py \
-    --mode deepspeed \
-    --deepspeed-stage 2 \
-    --bf16 \
-    --batch-size 16 \
-    --grad-accum 4 \
-    --run-name my_deepspeed_experiment
-
-# FSDP (multi-GPU)
-CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-  --num_processes 2 \
-  train_distributed.py \
-    --mode fsdp \
-    --bf16 \
-    --batch-size 16 \
-    --run-name my_fsdp_experiment
+make train-baseline
 ```
 
-### Шаг 2: Найти сохранённый checkpoint
+### Шаг 2: Запуск с обученной моделью
 
-После обучения модель сохраняется в `output_dir`:
-
-```bash
-ls -lh /app/output_dir/gpt2-1b-russian/
-# Ищем папки вида checkpoint-XXXX
-```
-
-### Шаг 3: Запустить API с обученной моделью
+Если вы используете Docker Compose, вам нужно прокинуть путь к checkpoint в переменную окружения или `.env` файл, либо просто смонтировать volume.
+Для простоты, можно запустить локально:
 
 ```bash
-# Через Makefile
 make serve-trained CHECKPOINT=/app/output_dir/gpt2-1b-russian/checkpoint-1000
-
-# Или напрямую
-python serve.py --checkpoint /app/output_dir/gpt2-1b-russian/checkpoint-1000
-```
-
-### Шаг 4: Протестировать API
-
-```bash
-curl -X POST "http://localhost:8000/forward" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Машинное обучение это"}'
 ```
 
 ---
 
-## Docker
+## Docker команды
 
-### Локальный запуск (текущий контейнер)
-
-Вы уже находитесь внутри Docker контейнера. Просто используйте `make serve`.
-
-### Docker Compose (для production)
+### Управление контейнерами
 
 ```bash
-# Запустить только API
-docker-compose up -d api
+# Запустить всё (с мониторингом)
+make up-full
 
-# Запустить с мониторингом (Prometheus + Grafana)
-docker-compose --profile monitoring up -d
+# Запустить только API и БД
+docker-compose up -d api db
 
-# Остановить
+# Пересобрать контейнеры (если изменили код)
+make docker-build
+
+# Остановить всё
 docker-compose down
 
-# Посмотреть логи
+# Посмотреть логи API
 docker-compose logs -f api
 ```
 
-### Переменные окружения
+### Переменные окружения (.env)
 
-Создайте `.env` файл:
+Создайте файл `.env` в корне проекта для настройки:
 
 ```env
 CUDA_VISIBLE_DEVICES=0
-WANDB_API_KEY=your_key_here
-WANDB_PROJECT=llm_service
+DATABASE_URL=postgresql://postgres:postgres@db:5432/llm_service
 GRAFANA_PASSWORD=admin
-```
-
----
-
-## Makefile команды
-
-```bash
-make help              # Показать все команды
-make serve             # Запустить с необученной моделью
-make serve-dev         # Запустить с auto-reload
-make serve-trained     # Запустить с обученной моделью (CHECKPOINT=...)
-make test              # Запустить базовые тесты
-make train-baseline    # Быстрое обучение для теста
-make docker-build      # Собрать Docker образ
-make docker-up         # Запустить Docker Compose
-make clean             # Очистить временные файлы
-```
-
----
-
-## Параметры serve.py
-
-```bash
-python serve.py --help
-
-# Основные параметры:
---checkpoint PATH       # Путь к checkpoint
---device cuda/cpu       # Устройство (по умолчанию auto)
---max-new-tokens N      # Макс. токенов генерации (по умолчанию 50)
---host HOST             # Host (по умолчанию 0.0.0.0)
---port PORT             # Port (по умолчанию 8000)
---reload                # Auto-reload для разработки
-```
-
----
-
-## Примеры использования
-
-### Python клиент
-
-```python
-import requests
-
-# Генерация текста
-response = requests.post(
-    "http://localhost:8000/forward",
-    json={"text": "Искусственный интеллект"}
-)
-print(response.json()["prediction"])
-
-# Батчевая генерация
-response = requests.post(
-    "http://localhost:8000/forward_batch",
-    json={"texts": ["Текст 1", "Текст 2", "Текст 3"]}
-)
-print(response.json()["predictions"])
-
-# Метаданные
-response = requests.get("http://localhost:8000/metadata")
-print(response.json())
-```
-
-### JavaScript клиент
-
-```javascript
-// Генерация текста
-fetch('http://localhost:8000/forward', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({text: 'Привет, мир!'})
-})
-.then(res => res.json())
-.then(data => console.log(data.prediction));
 ```
 
 ---
 
 ## Troubleshooting
 
+### Ошибка: "Connection refused" к БД
+Если API падает с ошибкой подключения к БД, подождите пару секунд. Docker Compose настроен на `healthcheck`, но иногда первый запуск Postgres занимает время. Контейнер `api` должен автоматически перезапуститься.
+
 ### Ошибка: "CUDA out of memory"
+Уменьшите размер батча или `max_new_tokens` в запросе. Или запустите API на CPU:
+`python serve.py --device cpu`
 
+### Как подключиться к БД вручную?
 ```bash
-# Уменьшите max-new-tokens
-python serve.py --max-new-tokens 20
-
-# Или используйте CPU
-python serve.py --device cpu
+docker exec -it llm_db psql -U postgres -d llm_service
+# \dt - показать таблицы
+# select * from request_logs limit 5; - посмотреть логи
 ```
-
-### Ошибка: "Port 8000 already in use"
-
-```bash
-# Используйте другой порт
-python serve.py --port 8001
-```
-
-### Модель генерирует бессмыслицу
-
-Это нормально для необученной модели. Обучите модель или загрузите checkpoint.
-
----
-
-## Мониторинг (опционально)
-
-После запуска с `--profile monitoring`:
-
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:3000 (admin/admin)
 
 ---
 
 ## Дополнительная информация
-
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI схема**: http://localhost:8000/openapi.json
-

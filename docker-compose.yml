@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  # Database for logging
+  db:
+    image: postgres:15-alpine
+    container_name: llm_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=llm_service
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - llm_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   # ML Service API
   api:
     build:
@@ -17,7 +36,11 @@ services:
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - WANDB_API_KEY=${WANDB_API_KEY:-}
       - WANDB_PROJECT=${WANDB_PROJECT:-llm_service}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/llm_service
     command: python serve.py --host 0.0.0.0 --port 8000
+    depends_on:
+      db:
+        condition: service_healthy
     deploy:
       resources:
         reservations:
@@ -29,7 +52,23 @@ services:
       - llm_network
     restart: unless-stopped
 
-  # Monitoring: Prometheus (опционально)
+  # Frontend (Streamlit)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: llm_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    networks:
+      - llm_network
+    restart: unless-stopped
+
+  # Monitoring: Prometheus
   prometheus:
     image: prom/prometheus:latest
     container_name: llm_prometheus
@@ -47,7 +86,7 @@ services:
     profiles:
       - monitoring
 
-  # Monitoring: Grafana (опционально)
+  # Monitoring: Grafana
   grafana:
     image: grafana/grafana:latest
     container_name: llm_grafana
@@ -55,8 +94,8 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      # - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      # - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -68,10 +107,10 @@ services:
 
 volumes:
   model_cache:
+  postgres_data:
   prometheus_data:
   grafana_data:
 
 networks:
   llm_network:
     driver: bridge
-

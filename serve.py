@@ -8,10 +8,12 @@ from datetime import datetime
 from typing import Dict
 
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from lib.inference import load_model_for_inference
 from ml_service import create_app
 from ml_service.backend.dependencies import AppDependencies
+from ml_service.backend.database import engine, Base
 
 logging.basicConfig(
     level=logging.INFO,
@@ -77,6 +79,14 @@ def main():
     LOGGER.info("Device: %s", args.device or "auto")
     LOGGER.info("Max new tokens: %d", args.max_new_tokens)
     LOGGER.info("=" * 80)
+
+    # Инициализация БД
+    LOGGER.info("Инициализация базы данных...")
+    try:
+        Base.metadata.create_all(bind=engine)
+        LOGGER.info("База данных инициализирована успешно.")
+    except Exception as e:
+        LOGGER.warning(f"Ошибка при инициализации БД (возможно, сервис БД еще не готов): {e}")
     
     # Загружаем модель
     inference_service = load_model_for_inference(
@@ -109,9 +119,13 @@ def main():
         metadata=metadata,
     )
     app = create_app(deps)
+
+    # Подключаем Prometheus metrics
+    Instrumentator().instrument(app).expose(app)
     
     LOGGER.info("Сервис готов к работе!")
     LOGGER.info("Swagger UI: http://%s:%d/docs", args.host, args.port)
+    LOGGER.info("Metrics: http://%s:%d/metrics", args.host, args.port)
     
     # Запускаем сервер
     uvicorn.run(
@@ -124,4 +138,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

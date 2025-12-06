@@ -1,77 +1,102 @@
-version: '3.8'
-
 services:
-  # ML Service API
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: llm_service
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [llm_network]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d llm_service || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: llm_service_api
     ports:
-      - "8000:8000"
+      - "127.0.0.1:14443:8000"
     volumes:
       - ./:/app
       - model_cache:/root/.cache/huggingface
     environment:
-      - PYTHONUNBUFFERED=1
-      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
-      - WANDB_API_KEY=${WANDB_API_KEY:-}
-      - WANDB_PROJECT=${WANDB_PROJECT:-llm_service}
+      PYTHONUNBUFFERED: "1"
+      CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:-0}
+      WANDB_API_KEY: ${WANDB_API_KEY:-}
+      WANDB_PROJECT: ${WANDB_PROJECT:-llm_service}
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/llm_service
     command: python serve.py --host 0.0.0.0 --port 8000
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    networks:
-      - llm_network
+    depends_on:
+      db:
+        condition: service_healthy
+    gpus: "all"
+    networks: [llm_network]
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
 
-  # Monitoring: Prometheus (опционально)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:14442:8501"
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_started
+    networks: [llm_network]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8501/_stcore/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   prometheus:
     image: prom/prometheus:latest
-    container_name: llm_prometheus
     ports:
-      - "9090:9090"
+      - "127.0.0.1:14440:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-    networks:
-      - llm_network
+    networks: [llm_network]
     restart: unless-stopped
-    profiles:
-      - monitoring
+    profiles: [monitoring]
 
-  # Monitoring: Grafana (опционально)
   grafana:
     image: grafana/grafana:latest
-    container_name: llm_grafana
     ports:
-      - "3000:3000"
+      - "127.0.0.1:14441:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    networks:
-      - llm_network
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    networks: [llm_network]
     restart: unless-stopped
-    profiles:
-      - monitoring
+    profiles: [monitoring]
 
 volumes:
   model_cache:
+  postgres_data:
   prometheus_data:
   grafana_data:
 
 networks:
   llm_network:
     driver: bridge
-

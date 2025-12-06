@@ -1,82 +1,49 @@
-.PHONY: help serve serve-dev serve-trained test clean install
+.PHONY: help serve serve-dev serve-trained test train-baseline docker-build docker-up clean up-full
 
-# Цвета для вывода
-BLUE := \033[0;34m
-GREEN := \033[0;32m
-YELLOW := \033[0;33m
-NC := \033[0m # No Color
+help:
+	@echo "Available commands:"
+	@echo "  make serve             - Run API with baseline model"
+	@echo "  make serve-dev         - Run API in dev mode (autoreload)"
+	@echo "  make serve-trained     - Run API with trained model (requires CHECKPOINT)"
+	@echo "  make test              - Run tests"
+	@echo "  make train-baseline    - Run simple baseline training"
+	@echo "  make docker-build      - Build all Docker images"
+	@echo "  make docker-up         - Run API via Docker Compose"
+	@echo "  make up-full           - Run API + DB + Frontend + Monitoring via Docker Compose"
+	@echo "  make clean             - Remove artifacts"
 
-help: ## Показать справку
-	@echo "$(BLUE)Доступные команды:$(NC)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
+serve:
+	python serve.py
 
-install: ## Установить зависимости
-	@echo "$(BLUE)Установка зависимостей...$(NC)"
-	pip install -r requirements.txt
+serve-dev:
+	python serve.py --reload
 
-serve: ## Запустить сервис с необученной моделью (baseline)
-	@echo "$(BLUE)Запуск сервиса с необученной моделью...$(NC)"
-	python serve.py --host 0.0.0.0 --port 8000
+serve-trained:
+	@if [ -z "$(CHECKPOINT)" ]; then echo "Error: CHECKPOINT variable is not set"; exit 1; fi
+	python serve.py --checkpoint $(CHECKPOINT)
 
-serve-dev: ## Запустить сервис в режиме разработки (с auto-reload)
-	@echo "$(BLUE)Запуск сервиса в режиме разработки...$(NC)"
-	python serve.py --host 0.0.0.0 --port 8000 --reload
+test:
+	pytest tests/
 
-serve-trained: ## Запустить сервис с обученной моделью (требуется CHECKPOINT)
-	@echo "$(BLUE)Запуск сервиса с обученной моделью...$(NC)"
-	@if [ -z "$(CHECKPOINT)" ]; then \
-		echo "$(YELLOW)Ошибка: укажите CHECKPOINT=<path>$(NC)"; \
-		exit 1; \
-	fi
-	python serve.py --checkpoint $(CHECKPOINT) --host 0.0.0.0 --port 8000
-
-test: ## Запустить тесты
-	@echo "$(BLUE)Запуск тестов...$(NC)"
-	python test_api.py
-
-test-all: ## Запустить все тесты (включая pytest)
-	@echo "$(BLUE)Запуск всех тестов...$(NC)"
-	pytest tests/ -v
-
-train-baseline: ## Запустить обучение baseline модели
-	@echo "$(BLUE)Запуск обучения baseline...$(NC)"
+train-baseline:
 	CUDA_VISIBLE_DEVICES=0 python train_distributed.py \
 		--mode baseline \
 		--bf16 \
-		--batch-size 16 \
+		--batch-size 8 \
 		--grad-accum 4 \
-		--run-name baseline_test \
+		--run-name test_baseline \
 		--max-steps 100
 
-docker-build: ## Собрать Docker образ
-	@echo "$(BLUE)Сборка Docker образа...$(NC)"
-	docker build -t llm_service:latest .
+docker-build:
+	docker-compose build
 
-docker-up: ## Запустить Docker Compose
-	@echo "$(BLUE)Запуск Docker Compose...$(NC)"
-	docker-compose up -d
+docker-up:
+	docker-compose up -d api
 
-docker-down: ## Остановить Docker Compose
-	@echo "$(BLUE)Остановка Docker Compose...$(NC)"
-	docker-compose down
+up-full:
+	docker-compose --profile monitoring up -d
 
-docker-logs: ## Показать логи Docker Compose
-	docker-compose logs -f
-
-clean: ## Очистить временные файлы
-	@echo "$(BLUE)Очистка временных файлов...$(NC)"
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-
-lint: ## Проверить код линтером
-	@echo "$(BLUE)Проверка кода...$(NC)"
-	ruff check lib/ ml_service/ --fix
-
-format: ## Отформатировать код
-	@echo "$(BLUE)Форматирование кода...$(NC)"
-	black lib/ ml_service/ serve.py train_distributed.py
-
-.DEFAULT_GOAL := help
-
+clean:
+	rm -rf output_dir/
+	rm -rf __pycache__
+	find . -type d -name "__pycache__" -exec rm -rf {} +

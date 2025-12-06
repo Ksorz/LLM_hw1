@@ -2,8 +2,12 @@ FROM registry.k.avito.ru/nvcr-proxy/nvidia/pytorch:24.12-py3 AS base
 
 WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --upgrade pip \
-    && pip install 'transformers==4.52.0' 'datasets==3.6.0' 'wandb==0.19.10' 'accelerate==1.6.0' 'deepspeed>=0.9.3'
+    python3 -m pip install --upgrade pip
+
+COPY requirements.txt $PROJECT_ROOT/
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r $PROJECT_ROOT/requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install --no-build-isolation \
@@ -19,7 +23,5 @@ ENV HF_DISABLE_TELEMETRY=true \
     PROJECT_ROOT=/app
 
 ENV PATH="$PROJECT_ROOT/bin:$PATH" PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
-
-
 
 COPY . $PROJECT_ROOT

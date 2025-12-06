@@ -1,0 +1,37 @@
+# VCS
+.git
+.gitignore
+
+# глобально тяжёлое
+frontend/
+data/
+datasets/
+checkpoints/
+weights/
+experiments/
+wandb/
+logs/
+outputs/
+artifacts/
+.cache/
+.tmp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+.ipynb_checkpoints/
+.mypy_cache/
+.pytest_cache/
+
+# файлы
+*.pt
+*.bin
+*.safetensors
+*.csv
+*.parquet
+*.zip
+*.tar*
+*.xz
+*.log

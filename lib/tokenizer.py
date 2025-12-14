@@ -13,7 +13,7 @@ def build_tokenizer(
     name: str = TOKENIZER_NAME,
     *,
     use_fast: bool = True,
-    padding_side: Optional[str] = "right",
+    padding_side: Optional[str] = "left",
 ) -> PreTrainedTokenizerBase:
     """Создать токенайзер и гарантировать наличие pad_token.
 

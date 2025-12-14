@@ -13,7 +13,7 @@ from .constants import (
     LABELS,
     MAX_LENGTH,
     NUM_SHARDS,
-    OUTPUT_DIR,
+    DATASET_DIR,
     VALIDATION_SIZE,
 )
 
@@ -86,7 +86,7 @@ def tokenize_dataset(
 def save_dataset_shards(
     dataset: Dataset,
     *,
-    output_dir: str = OUTPUT_DIR,
+    output_dir: str = DATASET_DIR,
     num_shards: int = NUM_SHARDS,
 ) -> None:
     """Сохранить датасет по шартам в Parquet."""
@@ -108,7 +108,7 @@ def prepare_tokenized_dataset(
     split: str = "train",
     max_length: int = MAX_LENGTH,
     num_proc: int = 4,
-    output_dir: str = OUTPUT_DIR,
+    output_dir: str = DATASET_DIR,
     num_shards: int = NUM_SHARDS,
 ) -> Dataset:
     """Полный цикл: загрузка, токенизация и сохранение шардов."""
@@ -126,7 +126,7 @@ def prepare_tokenized_dataset(
 
 
 def load_tokenized_dataset(
-    data_dir: str = OUTPUT_DIR,
+    data_dir: str = DATASET_DIR,
     split: str = "train",
     columns=(INPUT_IDS, ATTENTION_MASK, LABELS),
 ) -> Dataset:

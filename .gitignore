@@ -7,5 +7,5 @@ output_dir/
 __pycache__/
 *.pyc
 .env
-
+.dvc/
 core

@@ -1,0 +1,33 @@
+stages:
+  extract_data:
+    cmd: python pipeline/extract.py
+    deps:
+      - pipeline/extract.py
+      - params.yaml
+    outs:
+      - output_dir/dataset
+    params:
+      - extract_data
+
+  train_model:
+    cmd: python pipeline/train.py
+    deps:
+      - pipeline/train.py
+      - params.yaml
+      - output_dir/dataset
+    outs:
+      - output_dir/gpt2-1b-russian
+    params:
+      - train_model
+
+  export_onnx:
+    cmd: python pipeline/export.py
+    deps:
+      - pipeline/export.py
+      - params.yaml
+      - output_dir/gpt2-1b-russian
+    outs:
+      - output_dir/onnx
+    params:
+      - export_onnx
+

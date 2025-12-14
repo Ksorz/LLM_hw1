@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Protocol
+from typing import Dict, Iterable, List, Protocol, Callable, Optional
 
 
 class SinglePredictFn(Protocol):
@@ -21,8 +21,12 @@ class MetadataFn(Protocol):
         ...
 
 
+EvaluateFn = Callable[[Iterable[str]], Dict[str, float]]
+
+
 @dataclass
 class AppDependencies:
     predict: SinglePredictFn
     predict_batch: BatchPredictFn
     metadata: MetadataFn
+    evaluate_perplexity: Optional[EvaluateFn] = None

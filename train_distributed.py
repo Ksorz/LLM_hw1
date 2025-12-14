@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from lib.constants import OUTPUT_DIR
+from lib.constants import DATASET_DIR
 
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def parse_args():
+def parse_args(args=None):
     parser = argparse.ArgumentParser(description="Распределённое обучение модели")
     
     # Режим обучения
@@ -155,6 +155,18 @@ def parse_args():
         help="Максимальное количество шагов (None = полная эпоха)"
     )
     parser.add_argument(
+        "--eval-steps",
+        type=int,
+        default=None,
+        help="Периодичность валидации в шагах (переопределяет eval_steps из конфигурации)"
+    )
+    parser.add_argument(
+        "--save-steps",
+        type=int,
+        default=None,
+        help="Периодичность сохранения чекпоинтов в шагах (переопределяет save_steps из конфигурации)"
+    )
+    parser.add_argument(
         "--timeout",
         type=int,
         default=30 * 60,
@@ -184,7 +196,7 @@ def parse_args():
     parser.add_argument(
         "--data-dir",
         type=str,
-        default=OUTPUT_DIR,
+        default=DATASET_DIR,
         help="Путь к токенизированному датасету"
     )
     
@@ -210,11 +222,11 @@ def parse_args():
         help="Prompt для генерации текста"
     )
     
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
-def main():
-    args = parse_args()
+def main(argv=None):
+    args = parse_args(argv)
     
     logger.info("=" * 60)
     logger.info(f"Запуск обучения в режиме: {args.mode}")
@@ -249,6 +261,12 @@ def main():
     
     if args.max_steps is not None:
         config_overrides["max_steps"] = args.max_steps
+
+    if args.eval_steps is not None:
+        config_overrides["eval_steps"] = args.eval_steps
+
+    if args.save_steps is not None:
+        config_overrides["save_steps"] = args.save_steps
     
     # Создаём setup в зависимости от режима
     if args.mode == "baseline":

@@ -30,7 +30,10 @@ services:
       WANDB_API_KEY: ${WANDB_API_KEY:-}
       WANDB_PROJECT: ${WANDB_PROJECT:-llm_service}
       DATABASE_URL: postgresql://postgres:postgres@db:5432/llm_service
-    command: python serve.py --host 0.0.0.0 --port 8000
+    # По умолчанию запускаем API. Для ручного dev-режима можно задать
+    # переменную API_CMD, например: API_CMD="tail -f /dev/null" или
+    # API_CMD="python serve.py --host 0.0.0.0 --port 8000 --onnx /app/output_dir/onnx/exp1/model.onnx"
+    command: ${API_CMD:-python serve.py --host 0.0.0.0 --port 8000}
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +41,8 @@ services:
     networks: [llm_network]
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      # Если API_CMD задан (ручной режим), healthcheck пропускается.
+      test: ["CMD-SHELL", "[ -n \"$API_CMD\" ] && exit 0 || curl -sf http://localhost:8000/health || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 10

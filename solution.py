@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, Mapping, Optional
 
 from ml_service import build_training_artifacts, prepare_dataset as _prepare_dataset
-from ml_service.common.constants import OUTPUT_DIR, VALIDATION_SIZE, MAX_TRAINING_TIME_SECONDS
+from ml_service.common.constants import OUTPUT_DIR, DATASET_DIR, VALIDATION_SIZE, MAX_TRAINING_TIME_SECONDS
 from lib.schedulers import build_custom_scheduler_v2
 
 
@@ -17,7 +17,7 @@ def prepare_dataset(
     split: str = "train",
     max_length: int = 512,
     num_proc: int = 4,
-    output_dir: str = OUTPUT_DIR,
+    output_dir: str = DATASET_DIR,
     num_shards: int = 32,
 ):
     return _prepare_dataset(
@@ -38,7 +38,7 @@ def build_trainer_setup(
     use_best_hp: bool = True,
     tokenizer=None,
     prepare_data_if_missing: bool = False,
-    data_dir: str = OUTPUT_DIR,
+    data_dir: str = DATASET_DIR,
     validation_size: int = VALIDATION_SIZE,
     scheduler_fn=None,
     scheduler_kwargs: Optional[Mapping[str, Any]] = None,

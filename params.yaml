@@ -1,0 +1,25 @@
+extract_data:
+  dataset_name: "wikimedia/wikipedia"
+  dataset_config: "20231101.ru"
+  split: "train"
+  max_length: 512
+  num_proc: 4
+  num_shards: 32
+  output_dir: "output_dir/dataset"
+
+train_model:
+  mode: "baseline"
+  bf16: true
+  torch_compile: true
+  batch_size: 16
+  grad_accum: 4
+  max_steps: 20000
+  timeout: 10800
+  learning_rate: null
+  data_dir: "output_dir/dataset"
+
+export_onnx:
+  checkpoint: "output_dir/gpt2-1b-russian/checkpoint-1000"
+  onnx_out: "output_dir/onnx/exp1/model.onnx"
+  experiment: "exp1"
+

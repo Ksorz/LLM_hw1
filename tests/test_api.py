@@ -1,5 +1,6 @@
 """Tests for the FastAPI endpoints."""
 
+import base64
 import pytest
 from fastapi.testclient import TestClient
 
@@ -13,19 +14,19 @@ import io
 @pytest.fixture
 def test_app():
     """Create a test app with mock dependencies."""
-    
+
     def mock_predict(text: str) -> str:
         return f"Generated: {text}"
-    
+
     def mock_predict_batch(texts):
         return [mock_predict(t) for t in texts]
-    
+
     def mock_metadata():
         return {"commit": "test", "date": "2025-11-09", "experiment": "test"}
 
     def mock_evaluate(texts):
         return {"avg_loss": 1.0, "perplexity": 2.0, "count": len(texts)}
-    
+
     deps = AppDependencies(
         predict=mock_predict,
         predict_batch=mock_predict_batch,
@@ -58,13 +59,15 @@ def test_forward_valid(client):
 def test_forward_empty_text(client):
     """Test /forward with empty text."""
     response = client.post("/forward", json={"text": ""})
-    assert response.status_code == 422
+    assert response.status_code == 400
+    assert response.text == "bad request"
 
 
 def test_forward_missing_field(client):
     """Test /forward with missing field."""
     response = client.post("/forward", json={"wrong": "field"})
-    assert response.status_code == 422
+    assert response.status_code == 400
+    assert response.text == "bad request"
 
 
 def test_forward_batch_valid(client):
@@ -74,6 +77,17 @@ def test_forward_batch_valid(client):
     data = response.json()
     assert "predictions" in data
     assert len(data["predictions"]) == 2
+
+
+def test_forward_multipart_image(client):
+    """Test /forward with multipart/form-data image + X-Text header."""
+    raw = b"fake-image-bytes"
+    files = {"image": ("img.png", io.BytesIO(raw), "image/png")}
+    resp = client.post("/forward", files=files, headers={"X-Text": "Hello"})
+    assert resp.status_code == 200
+    payload = resp.json()
+    assert payload["prediction"] == "Generated: Hello"
+    assert payload["image_base64"] == base64.b64encode(raw).decode("ascii")
 
 
 def test_forward_batch_empty(client):
@@ -178,4 +192,3 @@ def test_evaluate_json(client):
 def test_evaluate_empty(client):
     response = client.post("/evaluate", json={"texts": []})
     assert response.status_code == 422
-

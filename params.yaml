@@ -13,13 +13,24 @@ train_model:
   torch_compile: true
   batch_size: 16
   grad_accum: 4
+  # Smoke-friendly defaults (для быстрого воспроизведения DVC pipeline).
+  # Для полноценного обучения увеличьте max_steps/timeout.
   max_steps: 20000
-  timeout: 10800
+  timeout: 12000
   learning_rate: null
   data_dir: "output_dir/dataset"
+  output_dir: "output_dir/gpt2-1b-russian"
+  save_steps: 2000
+  eval_steps: 2000
+  logging_steps: 10
+  no_wandb: true
+  no_generation: true
+  tensorboard: true
+  cuda_visible_devices: "0"
 
 export_onnx:
-  checkpoint: "output_dir/gpt2-1b-russian/checkpoint-1000"
-  onnx_out: "output_dir/onnx/exp1/model.onnx"
-  experiment: "exp1"
-
+  # Можно оставить пустым: export_onnx.py сам подберёт последний checkpoint
+  # и создаст новый expN в output_dir/onnx.
+  checkpoint: null
+  onnx_out: null
+  experiment: null

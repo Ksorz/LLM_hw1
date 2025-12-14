@@ -11,11 +11,15 @@ def main():
     with open("params.yaml", "r", encoding="utf-8") as f:
         params = yaml.safe_load(f)["export_onnx"]
 
-    args = [
-        "--checkpoint", params["checkpoint"],
-        "--output", params["onnx_out"],
-        "--experiment", params["experiment"],
-    ]
+    # export_onnx умеет сам подобрать последний checkpoint и следующий expN,
+    # если checkpoint/output/experiment не заданы.
+    args = []
+    if params.get("checkpoint"):
+        args += ["--checkpoint", params["checkpoint"]]
+    if params.get("onnx_out"):
+        args += ["--output", params["onnx_out"]]
+    if params.get("experiment"):
+        args += ["--experiment", params["experiment"]]
     export_onnx.main(args)
 
 

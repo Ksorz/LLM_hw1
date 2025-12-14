@@ -1,7 +1,10 @@
 """Database models."""
+
 from sqlalchemy import Column, Integer, String, DateTime, Text, Float, JSON
 from sqlalchemy.sql import func
+
 from .database import Base
+
 
 class RequestLog(Base):
     """Log of API requests and responses."""

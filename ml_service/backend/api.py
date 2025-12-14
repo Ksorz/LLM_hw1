@@ -5,14 +5,15 @@ from __future__ import annotations
 import time
 import io
 import csv
+import base64
 from typing import Dict, Iterable, List, Optional
 import os
 
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 import threading
 import subprocess
-import json
 from datetime import datetime
 from lib.inference import load_model_for_inference
 from ml_service.inference.service import OnnxTextGenerator, read_onnx_metadata, PerplexityCalculator
@@ -26,7 +27,6 @@ from .schemas import (
     MetadataResponse,
     TextRequest,
     TextResponse,
-    EvaluateRequest,
     EvaluateResponse,
     AddDataResponse,
     RetrainRequest,
@@ -116,12 +116,17 @@ def create_app(deps: Optional[AppDependencies] = None) -> FastAPI:
 
             cmd = ["python", "train_distributed.py", "--mode", "baseline"]
             if checkpoint_path:
-                # train_distributed не принимает прямой output путь, но можем оставить для метаданных
+                # train_distributed не принимает прямой output путь,
+                # но можем оставить checkpoint_path для метаданных.
                 pass
 
             result = subprocess.run(cmd, env=env, capture_output=True, text=True)
 
-            status = ExperimentStatus.succeeded.value if result.returncode == 0 else ExperimentStatus.failed.value
+            status = (
+                ExperimentStatus.succeeded.value
+                if result.returncode == 0
+                else ExperimentStatus.failed.value
+            )
             metrics_payload = None
             final_ckpt = checkpoint_path or "output_dir/gpt2-1b-russian"
 
@@ -144,22 +149,58 @@ def create_app(deps: Optional[AppDependencies] = None) -> FastAPI:
             db.close()
 
     @app.post("/forward", response_model=TextResponse)
-    def forward(
-        request: TextRequest,
+    async def forward(
+        request: Request,
         background_tasks: BackgroundTasks,
+        image: Optional[UploadFile] = File(None),
         deps: AppDependencies = Depends(lambda: deps_ref["deps"]),
         db: Session = Depends(get_db),
-    ) -> TextResponse:
+    ) -> TextResponse | PlainTextResponse:
+        # Требование ТЗ: /forward принимает либо JSON (без изображений),
+        # либо multipart/form-data с image.
+        # Если формат неверный — вернуть 400 plain-text "bad request".
+        #
+        # Для multipart: дополнительные параметры берём из headers (минимально поддерживаем X-Text).
+        validated_text: Optional[str] = None
+        image_b64: Optional[str] = None
+
+        if image is not None:
+            header_text = (
+                request.headers.get("x-text")
+                or request.headers.get("x_prompt")
+                or request.headers.get("x-prompt")
+            )
+            if not header_text or not header_text.strip():
+                return PlainTextResponse("bad request", status_code=400)
+
+            try:
+                raw = await image.read()
+            except Exception:
+                return PlainTextResponse("bad request", status_code=400)
+
+            if not raw:
+                return PlainTextResponse("bad request", status_code=400)
+
+            validated_text = header_text.strip()
+            image_b64 = base64.b64encode(raw).decode("ascii")
+        else:
+            try:
+                payload = await request.json()
+                validated = TextRequest(**payload)
+                validated_text = validated.text
+            except Exception:
+                return PlainTextResponse("bad request", status_code=400)
+
         start_time = time.time()
         try:
-            prediction = deps.predict(request.text)
+            prediction = deps.predict(validated_text or "")
         except HTTPException:
             raise
-        except Exception as exc:  # pragma: no cover - runtime errors
-            raise HTTPException(status_code=403, detail="модель не смогла обработать данные") from exc
-        
+        except Exception:  # pragma: no cover - runtime errors
+            return PlainTextResponse("модель не смогла обработать данные", status_code=403)
+
         duration = time.time() - start_time
-        
+
         # Log metadata if available to get model name/device
         meta = deps.metadata()
         model_name = meta.get("experiment") or meta.get("checkpoint")
@@ -168,14 +209,14 @@ def create_app(deps: Optional[AppDependencies] = None) -> FastAPI:
         background_tasks.add_task(
             log_request,
             db,
-            request.text,
+            validated_text or "",
             prediction,
             duration,
             model_name,
             device
         )
-        
-        return TextResponse(prediction=prediction)
+
+        return TextResponse(prediction=prediction, image_base64=image_b64)
 
     @app.post("/forward_batch", response_model=BatchTextResponse)
     def forward_batch(
@@ -190,21 +231,25 @@ def create_app(deps: Optional[AppDependencies] = None) -> FastAPI:
         except HTTPException:
             raise
         except Exception as exc:  # pragma: no cover - runtime errors
-            raise HTTPException(status_code=403, detail="модель не смогла обработать данные") from exc
-        
+            raise HTTPException(
+                status_code=403,
+                detail="модель не смогла обработать данные",
+            ) from exc
+
         duration = time.time() - start_time
-        
+
         # Log metadata
         meta = deps.metadata()
         model_name = meta.get("experiment") or meta.get("checkpoint")
         device = meta.get("device")
 
         # Log each item in the batch
-        # Note: simplistic time division, better to measure per item if possible but batch processing is usually monolithic
+        # Note: simplistic time division. Better to measure per item if possible,
+        # but batch processing is usually monolithic.
         avg_duration = duration / len(request.texts) if request.texts else 0
-        
+
         for text, pred in zip(request.texts, predictions):
-             background_tasks.add_task(
+            background_tasks.add_task(
                 log_request,
                 db,
                 text,

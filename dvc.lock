@@ -3,10 +3,6 @@ stages:
   extract_data:
     cmd: python pipeline/extract.py
     deps:
-    - path: params.yaml
-      hash: md5
-      md5: 474e3b2a6d98d9823b419282bb5e5ca9
-      size: 518
     - path: pipeline/extract.py
       hash: md5
       md5: 26282c095cd42270d022da82e20f41dd
@@ -30,19 +26,24 @@ stages:
   train_model:
     cmd: python pipeline/train.py
     deps:
+    - path: lib/training.py
+      hash: md5
+      md5: 0159874134b82cb2a3459f09d2e3bc20
+      size: 6023
     - path: output_dir/dataset
       hash: md5
       md5: 6e367da43b1ba4c3eed58df5b67f606e.dir
       size: 2936660723
       nfiles: 32
-    - path: params.yaml
-      hash: md5
-      md5: 474e3b2a6d98d9823b419282bb5e5ca9
-      size: 518
     - path: pipeline/train.py
       hash: md5
-      md5: cec1fd2009ddfb89adb641e43edb3271
-      size: 938
+      md5: dac1ad8d4ccc3e07f5a5846bed954134
+      size: 1923
+    - path: train_distributed.py
+      hash: md5
+      md5: 45890d49fd4f2c9337adca9667b91995
+      size: 15685
+      isexec: true
     params:
       params.yaml:
         train_model:
@@ -51,13 +52,62 @@ stages:
           torch_compile: true
           batch_size: 16
           grad_accum: 4
-          max_steps: 20000
-          timeout: 10800
+          max_steps: 200
+          timeout: 1800
           learning_rate:
           data_dir: output_dir/dataset
+          output_dir: output_dir/gpt2-1b-russian
+          save_steps: 100
+          eval_steps: 100
+          logging_steps: 10
+          no_wandb: true
+          no_generation: true
+          tensorboard: true
+          cuda_visible_devices: '0'
     outs:
     - path: output_dir/gpt2-1b-russian
       hash: md5
-      md5: cc26d6e1781d5dc70ad8aac057442a02.dir
-      size: 11547467269
+      md5: 19bd135fcebdab6afef35b039005a463.dir
+      size: 11547036818
       nfiles: 26
+    - path: output_dir/metrics/train_model.json
+      hash: md5
+      md5: 3b435951a3bace4a1c231a956d8e1972
+      size: 431
+    - path: output_dir/plots/train_model_history.csv
+      hash: md5
+      md5: a6f2135e59bcd5c2699b5a58e214cfee
+      size: 1991
+    - path: output_dir/tensorboard/train_model
+      hash: md5
+      md5: 3a389579d91942efb7d3125a6c632fa0.dir
+      size: 10398
+      nfiles: 2
+  export_onnx:
+    cmd: python pipeline/export.py
+    deps:
+    - path: export_onnx.py
+      hash: md5
+      md5: bf4d7421e274bda23ea255aeeda826d2
+      size: 8011
+    - path: output_dir/gpt2-1b-russian
+      hash: md5
+      md5: 19bd135fcebdab6afef35b039005a463.dir
+      size: 11547036818
+      nfiles: 26
+    - path: pipeline/export.py
+      hash: md5
+      md5: 5895d28f65f38abe06966224a81392c1
+      size: 753
+    params:
+      params.yaml:
+        export_onnx:
+          checkpoint:
+          onnx_out:
+          experiment:
+    outs:
+    - path: output_dir/onnx
+      hash: md5
+      md5: 3e1e34ac57861ed8faf84e987aae8eea.dir
+      size: 7695324512
+      nfiles: 9

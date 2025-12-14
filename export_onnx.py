@@ -179,7 +179,7 @@ def main(argv=None):
 
     # Resolve output path / experiment
     if args.output:
-    output_path = Path(args.output)
+        output_path = Path(args.output)
         if output_path.suffix == "":
             output_path = output_path / "model.onnx"
     else:
@@ -194,13 +194,13 @@ def main(argv=None):
     print(f"[info] experiment: {experiment_name}")  # noqa: T201
 
     try:
-    _export(
-        checkpoint=checkpoint,
-        output=output_path,
-        opset=args.opset,
-        device=args.device,
-        tokenizer_path=args.tokenizer,
-    )
+        _export(
+            checkpoint=checkpoint,
+            output=output_path,
+            opset=args.opset,
+            device=args.device,
+            tokenizer_path=args.tokenizer,
+        )
         exported = True
     except Exception as exc:  # noqa: BLE001
         print(f"[warn] transformers.onnx export failed ({exc}); trying optimum-cli...")  # noqa: T201

@@ -199,6 +199,42 @@ def parse_args(args=None):
         default=DATASET_DIR,
         help="Путь к токенизированному датасету"
     )
+
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Куда сохранять артефакты обучения (output_dir TrainingArguments)",
+    )
+    parser.add_argument(
+        "--logging-dir",
+        type=str,
+        default=None,
+        help="Куда писать TensorBoard логи (TrainingArguments.logging_dir)",
+    )
+    parser.add_argument(
+        "--metrics-out",
+        type=str,
+        default=None,
+        help="Путь для записи итоговых метрик в JSON (для DVC metrics)",
+    )
+    parser.add_argument(
+        "--history-out",
+        type=str,
+        default=None,
+        help="Путь для записи log_history в CSV (для DVC plots)",
+    )
+    parser.add_argument(
+        "--tensorboard",
+        action="store_true",
+        help="Включить report_to=tensorboard (для DVC усложнения 2)",
+    )
+    parser.add_argument(
+        "--logging-steps",
+        type=int,
+        default=None,
+        help="Периодичность логирования (TrainingArguments.logging_steps)",
+    )
     
     # # ==================== Распределение ====================
     # # Аргумент для deepspeed/torchrun (игнорируется, берётся из окружения)
@@ -255,6 +291,16 @@ def main(argv=None):
         "report_to": "none" if args.no_wandb else "wandb",
         "torch_compile": args.torch_compile,
     }
+
+    if args.output_dir is not None:
+        config_overrides["output_dir"] = args.output_dir
+    if args.logging_dir is not None:
+        config_overrides["logging_dir"] = args.logging_dir
+    if args.tensorboard:
+        config_overrides["report_to"] = "tensorboard"
+
+    if args.logging_steps is not None:
+        config_overrides["logging_steps"] = int(args.logging_steps)
     
     if args.learning_rate is not None:
         config_overrides["learning_rate"] = args.learning_rate
@@ -360,6 +406,27 @@ def main(argv=None):
         generate_text=not args.no_generation,
         generation_prompt=args.generation_prompt,
     )
+
+    # Persist metrics/history for DVC pipeline if requested.
+    if rank == 0 and args.metrics_out:
+        out_path = Path(args.metrics_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if rank == 0 and args.history_out:
+        out_path = Path(args.history_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        # trainer.state.log_history is a list[dict]
+        history = list(getattr(trainer.state, "log_history", []) or [])
+        # Normalize columns
+        keys = sorted({k for row in history for k in row.keys()})
+        with out_path.open("w", newline="", encoding="utf-8") as f:
+            import csv
+
+            writer = csv.DictWriter(f, fieldnames=keys)
+            writer.writeheader()
+            for row in history:
+                writer.writerow(row)
     
     if rank == 0:
         logger.info("Обучение завершено!")

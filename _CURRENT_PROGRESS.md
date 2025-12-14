@@ -8,7 +8,7 @@
 - 🏰: **Базовые требования** (выполнены ранее)
 - 0_🏗️: **Усложнение 0** (Docker, Frontend, DB, Monitoring)
 - 1_🏗️: **Усложнение 1** (ONNX)
-- 2_🏗️: **Усложнение 2** (DVC/MLflow) — план
+- 2_🏗️: **Усложнение 2** (DVC pipeline + metrics/plots + TensorBoard) — сделано
 - 3_🏗️: **Усложнение 3/4** (Evaluate/ Retrain / Deploy) — план
 
 ---
@@ -91,7 +91,8 @@
 |------------|--------|-------------|
 | Flask/FastAPI сервис | 🏰 | FastAPI реализован |
 | POST `/forward` с JSON | 🏰 | Работает |
-| Код ошибки 400/403 | 🏰 | Реализовано |
+| POST `/forward` с multipart image | 🏰 | Работает (image + X-Text header) |
+| Код ошибки 400/403 | 🏰 | Реализовано (400: `bad request`, 403: plain-text) |
 | JSON response | 🏰 | Реализовано |
 | Код обучения модели | 🏰 | Реализовано |
 | Нет копипасты | 🏰 | Отличная архитектура |
@@ -101,8 +102,8 @@
 | Требование | Статус | Комментарий |
 |------------|--------|-------------|
 | Docker Compose | 0_🏗️ | Реализован `docker-compose.yml` |
-| Фронтенд | 0_🏗️ | Streamlit (`http://localhost:8501`) |
-| Backend | 0_🏗️ | FastAPI (`http://localhost:8000`) |
+| Фронтенд | 0_🏗️ | Streamlit (`http://localhost:14442`) |
+| Backend | 0_🏗️ | FastAPI (`http://localhost:14443`) |
 | DB (Feature Storage) | 0_🏗️ | PostgreSQL (таблица `request_logs`) |
 | Monitoring | 0_🏗️ | Prometheus + Grafana |
 
@@ -114,13 +115,15 @@
 | ONNX Runtime Inference | 1_🏗️ | `serve.py --onnx ...` |
 | Метаданные из ONNX в `/metadata` | 1_🏗️ | `read_onnx_metadata` |
 
-### Усложнение 2 (DVC pipeline): **в процессе**
+### Усложнение 2 (DVC pipeline): **100%** ✅
 
 | Требование | Статус | Комментарий |
 |------------|--------|-------------|
 | DVC pipeline: extract_data, train_model, export_onnx | 2_🏗️ | `dvc.yaml` + `params.yaml` |
+| DVC metrics/plots | 2_🏗️ | `output_dir/metrics/train_model.json`, `output_dir/plots/train_model_history.csv` |
+| TensorBoard | 2_🏗️ | `output_dir/tensorboard/train_model` |
 | Makefile/DOC: команды `make dvc-repro(-all)` | 2_🏗️ | `_HOW_TO_USE.md`, Makefile |
-| Удалённое хранилище/метрики | ⏳ | Настроить при необходимости |
+| DVC remote | ⏳ | Опционально: `dvc remote add -d ...` + `dvc push` |
 
 ---
 
@@ -131,10 +134,11 @@
 make up-full
 ```
 
-- **Frontend**: http://localhost:8501
-- **API Docs**: http://localhost:8000/docs
-- **Grafana**: http://localhost:3000
-- **Prometheus**: http://localhost:9090
+- **Frontend**: http://localhost:14442
+- **API Docs**: http://localhost:14443/docs
+- **Grafana**: http://localhost:14441
+- **Prometheus**: http://localhost:14440
+- **Frontend**: http://localhost:14442
 
 ---
 

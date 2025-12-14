@@ -18,7 +18,12 @@ from transformers import PreTrainedTokenizerBase
 
 from lib.tokenizer import build_tokenizer
 
-__all__ = ["ONNXRuntimeService", "OnnxTextGenerator", "read_onnx_metadata", "PerplexityCalculator"]
+__all__ = [
+    "ONNXRuntimeService",
+    "OnnxTextGenerator",
+    "read_onnx_metadata",
+    "PerplexityCalculator",
+]
 
 
 @dataclass
@@ -46,14 +51,21 @@ class ONNXRuntimeService:
             raise RuntimeError("onnxruntime is not installed")
 
         tokenizer = tokenizer or build_tokenizer()
-        session = ort.InferenceSession(onnx_path, providers=list(providers or ["CPUExecutionProvider"]), options=session_options)
+        session = ort.InferenceSession(
+            onnx_path,
+            providers=list(providers or ["CPUExecutionProvider"]),
+            options=session_options,
+        )
         return cls(session=session, tokenizer=tokenizer)
 
     def _encode(self, text: str) -> Mapping[str, np.ndarray]:
         encoded = self.tokenizer(text, return_tensors="np")
         return {
             self.input_name: encoded["input_ids"],
-            self.attention_mask_name: encoded.get("attention_mask", np.ones_like(encoded["input_ids"])),
+            self.attention_mask_name: encoded.get(
+                "attention_mask",
+                np.ones_like(encoded["input_ids"]),
+            ),
         }
 
     def _postprocess(self, outputs: List[np.ndarray]) -> Dict[str, np.ndarray]:

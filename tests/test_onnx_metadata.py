@@ -36,4 +36,3 @@ def test_read_onnx_metadata():
         assert meta["experiment"] == "exp"
         assert meta["checkpoint"] == "/tmp/chkpt"
         assert meta["date"] == "2025-12-06"
-

@@ -17,10 +17,10 @@ make up-full
   - `make serve-base` (GPU PyTorch - необученная модель)
 
 Что поднимается:
-1. **Frontend (Streamlit)**: http://localhost:8501 — чат с моделью.
-2. **API (FastAPI)**: http://localhost:8000/docs — Swagger UI.
-3. **Grafana**: http://localhost:3000 — дашборды (login: `admin`/`admin`).
-4. **Prometheus**: http://localhost:9090 — метрики.
+1. **Frontend (Streamlit)**: http://localhost:14442 — чат с моделью.
+2. **API (FastAPI)**: http://localhost:14443/docs — Swagger UI.
+3. **Grafana**: http://localhost:14441 — дашборды (login: `admin`/`admin`).
+4. **Prometheus**: http://localhost:14440 — метрики.
 5. **PostgreSQL**: БД (порт 5432).
 
 
@@ -54,7 +54,7 @@ make serve-ckpt
 ### Интерфейсы
 
 #### 🖥️ Frontend (Чат)
-Откройте http://localhost:8501.
+Откройте http://localhost:14442.
 Здесь можно общаться с моделью в режиме диалога. История сообщений сохраняется в рамках сессии браузера.
 
 #### 🔌 API Endpoints
@@ -64,8 +64,8 @@ make serve-ckpt
 - **GET /metrics**: Метрики для Prometheus.
 
 #### 📊 Мониторинг
-- **Grafana** (http://localhost:3000): Визуализация метрик. Вы можете добавить Prometheus как Data Source (`http://prometheus:9090`) и создать дашборд.
-- **Prometheus** (http://localhost:9090): Сырые метрики. Попробуйте запросить `http_requests_total`.
+- **Grafana** (http://localhost:14441): Визуализация метрик. Вы можете добавить Prometheus как Data Source (`http://prometheus:9090`) и создать дашборд.
+- **Prometheus** (http://localhost:14440): Сырые метрики. Попробуйте запросить `http_requests_total`.
 
 #### 🗄️ База данных
 Все запросы к API логируются в таблицу `request_logs` в PostgreSQL.
@@ -107,9 +107,10 @@ make export-onnx \
 ```bash
 make dvc-repro-all   # dvc repro export_onnx (extract_data -> train_model -> export_onnx)
 ```
-- Только базовые стадии (extract -> train):
+- Точечно:
 ```bash
-make dvc-repro       # dvc repro
+make dvc-repro-extract
+make dvc-repro-train
 ```
 
 ### Стадии (dvc.yaml)
@@ -120,7 +121,7 @@ make dvc-repro       # dvc repro
 ### Параметры
 - Редактировать в `params.yaml`:
   - `extract_data`: датасет, split, max_length, num_shards, num_proc, output_dir
-  - `train_model`: режим, batch_size, grad_accum, max_steps, lr, bf16, torch_compile, data_dir
+  - `train_model`: режим, batch_size, grad_accum, max_steps, timeout, bf16, torch_compile, data_dir (+ логирование/метрики для 2_🏗️)
   - `export_onnx`: checkpoint, onnx_out, experiment (опциональны, есть авто-подбор)
 
 ### Авто-подбор артефактов
@@ -134,6 +135,15 @@ make dvc-repro       # dvc repro
    - есть `output_dir/dataset/` (шарды);
    - есть `output_dir/gpt2-1b-russian/checkpoint-*`;
    - есть `output_dir/onnx/expN/model.onnx` и `model.onnx_data` + tokenizer/config.
+2) Проверьте метрики/плоты (2_🏗️):
+```bash
+dvc metrics show
+dvc plots show output_dir/plots/train_model_history.csv -x step -y loss
+```
+3) Проверьте TensorBoard (2_🏗️):
+```bash
+tensorboard --logdir output_dir/tensorboard
+```
 2) Проверьте метаданные в ONNX:
 ```bash
 python - <<'PY'
@@ -149,9 +159,9 @@ make serve-onnx ONNX=/app/output_dir/onnx/expN/model.onnx
 4) Откройте `/metadata` — commit/date/experiment должны читаться из ONNX.
 
 ### Что дальше (для полного закрытия усложнения 2)
-- Добавить DVC `metrics:`/`plots:` (loss/ppl) из тренировки или пост-обработки логов.
-- (Опц.) Подключить DVC remote для хранения артефактов/метрик.
-- (Опц.) Экспорт TensorBoard/W&B графиков в DVC plots или задокументировать W&B как основной трекер.
+- ✅ DVC `metrics:`/`plots:` добавлены в `dvc.yaml` (см. `output_dir/metrics/train_model.json` и `output_dir/plots/train_model_history.csv`).
+- ✅ TensorBoard логи сохраняются в `output_dir/tensorboard/train_model`.
+- (Опц.) Подключить DVC remote для хранения артефактов/метрик (`dvc remote add -d ...` + `dvc push`).
 
 
 ---
@@ -230,14 +240,14 @@ docker compose run -d --service-ports \
 
 Пример (JSON):
 ```bash
-curl -X POST http://localhost:8000/evaluate \
+curl -X POST http://localhost:14443/evaluate \
   -H "Content-Type: application/json" \
   -d '{"texts": ["hello", "world"]}'
 ```
 
 Пример (CSV):
 ```bash
-curl -X POST http://localhost:8000/evaluate \
+curl -X POST http://localhost:14443/evaluate \
   -F "file=@texts.csv"
 # в texts.csv должна быть колонка 'text'
 ```
@@ -252,7 +262,7 @@ curl -X POST http://localhost:8000/evaluate \
 - Эндпоинт: `PUT /add_data`
 - Вход: multipart CSV с колонкой `text` (обязательно) и `label` (опционально)
 ```bash
-curl -X PUT http://localhost:8000/add_data \
+curl -X PUT http://localhost:14443/add_data \
   -F "file=@data.csv"
 # data.csv: text,label
 ```
@@ -262,7 +272,7 @@ curl -X PUT http://localhost:8000/add_data \
 - Эндпоинт: `PUT /retrain`
 - Вход (JSON): `{"gpu_id": "0", "checkpoint_path": "/app/output_dir/gpt2-1b-russian"}`
 ```bash
-curl -X PUT http://localhost:8000/retrain \
+curl -X PUT http://localhost:14443/retrain \
   -H "Content-Type: application/json" \
   -d '{"gpu_id":"0"}'
 ```
@@ -283,7 +293,7 @@ curl -X PUT http://localhost:8000/retrain \
 ## 🏗️_5 Мониторинг и Grafana
 
 - Prometheus собирает метрики с `api:8000/metrics` (см. `monitoring/prometheus.yml`).
-- Grafana: http://localhost:3000 (admin/admin). Data Source: Prometheus `http://prometheus:9090`.
+- Grafana: http://localhost:14441 (admin/admin). Data Source: Prometheus `http://prometheus:9090`.
 - Готовый дашборд: `monitoring/grafana-dashboard.json` (импортируйте в Grafana).
   - HTTP request rate по handler/method/status
   - Latency p50/p95
@@ -296,9 +306,6 @@ curl -X PUT http://localhost:8000/retrain \
 ```bash
 # Выполнить все стадии по dvc.yaml
 make dvc-repro-all
-
-# Только стандартные цели (по умолчанию = dvc repro)
-make dvc-repro
 ```
 
 Стадии:
@@ -307,6 +314,13 @@ make dvc-repro
 - `export_onnx` → экспортирует чекпоинт в ONNX (`output_dir/onnx/...`)
 
 Параметры править в `params.yaml` (dataset, batch_size, max_steps и т.д.).
+
+### Быстрый rerun без перескачивания датасета
+Если `output_dir/dataset` уже существует и вы не хотите заново гонять `extract_data`, можно “зафиксировать” текущий датасет:
+```bash
+dvc commit extract_data
+```
+Дальше `dvc repro train_model` не будет перезапускать extract, если он не менялся.
 
 ---
 
@@ -362,5 +376,5 @@ docker exec -it llm_db psql -U postgres -d llm_service
 ---
 
 ## Дополнительная информация
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**: http://localhost:14443/docs
+- **ReDoc**: http://localhost:14443/redoc

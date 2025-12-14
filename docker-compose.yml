@@ -23,7 +23,8 @@ services:
       - "127.0.0.1:14443:8000"
     volumes:
       - ./:/app
-      - model_cache:/root/.cache/huggingface
+      # HF cache кладём в bind-mount проекта, чтобы не раздувать /var/lib/docker (docker volumes).
+      - ./.cache/huggingface:/root/.cache/huggingface
     environment:
       PYTHONUNBUFFERED: "1"
       CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:-0}
@@ -96,7 +97,6 @@ services:
     profiles: [monitoring]
 
 volumes:
-  model_cache:
   postgres_data:
   prometheus_data:
   grafana_data:

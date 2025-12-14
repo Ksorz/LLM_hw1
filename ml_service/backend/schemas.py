@@ -35,6 +35,7 @@ class TextRequest(BaseModel):
 
 class TextResponse(BaseModel):
     prediction: str
+    image_base64: Optional[str] = None
 
 
 class BatchTextRequest(BaseModel):

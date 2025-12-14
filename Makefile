@@ -1,4 +1,4 @@
-.PHONY: help serve-base serve-ckpt serve-onnx test train-baseline export-onnx docker-build docker-up clean up-full dvc-repro dvc-repro-extract dvc-repro-train dvc-repro-export venv
+.PHONY: help serve-base serve-ckpt serve-onnx test lint train-baseline export-onnx docker-build docker-up clean up-full dvc-repro-all dvc-repro-extract dvc-repro-train venv
 .PHONY: up-full-dev
 .PHONY: up-full-onnx up-full-ckpt
 
@@ -14,6 +14,7 @@ help:
 	@echo "  make serve-ckpt        - Run API with trained model (auto-picks latest if CHECKPOINT not set)"
 	@echo "  make serve-onnx        - Run API with ONNX model (auto-picks latest if ONNX not set)"
 	@echo "  make test              - Run tests"
+	@echo "  make lint              - Run flake8"
 	@echo "  make train-baseline    - Run simple baseline training"
 	@echo "  make export-onnx       - Export checkpoint to ONNX (requires CHECKPOINT, ONNX_OUT)"
 	@echo "  make docker-build      - Build all Docker images"
@@ -21,10 +22,9 @@ help:
 	@echo "  make up-full           - Run API + DB + Frontend + Monitoring via Docker Compose"
 	@echo "  make up-full-onnx      - Run full stack with API on ONNX model (ONNX=...)"
 	@echo "  make up-full-ckpt      - Run full stack with API on PyTorch checkpoint (CHECKPOINT=...)"
-	@echo "  make dvc-repro         - Run DVC pipeline (default targets)"
+	@echo "  make dvc-repro-all     - Run full DVC pipeline up to export_onnx"
 	@echo "  make dvc-repro-extract - Run DVC stage extract_data"
 	@echo "  make dvc-repro-train   - Run DVC stage train_model"
-	@echo "  make dvc-repro-export  - Run DVC stage export_onnx"
 	@echo "  make run-api-base      - Run API (inside container shell): baseline"
 	@echo "  make run-api-ckpt      - Run API (inside container shell): checkpoint (CHECKPOINT=...)"
 	@echo "  make run-api-onnx      - Run API (inside container shell): ONNX (ONNX=...)"
@@ -46,6 +46,9 @@ serve-onnx:
 
 test:
 	pytest tests/
+
+lint:
+	flake8 ml_service tests
 
 train-baseline:
 	CUDA_VISIBLE_DEVICES=0 python train_distributed.py \
@@ -91,14 +94,11 @@ clean:
 export-onnx:
 	python export_onnx.py $(if $(CHECKPOINT),--checkpoint $(CHECKPOINT),) $(if $(ONNX_OUT),--output $(ONNX_OUT),) $(if $(EXPERIMENT),--experiment $(EXPERIMENT),)
 
-dvc-repro:
-	CUDA_VISIBLE_DEVICES=1 dvc repro
+dvc-repro-all:
+	CUDA_VISIBLE_DEVICES=0 dvc repro export_onnx
 
 dvc-repro-extract:
-	CUDA_VISIBLE_DEVICES=1 dvc repro extract_data
+	CUDA_VISIBLE_DEVICES=0 dvc repro extract_data
 
 dvc-repro-train:
-	CUDA_VISIBLE_DEVICES=1 dvc repro train_model
-
-dvc-repro-export:
-	CUDA_VISIBLE_DEVICES=1 dvc repro export_onnx
+	CUDA_VISIBLE_DEVICES=0 dvc repro train_model

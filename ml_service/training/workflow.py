@@ -119,7 +119,7 @@ def build_training_artifacts(
 
     # info logging model_config before model creation
     LOGGER.info("🧩 Model config before model creation: %s", model_config)
-    
+
     model = create_model(tokenizer, model_config=model_config, bf16=config["bf16"])
     if fsdp_kwargs and fsdp_kwargs.get("activation_checkpointing", False):
         config["gradient_checkpointing"] = False

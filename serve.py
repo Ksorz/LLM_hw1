@@ -5,7 +5,7 @@ import argparse
 import logging
 import os
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 import uvicorn
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -36,6 +36,12 @@ def parse_args():
         type=str,
         default=None,
         help="Путь к tokenizer (по умолчанию используется checkpoint path)",
+    )
+    parser.add_argument(
+        "--onnx",
+        type=str,
+        default=None,
+        help="Путь к ONNX-модели (если указан, используется ONNXRuntime вместо PyTorch)",
     )
     parser.add_argument(
         "--device",
@@ -76,6 +82,7 @@ def main():
     LOGGER.info("ЗАПУСК ML-СЕРВИСА")
     LOGGER.info("=" * 80)
     LOGGER.info("Checkpoint: %s", args.checkpoint or "не указан (используется необученная модель)")
+    LOGGER.info("ONNX: %s", args.onnx or "не указан")
     LOGGER.info("Device: %s", args.device or "auto")
     LOGGER.info("Max new tokens: %d", args.max_new_tokens)
     LOGGER.info("=" * 80)
@@ -88,13 +95,58 @@ def main():
     except Exception as e:
         LOGGER.warning(f"Ошибка при инициализации БД (возможно, сервис БД еще не готов): {e}")
     
+    evaluate_fn: Optional[object] = None
+
     # Загружаем модель
-    inference_service = load_model_for_inference(
-        checkpoint_path=args.checkpoint,
-        tokenizer_path=args.tokenizer,
-        device=args.device,
-        max_new_tokens=args.max_new_tokens,
-    )
+    if args.onnx:
+        from ml_service.inference.service import OnnxTextGenerator, read_onnx_metadata
+
+        providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+        inference_service = OnnxTextGenerator.from_checkpoint(
+            args.onnx,
+            tokenizer=None,
+            providers=providers,
+            max_new_tokens=args.max_new_tokens,
+        )
+
+        def metadata_from_model() -> Dict[str, str]:
+            meta = read_onnx_metadata(args.onnx)
+            meta.setdefault("checkpoint", args.onnx)
+            meta.setdefault("experiment", meta.get("experiment") or os.path.basename(args.onnx))
+            meta.setdefault("commit", os.getenv("GIT_COMMIT", "unknown"))
+            meta.setdefault("date", datetime.now().isoformat())
+            meta.setdefault("device", "onnxruntime")
+            return meta
+
+    else:
+        from ml_service.inference.service import PerplexityCalculator
+
+        inference_service = load_model_for_inference(
+            checkpoint_path=args.checkpoint,
+            tokenizer_path=args.tokenizer,
+            device=args.device,
+            max_new_tokens=args.max_new_tokens,
+        )
+
+        perplexity_calc = PerplexityCalculator(
+            model=inference_service.model,
+            tokenizer=inference_service.tokenizer,
+            device=inference_service.device,
+        )
+
+        def evaluate_perplexity(texts):
+            return perplexity_calc.compute(list(texts))
+
+        evaluate_fn = evaluate_perplexity
+
+        def metadata_from_model() -> Dict[str, str]:
+            return {
+                "commit": os.getenv("GIT_COMMIT", "unknown"),
+                "date": datetime.now().isoformat(),
+                "experiment": os.path.basename(args.checkpoint) if args.checkpoint else "baseline_untrained",
+                "checkpoint": args.checkpoint or "none",
+                "device": str(inference_service.device),
+            }
     
     # Создаём функции для API
     def predict(text: str) -> str:
@@ -104,19 +156,14 @@ def main():
         return inference_service.predict_batch(texts)
     
     def metadata() -> Dict[str, str]:
-        return {
-            "commit": os.getenv("GIT_COMMIT", "unknown"),
-            "date": datetime.now().isoformat(),
-            "experiment": os.path.basename(args.checkpoint) if args.checkpoint else "baseline_untrained",
-            "checkpoint": args.checkpoint or "none",
-            "device": str(inference_service.device),
-        }
+        return metadata_from_model()
     
     # Создаём приложение
     deps = AppDependencies(
         predict=predict,
         predict_batch=predict_batch,
         metadata=metadata,
+        evaluate_perplexity=evaluate_fn,
     )
     app = create_app(deps)
 

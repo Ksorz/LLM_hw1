@@ -13,6 +13,15 @@ wandb/
 logs/
 outputs/
 artifacts/
+.dvc/
+
+# локальные артефакты/модели (сокращаем размер контекста)
+output_dir/
+output_dir/**
+*.onnx
+*.onnx_data
+*.npz
+*.npy
 .cache/
 .tmp/
 

@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from lib.constants import OUTPUT_DIR
+from lib.constants import DATASET_DIR
 
 from dotenv import load_dotenv
 
@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def parse_args():
+def parse_args(args=None):
     parser = argparse.ArgumentParser(description="Распределённое обучение модели")
     
     # Режим обучения
@@ -155,6 +155,18 @@ def parse_args():
         help="Максимальное количество шагов (None = полная эпоха)"
     )
     parser.add_argument(
+        "--eval-steps",
+        type=int,
+        default=None,
+        help="Периодичность валидации в шагах (переопределяет eval_steps из конфигурации)"
+    )
+    parser.add_argument(
+        "--save-steps",
+        type=int,
+        default=None,
+        help="Периодичность сохранения чекпоинтов в шагах (переопределяет save_steps из конфигурации)"
+    )
+    parser.add_argument(
         "--timeout",
         type=int,
         default=30 * 60,
@@ -184,8 +196,44 @@ def parse_args():
     parser.add_argument(
         "--data-dir",
         type=str,
-        default=OUTPUT_DIR,
+        default=DATASET_DIR,
         help="Путь к токенизированному датасету"
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Куда сохранять артефакты обучения (output_dir TrainingArguments)",
+    )
+    parser.add_argument(
+        "--logging-dir",
+        type=str,
+        default=None,
+        help="Куда писать TensorBoard логи (TrainingArguments.logging_dir)",
+    )
+    parser.add_argument(
+        "--metrics-out",
+        type=str,
+        default=None,
+        help="Путь для записи итоговых метрик в JSON (для DVC metrics)",
+    )
+    parser.add_argument(
+        "--history-out",
+        type=str,
+        default=None,
+        help="Путь для записи log_history в CSV (для DVC plots)",
+    )
+    parser.add_argument(
+        "--tensorboard",
+        action="store_true",
+        help="Включить report_to=tensorboard (для DVC усложнения 2)",
+    )
+    parser.add_argument(
+        "--logging-steps",
+        type=int,
+        default=None,
+        help="Периодичность логирования (TrainingArguments.logging_steps)",
     )
     
     # # ==================== Распределение ====================
@@ -210,11 +258,11 @@ def parse_args():
         help="Prompt для генерации текста"
     )
     
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
-def main():
-    args = parse_args()
+def main(argv=None):
+    args = parse_args(argv)
     
     logger.info("=" * 60)
     logger.info(f"Запуск обучения в режиме: {args.mode}")
@@ -243,12 +291,28 @@ def main():
         "report_to": "none" if args.no_wandb else "wandb",
         "torch_compile": args.torch_compile,
     }
+
+    if args.output_dir is not None:
+        config_overrides["output_dir"] = args.output_dir
+    if args.logging_dir is not None:
+        config_overrides["logging_dir"] = args.logging_dir
+    if args.tensorboard:
+        config_overrides["report_to"] = "tensorboard"
+
+    if args.logging_steps is not None:
+        config_overrides["logging_steps"] = int(args.logging_steps)
     
     if args.learning_rate is not None:
         config_overrides["learning_rate"] = args.learning_rate
     
     if args.max_steps is not None:
         config_overrides["max_steps"] = args.max_steps
+
+    if args.eval_steps is not None:
+        config_overrides["eval_steps"] = args.eval_steps
+
+    if args.save_steps is not None:
+        config_overrides["save_steps"] = args.save_steps
     
     # Создаём setup в зависимости от режима
     if args.mode == "baseline":
@@ -342,6 +406,27 @@ def main():
         generate_text=not args.no_generation,
         generation_prompt=args.generation_prompt,
     )
+
+    # Persist metrics/history for DVC pipeline if requested.
+    if rank == 0 and args.metrics_out:
+        out_path = Path(args.metrics_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if rank == 0 and args.history_out:
+        out_path = Path(args.history_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        # trainer.state.log_history is a list[dict]
+        history = list(getattr(trainer.state, "log_history", []) or [])
+        # Normalize columns
+        keys = sorted({k for row in history for k in row.keys()})
+        with out_path.open("w", newline="", encoding="utf-8") as f:
+            import csv
+
+            writer = csv.DictWriter(f, fieldnames=keys)
+            writer.writeheader()
+            for row in history:
+                writer.writerow(row)
     
     if rank == 0:
         logger.info("Обучение завершено!")

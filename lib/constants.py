@@ -9,6 +9,7 @@ LABELS = "labels"
 
 TOKENIZER_NAME = "ai-forever/rugpt3small_based_on_gpt2"
 OUTPUT_DIR = "/app/output_dir"
+DATASET_DIR = f"{OUTPUT_DIR}/dataset"
 NUM_SHARDS = 32
 VALIDATION_SIZE = 5000
 

@@ -1,0 +1,17 @@
+[flake8]
+max-line-length = 100
+extend-ignore = E203, W503
+exclude =
+    .git,
+    .old,
+    .venv,
+    __pycache__,
+    data,
+    hw2_parallel_pretrain,
+    output_dir,
+    wandb,
+    data/wandb,
+    hw2_parallel_pretrain/wandb,
+    .dvc
+
+
